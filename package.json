@@ -1,0 +1,35 @@
+{
+  "name": "wechat-newspic",
+  "version": "0.1.0",
+  "description": "微信图片消息发布工具 — 将图片发布为公众号图片消息草稿",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx watch src/index.ts",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "lint": "tsc --noEmit"
+  },
+  "bin": {
+    "wx-newspic": "./bin/wx-newspic"
+  },
+  "dependencies": {
+    "@fastify/cors": "^10.0.0",
+    "@fastify/multipart": "^9.0.0",
+    "commander": "^13.1.0",
+    "dotenv": "^16.4.7",
+    "fastify": "^5.2.1",
+    "globby": "^14.1.0",
+    "node-fetch": "^3.3.2",
+    "pino": "^9.6.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.8.0",
+    "tsx": "^4.19.3",
+    "typescript": "^5.7.3",
+    "vitest": "^3.0.9"
+  }
+}

@@ -1,0 +1,8 @@
+#!/usr/bin/env node
+
+import { runCLI } from '../dist/src/cli/index.js';
+
+runCLI().catch((err) => {
+  console.error('运行错误:', err instanceof Error ? err.message : String(err));
+  process.exit(1);
+});
