@@ -11,3 +11,4 @@
 - docs/ai-engineering/checklists.md — 检查清单
 - docs/ai-engineering/deliverables.md — 产出物要求
 - docs/ai-engineering/document-management.md — 文档管理
+- docs/STATUS.md — 项目状态卡（任务完成后更新）
