@@ -71,8 +71,12 @@ metadata:
 ### 1. 安装 wx-newspic CLI
 
 ```bash
-# 在项目目录中安装
-npm install -g wechat-newspic
+# 克隆并构建
+git clone https://github.com/your-repo/wechat-newspic.git
+cd wechat-newspic
+npm install
+npm run build
+npm link
 
 # 验证安装
 wx-newspic --help
@@ -113,7 +117,7 @@ wx-newspic publish --app-id "wx_xxx" --app-secret "secret_xxx"
 cd /path/to/html-ppt/project
 
 # 发布 slide 截图（自动匹配 output/slide-*.png）
-./path/to/wechat-newspic/skill/scripts/publish.sh \
+wx-newspic publish \
   --title "HyperFrames: 用HTML写AI Agent" \
   --content "本文介绍如何用 HTML 构建 AI Agent 的视频生成框架..." \
   --images "./output/slide-*.png" \
