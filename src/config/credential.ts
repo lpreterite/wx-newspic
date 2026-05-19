@@ -3,14 +3,21 @@ import { resolve } from 'node:path';
 import { homedir } from 'node:os';
 import { WechatClientError } from '../wechat/client.js';
 
-const DEFAULT_ENV_PATH = resolve(homedir(), '.openclaw/skills/wechat-publisher/.env');
+const NEW_ENV_PATH = resolve(homedir(), '.openclaw/skills/wechat-newspic/.env');
+const OLD_ENV_PATH = resolve(homedir(), '.openclaw/skills/wechat-publisher/.env');
+
+function resolveEnvPath(optionsEnvPath?: string): string {
+  if (optionsEnvPath) return optionsEnvPath;
+  if (existsSync(NEW_ENV_PATH)) return NEW_ENV_PATH;
+  return OLD_ENV_PATH; // fallback to old path
+}
 
 export interface CredentialOptions {
   /** 微信 APP_ID（CLI 参数传入） */
   appId?: string;
   /** 微信 APP_SECRET（CLI 参数传入） */
   appSecret?: string;
-  /** .env 文件路径（默认 ~/.openclaw/skills/wechat-publisher/.env） */
+  /** .env 文件路径（默认 ~/.openclaw/skills/wechat-newspic/.env） */
   envPath?: string;
 }
 
@@ -43,11 +50,11 @@ export function getCredential(options: CredentialOptions = {}): Credential {
   }
 
   // 3. 自动读取 .env 文件
-  const envPath = options.envPath ?? DEFAULT_ENV_PATH;
+  const envPath = resolveEnvPath(options.envPath);
   if (existsSync(envPath)) {
     const envVars = parseDotenv(readFileSync(envPath, 'utf-8'));
-    const fileAppId = envVars.APP_ID;
-    const fileAppSecret = envVars.APP_SECRET;
+    const fileAppId = envVars.APP_ID || envVars.WECHAT_APP_ID;
+    const fileAppSecret = envVars.APP_SECRET || envVars.WECHAT_APP_SECRET;
     if (fileAppId && fileAppSecret) {
       return { appId: fileAppId, appSecret: fileAppSecret };
     }
@@ -58,7 +65,7 @@ export function getCredential(options: CredentialOptions = {}): Credential {
     '无法获取微信凭证。请通过以下任一方式配置：\n' +
     '  1. CLI 参数 --app-id --app-secret\n' +
     '  2. 环境变量 WECHAT_APP_ID / WECHAT_APP_SECRET\n' +
-    `  3. 创建 ${DEFAULT_ENV_PATH} 并填入 APP_ID/APP_SECRET`,
+    `  3. 执行 wx-newspic credential set`,
   );
 }
 
