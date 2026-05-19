@@ -91,8 +91,8 @@ async function handleSet(options: Record<string, string>): Promise<void> {
   // 写入 .env 文件
   const content = [
     '# wechat-newspic 微信凭证',
-    `WECHAT_APP_ID=${appId}`,
-    `WECHAT_APP_SECRET=${appSecret}`,
+    `APP_ID=${appId}`,
+    `APP_SECRET=${appSecret}`,
     '',
   ].join('\n');
 
