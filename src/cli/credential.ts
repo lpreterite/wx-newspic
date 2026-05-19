@@ -5,7 +5,17 @@ import { Command } from 'commander';
 import { getCredential } from '../config/credential.js';
 import { WechatClient } from '../wechat/client.js';
 
-const DEFAULT_ENV_PATH = resolve(homedir(), '.openclaw/skills/wechat-publisher/.env');
+const NEW_ENV_PATH = resolve(homedir(), '.openclaw/skills/wechat-newspic/.env');
+const OLD_ENV_PATH = resolve(homedir(), '.openclaw/skills/wechat-publisher/.env');
+
+function getDefaultEnvPath(): string {
+  // 优先使用新路径，兼容旧路径的已有配置
+  const newDir = dirname(NEW_ENV_PATH);
+  if (!existsSync(newDir)) {
+    mkdirSync(newDir, { recursive: true });
+  }
+  return NEW_ENV_PATH;
+}
 
 /**
  * 注册 credential 子命令
@@ -53,7 +63,7 @@ async function handleShow(): Promise<void> {
     console.log('请通过以下任一方式配置：');
     console.log('  1. wx-newspic credential set --app-id <id> --app-secret <secret>');
     console.log('  2. 环境变量 WECHAT_APP_ID / WECHAT_APP_SECRET');
-    console.log(`  3. 创建 ${DEFAULT_ENV_PATH} 并填入 APP_ID/APP_SECRET`);
+    console.log(`  3. 创建 ${NEW_ENV_PATH} 并填入 APP_ID/APP_SECRET`);
   }
 }
 
@@ -83,7 +93,7 @@ async function handleSet(options: Record<string, string>): Promise<void> {
   }
 
   // 准备目录
-  const envDir = dirname(DEFAULT_ENV_PATH);
+  const envDir = dirname(NEW_ENV_PATH);
   if (!existsSync(envDir)) {
     mkdirSync(envDir, { recursive: true });
   }
@@ -96,8 +106,8 @@ async function handleSet(options: Record<string, string>): Promise<void> {
     '',
   ].join('\n');
 
-  writeFileSync(DEFAULT_ENV_PATH, content, 'utf-8');
-  console.log(`凭证已写入: ${DEFAULT_ENV_PATH}`);
+  writeFileSync(NEW_ENV_PATH, content, 'utf-8');
+  console.log(`凭证已写入: ${NEW_ENV_PATH}`);
 }
 
 /**
@@ -139,8 +149,11 @@ function describeSource(): string {
   if (process.env.WECHAT_APP_ID && process.env.WECHAT_APP_SECRET) {
     return '环境变量 WECHAT_APP_ID / WECHAT_APP_SECRET';
   }
-  if (existsSync(DEFAULT_ENV_PATH)) {
-    return `.env 文件 (${DEFAULT_ENV_PATH})`;
+  if (existsSync(NEW_ENV_PATH)) {
+    return `.env 文件 (${NEW_ENV_PATH})`;
+  }
+  if (existsSync(OLD_ENV_PATH)) {
+    return `.env 文件 (${OLD_ENV_PATH})`;
   }
   return '未知';
 }
