@@ -145,6 +145,11 @@ export class TokenManager {
 
   /**
    * 获取当前缓存的 token 信息（用于调试）
+   *
+   * 返回字段：
+   * - `access_token`: 微信接口调用凭据
+   * - `expires_at`: Unix 时间戳（秒），token 过期时刻
+   * - `expires_in`: token 原始有效期（秒）
    */
   getTokenInfo(): { access_token: string; expires_at: number; expires_in: number } | null {
     return this.store ? { ...this.store } : null;
