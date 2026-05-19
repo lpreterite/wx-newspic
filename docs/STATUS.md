@@ -1,13 +1,13 @@
 # wechat-newspic 项目状态
 
-> 最后更新：2026-05-19
+> 最后更新：2026-05-19（Issue #9 修复完成）
 > 项目总览：[README.md](../README.md)
 
 ---
 
 ## 当前阶段
 
-**执行阶段** — M5 文档完善已完成，M6 实战发布待启动
+**执行阶段** — M5 文档完善已完成（含 Issue #8 正式验收），M6 实战发布待启动
 
 ---
 
@@ -21,7 +21,7 @@
 | T1.2 client.ts HTTP 客户端 | ✅ 完成 | 17/17 | 重试机制 + 错误码映射 |
 | T1.3 token.ts access_token 管理 | ✅ 完成 | 9/9 | 缓存 + 自动续期 + 并发锁 |
 | T1.4 material.ts 素材上传 | ✅ 完成 | 9/9 | 格式/大小/存在性校验 |
-| T1.5 draft.ts 草稿创建 | ✅ 完成 | 6/6 | 返回 media_id + created_at |
+| T1.5 draft.ts 草稿创建 | ✅ 完成 | 8/8 | 支持 article_type + image_info |
 | T1.6 config 配置文件 | ✅ 完成 | — | 凭证读取 + 服务端配置 |
 
 ### M2: 中转服务 ✅ 完成
@@ -75,12 +75,12 @@
 | wechat/client.test.ts | 17 | ✅ |
 | wechat/token.test.ts | 9 | ✅ |
 | wechat/material.test.ts | 9 | ✅ |
-| wechat/draft.test.ts | 6 | ✅ |
+| wechat/draft.test.ts | 8 | ✅ |
 | server/middleware/auth.test.ts | 4 | ✅ |
 | server/middleware/error.test.ts | 5 | ✅ |
 | server/integration/server.test.ts | 11 | ✅ |
 | cli/publish.test.ts | 17 | ✅ |
-| **总计** | **78** | **✅ 全部通过** |
+| **总计** | **80** | **✅ 全部通过** |
 
 ---
 
@@ -95,7 +95,8 @@
 | [#5](https://github.com/lpreterite/wechat-newspic/issues/5) | BUG-004: 错误码未定义在 WECHAT_ERROR_MAP 中 | P1 | ✅ resolved |
 | [#6](https://github.com/lpreterite/wechat-newspic/issues/6) | DOCS-001: API 响应 expires_at 格式需文档化 | P2 | ✅ resolved |
 | [#7](https://github.com/lpreterite/wechat-newspic/issues/7) | DOCS-002: 注释描述的键名与实际代码不符 | P2 | ✅ resolved |
-| [#8](https://github.com/lpreterite/wechat-newspic/issues/8) | ENH-002: 提供 OpenClaw 自动安装手册 | P2 | ✅ resolved |
+| [#8](https://github.com/lpreterite/wechat-newspic/issues/8) | ENH-002: 提供 OpenClaw 自动安装手册 | P2 | ✅ verified |
+| [#9](https://github.com/lpreterite/wechat-newspic/issues/9) | BUG-005: article_type 未传递，草稿箱生成普通文章而非小绿书 | P0 | ✅ resolved |
 
 ## 风险项
 
