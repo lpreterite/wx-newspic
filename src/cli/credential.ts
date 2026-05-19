@@ -159,7 +159,9 @@ function describeSource(): string {
 }
 
 /**
- * 简易 .env 文件解析器（从 WECHAT_APP_ID / WECHAT_APP_SECRET 格式读取）
+ * 简易 .env 文件解析器
+ *
+ * 支持读取多种键名格式，兼容旧版（WECHAT_APP_ID / WECHAT_APP_SECRET）和新版（APP_ID / APP_SECRET）
  */
 function parseDotenv(content: string): Record<string, string> {
   const result: Record<string, string> = {};
