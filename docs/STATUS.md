@@ -93,8 +93,8 @@
 | [#3](https://github.com/lpreterite/wechat-newspic/issues/3) | ENH-001: 环境变量两套前缀不一致 | P1 | ✅ resolved |
 | [#4](https://github.com/lpreterite/wechat-newspic/issues/4) | BUG-003: CLI 短选项 -i 语义冲突 | P1 | ✅ resolved |
 | [#5](https://github.com/lpreterite/wechat-newspic/issues/5) | BUG-004: 错误码未定义在 WECHAT_ERROR_MAP 中 | P1 | ✅ resolved |
-| [#6](https://github.com/lpreterite/wechat-newspic/issues/6) | DOCS-001: API 响应 expires_at 格式需文档化 | P2 | triaged |
-| [#7](https://github.com/lpreterite/wechat-newspic/issues/7) | DOCS-002: 注释描述的键名与实际代码不符 | P2 | triaged |
+| [#6](https://github.com/lpreterite/wechat-newspic/issues/6) | DOCS-001: API 响应 expires_at 格式需文档化 | P2 | ✅ resolved |
+| [#7](https://github.com/lpreterite/wechat-newspic/issues/7) | DOCS-002: 注释描述的键名与实际代码不符 | P2 | ✅ resolved |
 
 ## 风险项
 
