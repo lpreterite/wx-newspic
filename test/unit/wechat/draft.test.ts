@@ -93,5 +93,45 @@ describe('DraftManager', () => {
       const result = await manager.createDraft([sampleArticle], 'token');
       expect(result.media_id).toBe('single_media');
     });
+
+    it('请求体应包含 article_type 字段', async () => {
+      mockFetch.mockResolvedValue(mockJsonResponse({ media_id: 'm' }));
+      const manager = new DraftManager({ client: createClient(mockFetch) });
+
+      const newspaper: DraftArticle = {
+        title: '小绿书测试',
+        article_type: 'newspic',
+        image_info: {
+          image_list: [
+            { image_media_id: 'img_1' },
+            { image_media_id: 'img_2' },
+            { image_media_id: 'img_3' },
+          ],
+        },
+        content: '<p>正文</p>',
+      };
+      await manager.createDraft([newspaper], 'token');
+
+      const init = mockFetch.mock.calls[0][1] as RequestInit;
+      const body = JSON.parse(init.body as string);
+
+      expect(body.articles[0].article_type).toBe('newspic');
+      expect(body.articles[0].image_info).toBeDefined();
+      expect(body.articles[0].image_info.image_list).toHaveLength(3);
+      expect(body.articles[0].image_info.image_list[0].image_media_id).toBe('img_1');
+      expect(body.articles[0].image_info.image_list[2].image_media_id).toBe('img_3');
+    });
+
+    it('article_type 可选，不传时不应出现在请求体中', async () => {
+      mockFetch.mockResolvedValue(mockJsonResponse({ media_id: 'm' }));
+      const manager = new DraftManager({ client: createClient(mockFetch) });
+
+      await manager.createDraft([sampleArticle], 'token');
+
+      const init = mockFetch.mock.calls[0][1] as RequestInit;
+      const body = JSON.parse(init.body as string);
+
+      expect(body.articles[0].article_type).toBeUndefined();
+    });
   });
 });
