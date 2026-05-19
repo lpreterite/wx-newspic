@@ -2,10 +2,18 @@ import { WechatClient, WechatClientError } from './client.js';
 
 /**
  * 草稿文章
+ *
+ * 支持普通图文和"小绿书"（图片消息，article_type='newspic'）。
+ * 小绿书使用 image_info.image_list 传递多张图片，不传 thumb_media_id。
  */
 export interface DraftArticle {
   title: string;
-  thumb_media_id: string;
+  /** 封面 media_id（普通图文用，小绿书不需要） */
+  thumb_media_id?: string;
+  /** 文章类型: 'newspic' 表示小绿书图片消息 */
+  article_type?: string;
+  /** 图片列表（小绿书用） */
+  image_info?: { image_list: Array<{ image_media_id: string }> };
   author?: string;
   digest?: string;
   content?: string;
