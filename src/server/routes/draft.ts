@@ -51,10 +51,11 @@ export function registerDraftRoute(app: FastifyInstance, options: DraftRouteOpti
       return;
     }
 
-    // 构造 draft article
+    // 构造 draft article（小绿书图片消息）
     const articles = [{
       title: body.title,
-      thumb_media_id: body.image_list[0].image_media_id,
+      article_type: body.article_type ?? 'newspic',
+      image_info: { image_list: body.image_list },
       author: body.author,
       digest: body.digest,
       content: body.content,
