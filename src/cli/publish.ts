@@ -77,8 +77,8 @@ async function handlePublish(options: Record<string, string | string[]>): Promis
   });
 
   // 4. 确定服务器地址
-  const serverUrl = (options.server as string) || process.env.WX_NEWSPIC_SERVER || '';
-  const apiKey = (options.apiKey as string) || process.env.WX_NEWSPIC_API_KEY || '';
+  const serverUrl = (options.server as string) || process.env.WECHAT_SERVER_URL || process.env.WX_NEWSPIC_SERVER || '';
+  const apiKey = (options.apiKey as string) || process.env.WECHAT_API_KEY || process.env.WX_NEWSPIC_API_KEY || '';
 
   // 5. 执行发布
   const result = await executePublish({
@@ -208,7 +208,7 @@ export async function executePublish(params: {
   if (!serverUrl) {
     throw new WechatClientError(
       'SERVER_URL_MISSING',
-      '未指定中转服务器地址。请通过 --server 参数或 WX_NEWSPIC_SERVER 环境变量指定。',
+      '未指定中转服务器地址。请通过 --server 参数或 WECHAT_SERVER_URL 环境变量指定。',
     );
   }
 

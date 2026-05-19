@@ -5,8 +5,8 @@
 # 可选参数：
 #   --author, -a    <string>    作者
 #   --digest, -d    <string>    摘要
-#   --server, -s    <url>       中转服务器地址（默认取自环境变量 WX_NEWSPIC_SERVER）
-#   --api-key, -k   <string>    中转服务器 API Key（默认取自环境变量 WX_NEWSPIC_API_KEY）
+#   --server, -s    <url>       中转服务器地址（默认取自环境变量 WECHAT_SERVER_URL）
+#   --api-key, -k   <string>    中转服务器 API Key（默认取自环境变量 WECHAT_API_KEY）
 #   --json, -j                 以 JSON 格式输出结果
 #   --help, -h                  查看帮助
 
@@ -118,8 +118,8 @@ parse_args() {
     IMAGES=""
     AUTHOR=""
     DIGEST=""
-    SERVER="${WX_NEWSPIC_SERVER:-}"
-    API_KEY="${WX_NEWSPIC_API_KEY:-}"
+    SERVER="${WECHAT_SERVER_URL:-${WX_NEWSPIC_SERVER:-}}"
+    API_KEY="${WECHAT_API_KEY:-${WX_NEWSPIC_API_KEY:-}}"
 
     while [ $# -gt 0 ]; do
         case "$1" in
@@ -191,7 +191,7 @@ validate_args() {
 
     # 校验中转服务器
     if [ -z "$SERVER" ]; then
-        error "未指定中转服务器地址。请通过 --server 参数或 WX_NEWSPIC_SERVER 环境变量指定。"
+        error "未指定中转服务器地址。请通过 --server 参数或 WECHAT_SERVER_URL 环境变量指定。"
     fi
 }
 
@@ -213,8 +213,8 @@ show_help() {
 可选选项:
   --author, -a    <string>    作者（最长 16 字）
   --digest, -d    <string>    摘要（最长 128 字）
-  --server, -s    <url>       中转服务器地址（默认: \$WX_NEWSPIC_SERVER）
-  --api-key, -k   <string>    中转服务器 API Key（默认: \$WX_NEWSPIC_API_KEY）
+  --server, -s    <url>       中转服务器地址（默认: \$WECHAT_SERVER_URL）
+  --api-key, -k   <string>    中转服务器 API Key（默认: \$WECHAT_API_KEY）
   --json, -j                  以 JSON 格式输出结果
   --help, -h                  查看帮助
 
@@ -224,8 +224,8 @@ show_help() {
   $0 -t "标题" -c "正文" -i "./slides/*.png" --json
 
 环境变量:
-  WX_NEWSPIC_SERVER     中转服务器地址（如 https://your-server.com）
-  WX_NEWSPIC_API_KEY    中转服务器 API Key
+  WECHAT_SERVER_URL     中转服务器地址（如 https://your-server.com，旧名 WX_NEWSPIC_SERVER 仍兼容）
+  WECHAT_API_KEY        中转服务器 API Key（旧名 WX_NEWSPIC_API_KEY 仍兼容）
 EOF
 }
 

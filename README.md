@@ -175,9 +175,11 @@ wx-newspic publish \
 服务器地址和 API Key 也可通过环境变量指定：
 
 ```bash
-export WX_NEWSPIC_SERVER=https://your-server.com
-export WX_NEWSPIC_API_KEY=sk-your-key
+export WECHAT_SERVER_URL=https://your-server.com
+export WECHAT_API_KEY=sk-your-key
 ```
+
+> 旧名称 `WX_NEWSPIC_SERVER` / `WX_NEWSPIC_API_KEY` 仍兼容。
 
 成功输出示例：
 
