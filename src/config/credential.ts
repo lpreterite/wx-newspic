@@ -1,6 +1,7 @@
 import { readFileSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { homedir } from 'node:os';
+import { WechatClientError } from '../wechat/client.js';
 
 const DEFAULT_ENV_PATH = resolve(homedir(), '.openclaw/skills/wechat-publisher/.env');
 
@@ -52,7 +53,8 @@ export function getCredential(options: CredentialOptions = {}): Credential {
     }
   }
 
-  throw new Error(
+  throw new WechatClientError(
+    'CREDENTIAL_NOT_FOUND',
     '无法获取微信凭证。请通过以下任一方式配置：\n' +
     '  1. CLI 参数 --app-id --app-secret\n' +
     '  2. 环境变量 WECHAT_APP_ID / WECHAT_APP_SECRET\n' +

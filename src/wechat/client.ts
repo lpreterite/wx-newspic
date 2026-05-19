@@ -18,6 +18,22 @@ const WECHAT_ERROR_MAP: Record<string, { code: string; message: string; retryabl
 /**
  * 微信 API 客户端错误
  */
+/**
+ * 应用层自定义错误码
+ *
+ * 这些错误码不属于微信 API errcode 映射范围，
+ * 由项目代码直接抛出的 WechatClientError 使用。
+ * 所有错误码必须在 error.ts 的 mapErrorCodeToStatus 中有对应的 HTTP 状态映射。
+ */
+export const AppErrorCode = {
+  /** 未找到微信凭证 */
+  CREDENTIAL_NOT_FOUND: 'CREDENTIAL_NOT_FOUND',
+  /** 中转服务不可用 */
+  SERVER_UNAVAILABLE: 'SERVER_UNAVAILABLE',
+  /** 中转服务器地址未指定 */
+  SERVER_URL_MISSING: 'SERVER_URL_MISSING',
+} as const;
+
 export class WechatClientError extends Error {
   constructor(
     public readonly code: string,
