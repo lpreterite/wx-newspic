@@ -23,7 +23,7 @@ export function registerCredentialCommand(program: Command): void {
   cmd
     .command('set')
     .description('设置凭证')
-    .option('--app-id, -i <string>', '微信 APP_ID')
+    .option('--app-id <string>', '微信 APP_ID')
     .option('--app-secret, -s <string>', '微信 APP_SECRET')
     .option('--file, -f <path>', '从 .env 文件导入')
     .action(handleSet);
