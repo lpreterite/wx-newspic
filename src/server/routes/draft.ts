@@ -51,10 +51,13 @@ export function registerDraftRoute(app: FastifyInstance, options: DraftRouteOpti
       return;
     }
 
+    // 仅允许微信 API 识别的 article_type 值
+    const articleType = body.article_type === 'newspic' ? 'newspic' : 'newspic';
+
     // 构造 draft article（小绿书图片消息）
     const articles = [{
       title: body.title,
-      article_type: body.article_type ?? 'newspic',
+      article_type: articleType,
       image_info: { image_list: body.image_list },
       author: body.author,
       digest: body.digest,
@@ -70,7 +73,7 @@ export function registerDraftRoute(app: FastifyInstance, options: DraftRouteOpti
       success: true,
       data: {
         media_id: result.media_id,
-        article_type: body.article_type ?? 'wx-newspic',
+        article_type: articleType,
         status: 'draft_created',
         created_at: new Date(Number(result.created_at) * 1000).toISOString(),
       },

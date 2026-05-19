@@ -250,7 +250,7 @@ export async function executePublish(params: {
 
   // 3.2 创建草稿
   const draftBody = {
-    article_type: 'wx-newspic',
+    article_type: 'newspic',
     title,
     content,
     author,
