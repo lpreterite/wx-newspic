@@ -84,6 +84,59 @@ wx-newspic serve --api-key "sk-your-key" --port 3000
 
 服务器启动后，将服务器 IP 添加到微信公众号后台 → 开发 → 基本配置 → IP 白名单。
 
+### 服务持久化
+
+中转服务需长期运行，推荐以下方式保持后台运行：
+
+**方式一：systemd（推荐）**
+
+创建 systemd 服务文件 `/etc/systemd/system/wx-newspic.service`：
+
+```ini
+[Unit]
+Description=wechat-newspic Relay Server
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/env wx-newspic serve --api-key "sk-your-key" --port 3000
+Restart=always
+RestartSec=5
+User=your-user
+Environment=WECHAT_APP_ID=your_app_id
+Environment=WECHAT_APP_SECRET=your_app_secret
+
+[Install]
+WantedBy=multi-user.target
+```
+
+启用并启动：
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable wx-newspic
+sudo systemctl start wx-newspic
+sudo systemctl status wx-newspic
+```
+
+**方式二：pm2（Node.js 进程管理器）**
+
+```bash
+npm install -g pm2
+pm2 start wx-newspic -- serve --api-key "sk-your-key" --port 3000
+pm2 save
+pm2 startup
+```
+
+**方式三：screen/tmux**
+
+```bash
+screen -S wx-newspic
+wx-newspic serve --api-key "sk-your-key" --port 3000
+# Ctrl+A D 脱离会话，服务持续运行
+# screen -r wx-newspic 重新连接
+```
+
 ## 使用
 
 ### 命令概览
