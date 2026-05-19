@@ -142,7 +142,7 @@
 | 属性 | 说明 |
 |------|------|
 | **责任人** | PM Agent（维护） |
-| **存放位置** | `docs/project-tasks/W{nn}/problems/` |
+| **存放位置** | GitHub Issues（主） / `docs/project-tasks/W{nn}/problems/`（周任务上下文引用） |
 
 #### 内容要求
 
@@ -150,8 +150,19 @@
 |------|------|
 | **问题描述** | 问题的详细描述 |
 | **严重程度** | P0 / P1 / P2 / P3 |
+| **Issue 编号** | GitHub Issue #N |
 | **状态** | 待处理 / 处理中 / 已解决 |
-| **解决方案** | 解决措施（若有） |
+
+#### 与 GitHub Issues 的关系
+
+问题记录的**主存储为 GitHub Issues**，`problems/` 目录仅作为周任务上下文的引用快照。
+每条问题记录的写法：
+
+```markdown
+- [BUG-001] .env 键名不一致（Issue #1）— P0 — 已解决
+  Tester 验收发现 .env.example 与代码读写键名不一致。
+  详见：https://github.com/lpreterite/wechat-newspic/issues/1
+```
 
 ---
 
@@ -243,6 +254,7 @@
 |------|------|
 | 文档目录结构 | [../reference/directory.md](../reference/directory.md) |
 | 阶段门控清单 | [./04-checklists.md](./04-checklists.md) |
+| Issue 工作流 | [./issue-workflow.md](./issue-workflow.md) |
 
 ---
 

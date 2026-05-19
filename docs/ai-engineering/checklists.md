@@ -234,7 +234,7 @@
 □ 测试用例覆盖验收标准
 □ 测试环境就绪
 □ 测试执行记录完整
-□ Bug 已记录和跟踪
+□ Bug 已记录为 GitHub Issue 并跟踪
 □ 回归测试计划就绪
 ```
 
@@ -270,6 +270,7 @@
 | AI软件研发流程说明 | [./02-process.md](./02-process.md) |
 | 关键文档说明 | [./05-deliverables.md](./05-deliverables.md) |
 | 人机协作协议 | [./03-collaboration.md](./03-collaboration.md) |
+| Issue 工作流 | [./issue-workflow.md](./issue-workflow.md) |
 
 ---
 

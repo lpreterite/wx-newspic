@@ -90,6 +90,7 @@ color: "#E74C3C"
 ### 第三阶段：Bug 报告与验证循环
 
 - 发现缺陷后立即上报（使用 Bug 报告模板）
+- 上报的 Bug 由 PM Agent 创建 GitHub Issue 并分配
 - Developer Agent 修复后执行回归验证
 - 验证修复结果：原问题是否解决 + 是否引入新问题
 - 每个任务最多 3 次测试循环
@@ -265,6 +266,7 @@ color: "#E74C3C"
 | Agent 角色总览 | [./README.md](./README.md) |
 | AI软件研发流程说明 | [../guide/02-process.md](../guide/02-process.md) |
 | 阶段门控清单 | [../guide/04-checklists.md](../guide/04-checklists.md) |
+| Issue 工作流 | [../../docs/ai-engineering/issue-workflow.md](../../docs/ai-engineering/issue-workflow.md) |
 
 ---
 
