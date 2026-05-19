@@ -84,9 +84,17 @@
 
 ---
 
-## 阻塞项
+## 已知问题（GitHub Issues）
 
-无
+| Issue | 标题 | 优先级 | 状态 |
+|-------|------|--------|------|
+| [#1](https://github.com/lpreterite/wechat-newspic/issues/1) | BUG-001: .env.example 与代码读写键名不一致 | P0 | triaged |
+| [#2](https://github.com/lpreterite/wechat-newspic/issues/2) | BUG-002: .env 路径名 wechat-publisher 与项目名不一致 | P0 | triaged |
+| [#3](https://github.com/lpreterite/wechat-newspic/issues/3) | ENH-001: 环境变量两套前缀不一致 | P1 | triaged |
+| [#4](https://github.com/lpreterite/wechat-newspic/issues/4) | BUG-003: CLI 短选项 -i 语义冲突 | P1 | triaged |
+| [#5](https://github.com/lpreterite/wechat-newspic/issues/5) | BUG-004: 错误码未定义在 WECHAT_ERROR_MAP 中 | P1 | triaged |
+| [#6](https://github.com/lpreterite/wechat-newspic/issues/6) | DOCS-001: API 响应 expires_at 格式需文档化 | P2 | triaged |
+| [#7](https://github.com/lpreterite/wechat-newspic/issues/7) | DOCS-002: 注释描述的键名与实际代码不符 | P2 | triaged |
 
 ## 风险项
 
