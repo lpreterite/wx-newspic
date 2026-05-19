@@ -11,7 +11,7 @@
 
 ```bash
 # 克隆仓库
-git clone https://github.com/your-repo/wechat-newspic.git
+git clone https://github.com/lpreterite/wechat-newspic.git
 cd wechat-newspic
 
 # 安装依赖

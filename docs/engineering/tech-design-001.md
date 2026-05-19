@@ -333,7 +333,7 @@ wx-newspic publish --help
 示例:
   wx-newspic publish --title "标题" --content "正文" --images ./slides/*.png
 
-📖 文档: https://github.com/your-repo/wechat-newspic
+📖 文档: https://github.com/lpreterite/wechat-newspic
 ```
 
 ---

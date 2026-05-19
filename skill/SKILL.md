@@ -14,7 +14,7 @@ metadata:
 
 **发布图片消息（小绿书）到微信公众号草稿箱**
 
-基于 [wx-newspic](https://github.com/your-repo/wechat-newspic) CLI 封装的 OpenClaw skill。
+基于 [wx-newspic](https://github.com/lpreterite/wechat-newspic) CLI 封装的 OpenClaw skill。
 
 ## 功能
 
@@ -72,7 +72,7 @@ metadata:
 
 ```bash
 # 克隆并构建
-git clone https://github.com/your-repo/wechat-newspic.git
+git clone https://github.com/lpreterite/wechat-newspic.git
 cd wechat-newspic
 npm install
 npm run build
