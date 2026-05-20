@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.1.1 (2026-05-20)
+
+### Changed
+
+- 项目重命名：`wechat-newspic` → `wx-newspic`
+- npm 包名改为 scoped 命名：`@packy-tang/wx-newspic`
+
+### Added
+
+- CI 自动发布工作流（OIDC Trusted Publishing）
+- MIT 许可证文件
+- npm 安装方式文档（Badge + 安装命令）
+
 ## v0.1.0 (2026-05-19)
 
 ### Added
@@ -24,7 +37,6 @@
 
 - 完善 package.json 元信息（license、repository、bugs、homepage、keywords、files）
 - 添加 npm publish 生命周期脚本 prepublishOnly
-- 包名改为 scoped 命名：`@packy-tang/wx-newspic`
 
 ### Docs
 
