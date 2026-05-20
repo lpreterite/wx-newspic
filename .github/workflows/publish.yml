@@ -23,6 +23,6 @@ jobs:
       - run: npm run build --if-present
       - run: npm test
       - run: node --version && npm --version
-      - run: echo "OIDC env: ACTIONS_ID_TOKEN_REQUEST_URL=${ACTIONS_ID_TOKEN_REQUEST_URL:+present}"
+      - run: env | grep -i "ACTIONS_ID_TOKEN" | head -3 || echo "ACTIONS_ID_TOKEN env vars not found"
       - run: npm config list
       - run: npm publish --access public
