@@ -22,4 +22,5 @@ jobs:
       - run: npm ci
       - run: npm run build --if-present
       - run: npm test
-      - run: npx npm@latest publish --access public
+      - run: corepack enable && corepack prepare npm@11 --activate
+      - run: npm publish --access public
