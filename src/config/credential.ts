@@ -3,7 +3,7 @@ import { resolve } from 'node:path';
 import { homedir } from 'node:os';
 import { WechatClientError } from '../wechat/client.js';
 
-const NEW_ENV_PATH = resolve(homedir(), '.openclaw/skills/wechat-newspic/.env');
+const NEW_ENV_PATH = resolve(homedir(), '.openclaw/skills/wx-newspic/.env');
 const OLD_ENV_PATH = resolve(homedir(), '.openclaw/skills/wechat-publisher/.env');
 
 function resolveEnvPath(optionsEnvPath?: string): string {
@@ -17,7 +17,7 @@ export interface CredentialOptions {
   appId?: string;
   /** 微信 APP_SECRET（CLI 参数传入） */
   appSecret?: string;
-  /** .env 文件路径（默认 ~/.openclaw/skills/wechat-newspic/.env） */
+  /** .env 文件路径（默认 ~/.openclaw/skills/wx-newspic/.env） */
   envPath?: string;
 }
 

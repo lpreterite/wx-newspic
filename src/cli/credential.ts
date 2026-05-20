@@ -5,7 +5,7 @@ import { Command } from 'commander';
 import { getCredential } from '../config/credential.js';
 import { WechatClient } from '../wechat/client.js';
 
-const NEW_ENV_PATH = resolve(homedir(), '.openclaw/skills/wechat-newspic/.env');
+const NEW_ENV_PATH = resolve(homedir(), '.openclaw/skills/wx-newspic/.env');
 const OLD_ENV_PATH = resolve(homedir(), '.openclaw/skills/wechat-publisher/.env');
 
 function getDefaultEnvPath(): string {
@@ -100,7 +100,7 @@ async function handleSet(options: Record<string, string>): Promise<void> {
 
   // 写入 .env 文件
   const content = [
-    '# wechat-newspic 微信凭证',
+    '# wx-newspic 微信凭证',
     `APP_ID=${appId}`,
     `APP_SECRET=${appSecret}`,
     '',

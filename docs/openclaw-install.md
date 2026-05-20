@@ -1,6 +1,6 @@
-# OpenClaw 安装引导：wechat-newspic Skill
+# OpenClaw 安装引导：wx-newspic Skill
 
-> 本文档供 OpenClaw AI 读取，引导完成 wechat-newspic skill 的本地安装。
+> 本文档供 OpenClaw AI 读取，引导完成 wx-newspic skill 的本地安装。
 > 涉及服务器部署、IP 白名单等操作，由 AI 引导人类用户完成，AI 不直接执行。
 
 **所属目录**：`docs/`
@@ -16,9 +16,9 @@
 | CLI 命令 | `wx-newspic` |
 | 版本 | 0.1.0 |
 | 语言 | Node.js >= 20 / TypeScript |
-| 仓库 | `https://github.com/lpreterite/wechat-newspic.git` |
-| Skill 目录 | `~/.config/opencode/skills/dw/wechat-newspic/` |
-| 凭证路径 | `~/.openclaw/skills/wechat-newspic/.env` |
+| 仓库 | `https://github.com/lpreterite/wx-newspic.git` |
+| Skill 目录 | `~/.config/opencode/skills/dw/wx-newspic/` |
+| 凭证路径 | `~/.openclaw/skills/wx-newspic/.env` |
 
 ---
 
@@ -42,8 +42,8 @@
 AI 在本地机器上执行以下命令：
 
 ```bash
-git clone https://github.com/lpreterite/wechat-newspic.git
-cd wechat-newspic
+git clone https://github.com/lpreterite/wx-newspic.git
+cd wx-newspic
 npm install
 npm run build
 npm link
@@ -94,15 +94,15 @@ wx-newspic credential check
 AI 将项目中的 skill 定义文件安装到 OpenClaw 的技能目录：
 
 ```bash
-mkdir -p ~/.config/opencode/skills/dw/wechat-newspic
-cp /path/to/wechat-newspic/skill/SKILL.md \
-   ~/.config/opencode/skills/dw/wechat-newspic/SKILL.md
+mkdir -p ~/.config/opencode/skills/dw/wx-newspic
+cp /path/to/wx-newspic/skill/SKILL.md \
+   ~/.config/opencode/skills/dw/wx-newspic/SKILL.md
 ```
 
 验证：
 
 ```bash
-ls -la ~/.config/opencode/skills/dw/wechat-newspic/SKILL.md
+ls -la ~/.config/opencode/skills/dw/wx-newspic/SKILL.md
 ```
 
 ---
@@ -139,8 +139,8 @@ node --version  # 确认 >= 20
 告知用户依次执行：
 
 ```bash
-git clone https://github.com/lpreterite/wechat-newspic.git
-cd wechat-newspic
+git clone https://github.com/lpreterite/wx-newspic.git
+cd wx-newspic
 npm install
 npm run build
 npm link
@@ -215,7 +215,7 @@ curl -s ifconfig.me
 
 ## Skill 输入输出
 
-安装完成后，AI 可调用 wechat-newspic skill。输入字段见 `skill/SKILL.md`：
+安装完成后，AI 可调用 wx-newspic skill。输入字段见 `skill/SKILL.md`：
 
 | 字段 | 必填 | 说明 |
 |------|------|------|

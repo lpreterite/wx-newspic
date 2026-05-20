@@ -1,4 +1,4 @@
-# wechat-newspic
+# wx-newspic
 
 ## AI 研发规范
 

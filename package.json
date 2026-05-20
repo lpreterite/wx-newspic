@@ -1,20 +1,44 @@
 {
-  "name": "wechat-newspic",
+  "name": "@packy-tang/wx-newspic",
   "version": "0.1.0",
   "description": "微信图片消息发布工具 — 将图片发布为公众号图片消息草稿",
   "type": "module",
   "engines": {
     "node": ">=20"
   },
+  "files": [
+    "dist/",
+    "bin/",
+    "README.md",
+    "LICENSE"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lpreterite/wx-newspic.git"
+  },
+  "bugs": {
+    "url": "https://github.com/lpreterite/wx-newspic/issues"
+  },
+  "homepage": "https://github.com/lpreterite/wx-newspic#readme",
+  "keywords": [
+    "wechat",
+    "weixin",
+    "newspic",
+    "公众号",
+    "小绿书",
+    "cli"
+  ],
   "scripts": {
     "build": "tsc",
     "dev": "tsx watch src/index.ts",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "prepublishOnly": "npm run build && npm test"
   },
   "bin": {
-    "wx-newspic": "./bin/wx-newspic"
+    "wx-newspic": "bin/wx-newspic"
   },
   "dependencies": {
     "@fastify/cors": "^10.0.0",

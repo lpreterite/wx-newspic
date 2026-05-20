@@ -20,6 +20,12 @@
 
 - `credential set` 写入 `.env` 使用 `APP_ID`/`APP_SECRET` 以匹配读取逻辑
 
+### Changed
+
+- 完善 package.json 元信息（license、repository、bugs、homepage、keywords、files）
+- 添加 npm publish 生命周期脚本 prepublishOnly
+- 包名改为 scoped 命名：`@packy-tang/wx-newspic`
+
 ### Docs
 
 - README：安装指南、命令参考、配置说明、使用示例、故障排查

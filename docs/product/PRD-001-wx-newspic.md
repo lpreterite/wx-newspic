@@ -1,4 +1,4 @@
-# PRD-001: wechat-newspic — 小绿书图片消息发布工具
+# PRD-001: wx-newspic — 小绿书图片消息发布工具
 
 **Status**: Draft
 **Author**: PO Agent **Last Updated**: 2026-05-18 **Version**: v0.1
@@ -107,7 +107,7 @@
 
 ### Story 3: 凭证复用
 
-作为**内容创作者小帕**，我不想要再配置一套微信凭证。我希望 `wechat-newspic` 自动读取 `wechat-publisher` 已有的 APP_ID / APP_SECRET 配置，以便零额外配置即可使用。
+作为**内容创作者小帕**，我不想要再配置一套微信凭证。我希望 `wx-newspic` 自动读取 `wechat-publisher` 已有的 APP_ID / APP_SECRET 配置，以便零额外配置即可使用。
 
 **Acceptance Criteria（验收标准）**:
 
@@ -126,7 +126,7 @@
 
 **Acceptance Criteria（验收标准）**:
 
-- [ ] Given 当前正在 `html-ppt` 项目中编写短文，when 调用 `wechat-newspic` Skill，then 自动获取当前工作区的 slide 截图路径
+- [ ] Given 当前正在 `html-ppt` 项目中编写短文，when 调用 `wx-newspic` Skill，then 自动获取当前工作区的 slide 截图路径
 - [ ] Given Skill 调用传入标题、正文和图片路径，when 执行发布，then 返回草稿 `media_id` 和预览链接
 - [ ] Given 草稿创建成功，when Skill 返回结果，then 包含 `{ media_id, created_at, success: true }`
 - [ ] Given 中转服务未启动，when 调用 Skill，then 返回清晰错误提示及启动指南
@@ -140,7 +140,7 @@
 
 ```
 ┌──────────────┐     ┌──────────────┐     ┌──────────────┐     ┌──────────────┐     ┌─────────────────┐
-│ 编写短文      │ ──▶ │ html-ppt     │ ──▶ │ wechat-newspic│ ──▶ │ 中转服务      │ ──▶ │ 微信 API        │
+│ 编写短文      │ ──▶ │ html-ppt     │ ──▶ │ wx-newspic   │ ──▶ │ 中转服务      │ ──▶ │ 微信 API        │
 │ (Markdown)    │     │ 渲染为 slide  │     │ Skill / CLI   │     │ (固定 IP)     │     │ 创建图片消息草稿  │
 └──────────────┘     └──────────────┘     └──────────────┘     └──────────────┘     └─────────────────┘
                                                    │

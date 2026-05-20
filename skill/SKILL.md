@@ -1,5 +1,5 @@
 ---
-name: wechat-newspic
+name: wx-newspic
 description: "发布图片消息（小绿书）到微信公众号草稿箱。基于 wx-newspic CLI，支持多图上传、纯文本正文、凭证复用 wechat-publisher。"
 metadata:
   {
@@ -10,11 +10,11 @@ metadata:
   }
 ---
 
-# wechat-newspic
+# wx-newspic
 
 **发布图片消息（小绿书）到微信公众号草稿箱**
 
-基于 [wx-newspic](https://github.com/lpreterite/wechat-newspic) CLI 封装的 OpenClaw skill。
+基于 [wx-newspic](https://github.com/lpreterite/wx-newspic) CLI 封装的 OpenClaw skill。
 
 ## 功能
 
@@ -72,8 +72,8 @@ metadata:
 
 ```bash
 # 克隆并构建
-git clone https://github.com/lpreterite/wechat-newspic.git
-cd wechat-newspic
+git clone https://github.com/lpreterite/wx-newspic.git
+cd wx-newspic
 npm install
 npm run build
 npm link
@@ -146,7 +146,7 @@ wx-newspic publish \
 ```
 编写短文 (Markdown) → html-ppt 渲染为 slide 截图
               ↓
-  wechat-newspic Skill/CLI
+  wx-newspic Skill/CLI
               ↓
   中转服务器 (固定 IP)
               ↓
@@ -207,7 +207,7 @@ wx-newspic publish \
 - [微信公众号草稿箱 API 文档](https://developers.weixin.qq.com/doc/subscription/api/draftbox/draftmanage/api_draft_add.html)
 - [wx-newspic 项目文档](../docs/综合文档.md)
 - [技术设计文档](../docs/engineering/tech-design-001.md)
-- [PRD-001: 小绿书图片消息发布工具](../docs/product/PRD-001-wechat-newspic.md)
+- [PRD-001: 小绿书图片消息发布工具](../docs/product/PRD-001-wx-newspic.md)
 
 ## 修订记录
 

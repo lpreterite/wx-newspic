@@ -1,4 +1,4 @@
-# wechat-newspic 项目状态
+# wx-newspic 项目状态
 
 > 最后更新：2026-05-19（Issue #9 修复完成）
 > 项目总览：[README.md](../README.md)
@@ -88,15 +88,15 @@
 
 | Issue | 标题 | 优先级 | 状态 |
 |-------|------|--------|------|
-| [#1](https://github.com/lpreterite/wechat-newspic/issues/1) | BUG-001: .env.example 与代码读写键名不一致 | P0 | ✅ resolved |
-| [#2](https://github.com/lpreterite/wechat-newspic/issues/2) | BUG-002: .env 路径名 wechat-publisher 与项目名不一致 | P0 | ✅ resolved |
-| [#3](https://github.com/lpreterite/wechat-newspic/issues/3) | ENH-001: 环境变量两套前缀不一致 | P1 | ✅ resolved |
-| [#4](https://github.com/lpreterite/wechat-newspic/issues/4) | BUG-003: CLI 短选项 -i 语义冲突 | P1 | ✅ resolved |
-| [#5](https://github.com/lpreterite/wechat-newspic/issues/5) | BUG-004: 错误码未定义在 WECHAT_ERROR_MAP 中 | P1 | ✅ resolved |
-| [#6](https://github.com/lpreterite/wechat-newspic/issues/6) | DOCS-001: API 响应 expires_at 格式需文档化 | P2 | ✅ resolved |
-| [#7](https://github.com/lpreterite/wechat-newspic/issues/7) | DOCS-002: 注释描述的键名与实际代码不符 | P2 | ✅ resolved |
-| [#8](https://github.com/lpreterite/wechat-newspic/issues/8) | ENH-002: 提供 OpenClaw 自动安装手册 | P2 | ✅ verified |
-| [#9](https://github.com/lpreterite/wechat-newspic/issues/9) | BUG-005: article_type 未传递，草稿箱生成普通文章而非小绿书 | P0 | ✅ resolved |
+| [#1](https://github.com/lpreterite/wx-newspic/issues/1) | BUG-001: .env.example 与代码读写键名不一致 | P0 | ✅ resolved |
+| [#2](https://github.com/lpreterite/wx-newspic/issues/2) | BUG-002: .env 路径名 wechat-publisher 与项目名不一致 | P0 | ✅ resolved |
+| [#3](https://github.com/lpreterite/wx-newspic/issues/3) | ENH-001: 环境变量两套前缀不一致 | P1 | ✅ resolved |
+| [#4](https://github.com/lpreterite/wx-newspic/issues/4) | BUG-003: CLI 短选项 -i 语义冲突 | P1 | ✅ resolved |
+| [#5](https://github.com/lpreterite/wx-newspic/issues/5) | BUG-004: 错误码未定义在 WECHAT_ERROR_MAP 中 | P1 | ✅ resolved |
+| [#6](https://github.com/lpreterite/wx-newspic/issues/6) | DOCS-001: API 响应 expires_at 格式需文档化 | P2 | ✅ resolved |
+| [#7](https://github.com/lpreterite/wx-newspic/issues/7) | DOCS-002: 注释描述的键名与实际代码不符 | P2 | ✅ resolved |
+| [#8](https://github.com/lpreterite/wx-newspic/issues/8) | ENH-002: 提供 OpenClaw 自动安装手册 | P2 | ✅ verified |
+| [#9](https://github.com/lpreterite/wx-newspic/issues/9) | BUG-005: article_type 未传递，草稿箱生成普通文章而非小绿书 | P0 | ✅ resolved |
 
 ## 风险项
 

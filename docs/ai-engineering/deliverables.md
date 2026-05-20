@@ -161,7 +161,7 @@
 ```markdown
 - [BUG-001] .env 键名不一致（Issue #1）— P0 — 已解决
   Tester 验收发现 .env.example 与代码读写键名不一致。
-  详见：https://github.com/lpreterite/wechat-newspic/issues/1
+  详见：https://github.com/lpreterite/wx-newspic/issues/1
 ```
 
 ---

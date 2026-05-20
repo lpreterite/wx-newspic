@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# wechat-newspic: 发布图片消息（小绿书）到微信公众号草稿箱
+# wx-newspic: 发布图片消息（小绿书）到微信公众号草稿箱
 # Usage: ./publish.sh --title "标题" --content "正文" --images "path1.png,path2.png"
 #
 # 可选参数：
@@ -286,14 +286,14 @@ main() {
         exit 0
     fi
 
-    info "${CYAN}📱 wechat-newspic — 小绿书图片消息发布${NC}"
+    info "${CYAN}📱 wx-newspic — 小绿书图片消息发布${NC}"
     info ""
 
     # 校验参数
     validate_args
 
     # 查找 wx-newspic CLI
-    CLI=$(find_cli) || error "wx-newspic CLI 未找到。请确保已安装：npm install -g wechat-newspic"
+    CLI=$(find_cli) || error "wx-newspic CLI 未找到。请确保已安装：npm install -g @packy-tang/wx-newspic"
     info "${GREEN}✅ 使用 CLI: $CLI${NC}"
 
     # 展开图片路径

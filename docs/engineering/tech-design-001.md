@@ -1,10 +1,10 @@
-# Tech Design 001: wechat-newspic 技术设计文档
+# Tech Design 001: wx-newspic 技术设计文档
 
 **版本**：v0.1
 **状态**：草稿
 **创建日期**：2026-05-18
 **作者**：Developer Agent
-**来源**：PRD-001-wechat-newspic + 综合文档 v0.1
+**来源**：PRD-001-wx-newspic + 综合文档 v0.1
 
 ---
 
@@ -25,7 +25,7 @@
 采用 Monorepo 结构，CLI 与 Server 共享核心微信 API 集成层代码。
 
 ```
-wechat-newspic/
+wx-newspic/
 │
 ├── package.json                  # 项目根配置（monorepo workspaces）
 ├── tsconfig.json                 # TypeScript 全局配置
@@ -100,7 +100,7 @@ wechat-newspic/
     ├── engineering/
     │   └── tech-design-001.md    # 本文档
     ├── product/
-    │   └── PRD-001-wechat-newspic.md
+    │   └── PRD-001-wx-newspic.md
     └── 综合文档.md
 ```
 
@@ -333,7 +333,7 @@ wx-newspic publish --help
 示例:
   wx-newspic publish --title "标题" --content "正文" --images ./slides/*.png
 
-📖 文档: https://github.com/lpreterite/wechat-newspic
+📖 文档: https://github.com/lpreterite/wx-newspic
 ```
 
 ---
@@ -849,7 +849,7 @@ curl -fsSL https://deb.nodesource.com/setup_20.x | sudo bash -
 sudo apt-get install -y nodejs
 
 # 2. 安装 wx-newspic
-npm install -g wechat-newspic
+npm install -g @packy-tang/wx-newspic
 
 # 3. 配置凭证
 wx-newspic credential set --app-id "wx_xxx" --app-secret "secret_xxx"
@@ -857,7 +857,7 @@ wx-newspic credential set --app-id "wx_xxx" --app-secret "secret_xxx"
 # 4. 创建 systemd 服务
 sudo tee /etc/systemd/system/wx-newspic.service << 'EOF'
 [Unit]
-Description=wechat-newspic Middleware Server
+Description=wx-newspic Middleware Server
 After=network.target
 
 [Service]
@@ -994,7 +994,7 @@ wx-newspic publish \
 
 #### Skill 层面的自动对接
 
-在 `wechat-newspic` Skill 中，自动检测 `html-ppt` 项目的工作区截图路径：
+在 `wx-newspic` Skill 中，自动检测 `html-ppt` 项目的工作区截图路径：
 
 ```yaml
 # skill/SKILL.md 中的输入规范
@@ -1011,7 +1011,7 @@ images:
 `html-ppt` 默认输出格式：`slide-{n}.png`（如 `slide-01.png` → `slide-09.png`）
 
 ```
-html-ppt 输出                wechat-newspic 输入
+html-ppt 输出                wx-newspic 输入
 ─────────────────            ─────────────────────
 output/slide-01.png  ──→  --images "output/slide-*.png"
 output/slide-02.png  ──→  ↑ glob 自动匹配
@@ -1020,7 +1020,7 @@ output/slide-03.png  ──→  ↑ 按文件名排序
 
 ### 6.3 与 wechat-publisher / wenyan-cli 的对比
 
-| 能力 | wenyan-cli | wechat-newspic |
+| 能力 | wenyan-cli | wx-newspic |
 |------|-----------|----------------|
 | 目标格式 | 图文消息 (`article_type: news`) | 图片消息 (`article_type: wx-newspic`) |
 | 内容格式 | Markdown → HTML 渲染 | 纯文本 |
@@ -1083,5 +1083,5 @@ output/slide-03.png  ──→  ↑ 按文件名排序
 | 文档 | 路径 |
 |------|------|
 | 综合文档 | [../综合文档.md](../综合文档.md) |
-| PRD | [../product/PRD-001-wechat-newspic.md](../product/PRD-001-wechat-newspic.md) |
+| PRD | [../product/PRD-001-wx-newspic.md](../product/PRD-001-wx-newspic.md) |
 | 里程碑规划（待产出） | ../../project-management/milestones.md |

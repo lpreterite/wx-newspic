@@ -1,4 +1,8 @@
-# wechat-newspic
+# wx-newspic
+
+[![npm version](https://img.shields.io/npm/v/@packy-tang/wx-newspic.svg)](https://www.npmjs.com/package/@packy-tang/wx-newspic)
+[![License](https://img.shields.io/npm/l/@packy-tang/wx-newspic.svg)](https://github.com/lpreterite/wx-newspic/blob/main/LICENSE)
+[![Node](https://img.shields.io/node/v/@packy-tang/wx-newspic.svg)](https://nodejs.org/)
 
 微信公众号「图片消息」（小绿书）自动化发布工具。支持多图上传、纯文本正文、中转服务器代理 IP 白名单。
 
@@ -9,10 +13,18 @@
 
 ## 安装
 
+### 方式一：npm 全局安装（推荐）
+
+```bash
+npm install -g @packy-tang/wx-newspic
+```
+
+### 方式二：源码构建
+
 ```bash
 # 克隆仓库
-git clone https://github.com/lpreterite/wechat-newspic.git
-cd wechat-newspic
+git clone https://github.com/lpreterite/wx-newspic.git
+cd wx-newspic
 
 # 安装依赖
 npm install
@@ -94,7 +106,7 @@ wx-newspic serve --api-key "sk-your-key" --port 3000
 
 ```ini
 [Unit]
-Description=wechat-newspic Relay Server
+Description=wx-newspic Relay Server
 After=network.target
 
 [Service]
