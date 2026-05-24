@@ -1,0 +1,18 @@
+{
+  "manifest_version": "1.0",
+  "source": {
+    "repository": "lpreterite/ai-engineering",
+    "deployed_at": "2026-05-24T00:00:00Z"
+  },
+  "files": {
+    "principles.md": { "source": "guide/01-principles.md", "version": "v0.7", "customized": false, "previous_version": null },
+    "process.md": { "source": "guide/02-process.md", "version": "v0.7", "customized": false, "previous_version": null },
+    "collaboration.md": { "source": "guide/03-collaboration.md", "version": "v0.2", "customized": false, "previous_version": null },
+    "checklists.md": { "source": "guide/04-checklists.md", "version": "v0.2", "customized": false, "previous_version": null },
+    "deliverables.md": { "source": "guide/05-deliverables.md", "version": "v0.2", "customized": false, "previous_version": null },
+    "document-management.md": { "source": "guide/06-document-management.md", "version": "v0.2", "customized": false, "previous_version": null },
+    "repo-directory-guide.md": { "source": "guide/07-repo-directory-guide.md", "version": "v0.2", "customized": false, "previous_version": "v0.1" },
+    "tool-integration-guide.md": { "source": "guide/08-tool-integration-guide.md", "version": "v0.6", "customized": false, "previous_version": null },
+    "issue-workflow.md": { "source": "guide/issue-workflow.md", "version": "v0.2", "customized": false, "previous_version": "v0.1" }
+  }
+}
