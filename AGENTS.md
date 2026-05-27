@@ -12,5 +12,4 @@
 - docs/ai-engineering/deliverables.md — 产出物要求
 - docs/ai-engineering/document-management.md — 文档管理
 - docs/ai-engineering/issue-workflow.md — Issue 工作流
-- docs/ai-engineering/repo-directory-guide.md — 目录初始化指南
 - docs/STATUS.md — 项目状态卡（任务完成后更新）
