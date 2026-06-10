@@ -7,7 +7,14 @@
 
 ## 当前阶段
 
-**执行阶段** — M5 文档完善已完成（含 Issue #8 正式验收），M6 实战发布待启动
+**执行阶段** — M5 文档完善已完成，M6 实战发布测试中。
+
+## 已知问题
+
+- **BUG-001**: 中转服务器 TokenManager 缓存过期 token 不自刷新（[GitHub Issue #12](https://github.com/lpreterite/wx-newspic/issues/12)）
+  - 触发条件：另一服务使用同一凭证刷新 token 后，wx-newspic relay 缓存失效
+  - 影响范围：`upload-image` 和 `create-draft` 两个路由
+  - 解决方向：40001 时触发强制刷新，或与 wenyan relay 共享 token 缓存
 
 ---
 
@@ -57,7 +64,7 @@
 |------|------|------|
 | T5.1 README 安装与使用说明 | ✅ 完成 | 环境要求、安装方式、命令参考、使用示例、故障排查 |
 | T5.2 创建 .env.example | ✅ 完成 | 环境变量模板文件 |
-| T5.3 修正 skill/SKILL.md | ✅ 完成 | 安装命令改为源码构建流程，快速开始使用全局命令 |
+| T5.3 修正 skills/wx-newspic/SKILL.md | ✅ 完成 | 安装命令改为源码构建流程，快速开始使用全局命令 |
 
 ### M6: 实战发布 ⏳ 待启动
 

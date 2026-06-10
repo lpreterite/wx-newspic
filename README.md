@@ -285,7 +285,7 @@ html-ppt 截图 → wx-newspic publish → 中转服务器（固定IP） → 微
 | 组件 | 目录 | 说明 |
 |------|------|------|
 | 文档 | `docs/` | 需求、API 方案、架构设计、Skill 设计 |
-| Skill | `skill/` | OpenClaw Skill，封装发布链路 |
+| Skill | `skills/wx-newspic/` | Agent Skill，封装发布链路 |
 | CLI | `cli/` | 命令行工具（命令发布 + 中转服务） |
 | 参考 | `reference/` | 现有 wechat-publisher Skill 与 wenyan-cli 命令结构参考 |
 

@@ -95,7 +95,7 @@ AI 将项目中的 skill 定义文件安装到 OpenClaw 的技能目录：
 
 ```bash
 mkdir -p ~/.config/opencode/skills/dw/wx-newspic
-cp /path/to/wx-newspic/skill/SKILL.md \
+cp /path/to/wx-newspic/skills/wx-newspic/SKILL.md \
    ~/.config/opencode/skills/dw/wx-newspic/SKILL.md
 ```
 
@@ -215,7 +215,7 @@ curl -s ifconfig.me
 
 ## Skill 输入输出
 
-安装完成后，AI 可调用 wx-newspic skill。输入字段见 `skill/SKILL.md`：
+安装完成后，AI 可调用 wx-newspic skill。输入字段见 `skills/wx-newspic/SKILL.md`：
 
 | 字段 | 必填 | 说明 |
 |------|------|------|

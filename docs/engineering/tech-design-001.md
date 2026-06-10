@@ -86,7 +86,7 @@ wx-newspic/
 │   └── fixtures/                 # 测试用图片等
 │       └── test-image.png
 │
-├── skill/                        # OpenClaw Skill 定义
+├── skills/wx-newspic/             # Agent Skill 定义
 │   ├── SKILL.md                  # Skill 说明文档
 │   └── scripts/                  # Skill 内部脚本
 │       └── publish.sh
@@ -997,7 +997,7 @@ wx-newspic publish \
 在 `wx-newspic` Skill 中，自动检测 `html-ppt` 项目的工作区截图路径：
 
 ```yaml
-# skill/SKILL.md 中的输入规范
+# skills/wx-newspic/SKILL.md 中的输入规范
 images:
   description: "图片路径列表，支持 glob。自动检测 html-ppt 产出目录"
   auto_detect:

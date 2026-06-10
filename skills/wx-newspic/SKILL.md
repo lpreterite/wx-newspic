@@ -1,20 +1,22 @@
 ---
 name: wx-newspic
-description: "发布图片消息（小绿书）到微信公众号草稿箱。基于 wx-newspic CLI，支持多图上传、纯文本正文、凭证复用 wechat-publisher。"
+description: "发布图片消息（小绿书）到微信公众号草稿箱。基于 wx-newspic CLI，支持多图上传、纯文本正文。适用于将幻灯片截图、图文内容发布为公众号图片消息草稿的场景。"
+license: MIT
+compatibility: |
+  需要 Node.js >= 20，wx-newspic CLI（npm install -g @packy-tang/wx-newspic）。
+  可选：中转服务器（固定 IP，用于微信 API IP 白名单代理）。
 metadata:
-  {
-    "openclaw":
-      {
-        "emoji": "🖼️",
-      },
-  }
+  author: lpreterite
+  version: "0.1.1"
+  openclaw:
+    emoji: "🖼️"
 ---
 
 # wx-newspic
 
 **发布图片消息（小绿书）到微信公众号草稿箱**
 
-基于 [wx-newspic](https://github.com/lpreterite/wx-newspic) CLI 封装的 OpenClaw skill。
+基于 [wx-newspic](https://github.com/lpreterite/wx-newspic) CLI 封装的 Agent Skill。
 
 ## 功能
 
@@ -71,7 +73,10 @@ metadata:
 ### 1. 安装 wx-newspic CLI
 
 ```bash
-# 克隆并构建
+# 方式一：npm 全局安装（推荐）
+npm install -g @packy-tang/wx-newspic
+
+# 方式二：源码构建
 git clone https://github.com/lpreterite/wx-newspic.git
 cd wx-newspic
 npm install
@@ -82,7 +87,13 @@ npm link
 wx-newspic --help
 ```
 
-### 2. 启动中转服务（固定 IP 服务器）
+### 2. 安装此 Skill
+
+```bash
+SKILL_BASE_URL=https://github.com/lpreterite/wx-newspic/tree/main npx skill skills/wx-newspic
+```
+
+### 3. 启动中转服务（固定 IP 服务器）
 
 ```bash
 # 在中转服务器上运行
@@ -95,7 +106,7 @@ wx-newspic serve --api-key "sk-xxxx" --port 3000
 - 图片上传中转
 - 统一错误处理
 
-### 3. 配置微信凭证
+### 4. 配置微信凭证
 
 凭证自动从 `~/.openclaw/skills/wechat-publisher/.env` 读取。
 如需要手动指定：
@@ -135,7 +146,7 @@ wx-newspic publish \
   --api-key "sk-xxx"
 ```
 
-### 在 OpenClaw 中使用
+### 在 Agent 中使用
 
 ```
 "请将 output/ 目录下的 slide 截图以小绿书形式发布到公众号，标题为 'ABC'，正文为 'DEF'"
@@ -205,12 +216,13 @@ wx-newspic publish \
 ## 参考资料
 
 - [微信公众号草稿箱 API 文档](https://developers.weixin.qq.com/doc/subscription/api/draftbox/draftmanage/api_draft_add.html)
-- [wx-newspic 项目文档](../docs/综合文档.md)
-- [技术设计文档](../docs/engineering/tech-design-001.md)
-- [PRD-001: 小绿书图片消息发布工具](../docs/product/PRD-001-wx-newspic.md)
+- [wx-newspic 项目文档](../../docs/综合文档.md)
+- [技术设计文档](../../docs/engineering/tech-design-001.md)
+- [PRD-001: 小绿书图片消息发布工具](../../docs/product/PRD-001-wx-newspic.md)
 
 ## 修订记录
 
 | 版本 | 日期 | 修订内容 |
 |------|------|----------|
 | v0.1 | 2026-05-18 | 初始版本，基于综合文档和 PRD-001 输出 |
+| v0.1.1 | 2026-06-10 | 迁移到 Agent Skills 标准目录结构，补充 frontmatter 字段 |
