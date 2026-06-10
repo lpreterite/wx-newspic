@@ -36,6 +36,48 @@ export interface Credential {
  *
  * 如果所有来源都找不到凭证，抛出错误。
  */
+export interface ServerOptions {
+  serverUrl?: string;
+  apiKey?: string;
+}
+
+export interface ServerConfig {
+  serverUrl: string;
+  apiKey: string;
+}
+
+/**
+ * 获取中转服务器配置
+ *
+ * 优先级（高 → 低）：
+ * 1. CLI 参数（options.serverUrl / options.apiKey）
+ * 2. 环境变量（WECHAT_SERVER_URL / WECHAT_API_KEY，兼容 WX_NEWSPIC_SERVER / WX_NEWSPIC_API_KEY）
+ * 3. .env 文件（SERVER / API_KEY，兼容 WECHAT_SERVER_URL / WECHAT_API_KEY / WX_NEWSPIC_SERVER / WX_NEWSPIC_API_KEY）
+ */
+export function getServerConfig(options: ServerOptions = {}): ServerConfig {
+  if (options.serverUrl && options.apiKey) {
+    return { serverUrl: options.serverUrl, apiKey: options.apiKey };
+  }
+
+  const envServerUrl = process.env.WECHAT_SERVER_URL || process.env.WX_NEWSPIC_SERVER || '';
+  const envApiKey = process.env.WECHAT_API_KEY || process.env.WX_NEWSPIC_API_KEY || '';
+  if (envServerUrl && envApiKey) {
+    return { serverUrl: envServerUrl, apiKey: envApiKey };
+  }
+
+  const envPath = resolveEnvPath();
+  if (existsSync(envPath)) {
+    const envVars = parseDotenv(readFileSync(envPath, 'utf-8'));
+    const fileServerUrl = envVars.SERVER || envVars.WECHAT_SERVER_URL || envVars.WX_NEWSPIC_SERVER || '';
+    const fileApiKey = envVars.API_KEY || envVars.WECHAT_API_KEY || envVars.WX_NEWSPIC_API_KEY || '';
+    if (fileServerUrl && fileApiKey) {
+      return { serverUrl: fileServerUrl, apiKey: fileApiKey };
+    }
+  }
+
+  return { serverUrl: '', apiKey: '' };
+}
+
 export function getCredential(options: CredentialOptions = {}): Credential {
   // 1. CLI 参数优先
   if (options.appId && options.appSecret) {
@@ -74,7 +116,7 @@ export function getCredential(options: CredentialOptions = {}): Credential {
  *
  * 支持：KEY=VALUE、引号包裹的值、行注释（#）
  */
-function parseDotenv(content: string): Record<string, string> {
+export function parseDotenv(content: string): Record<string, string> {
   const result: Record<string, string> = {};
 
   for (const line of content.split('\n')) {

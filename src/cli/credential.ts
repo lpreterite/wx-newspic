@@ -2,7 +2,7 @@ import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { homedir } from 'node:os';
 import { Command } from 'commander';
-import { getCredential } from '../config/credential.js';
+import { getCredential, getServerConfig, parseDotenv } from '../config/credential.js';
 import { WechatClient } from '../wechat/client.js';
 
 const NEW_ENV_PATH = resolve(homedir(), '.openclaw/skills/wx-newspic/.env');
@@ -23,7 +23,7 @@ function getDefaultEnvPath(): string {
 export function registerCredentialCommand(program: Command): void {
   const cmd = program
     .command('credential')
-    .description('管理微信凭证（APP_ID / APP_SECRET）');
+    .description('管理微信凭证和中转服务器配置');
 
   cmd
     .command('show')
@@ -32,9 +32,11 @@ export function registerCredentialCommand(program: Command): void {
 
   cmd
     .command('set')
-    .description('设置凭证')
+    .description('设置凭证和中转服务器配置')
     .option('--app-id <string>', '微信 APP_ID')
     .option('--app-secret, -s <string>', '微信 APP_SECRET')
+    .option('--server <url>', '中转服务器地址')
+    .option('--api-key <string>', '中转服务器 API Key')
     .option('--file, -f <path>', '从 .env 文件导入')
     .action(handleSet);
 
@@ -48,18 +50,45 @@ export function registerCredentialCommand(program: Command): void {
  * 处理 credential show
  */
 async function handleShow(): Promise<void> {
-  try {
+  const hasCred = (() => {
+    try {
+      getCredential();
+      return true;
+    } catch {
+      return false;
+    }
+  })();
+
+  if (hasCred) {
     const cred = getCredential();
     const masked = cred.appSecret.length > 8
       ? cred.appSecret.slice(0, 4) + '****' + cred.appSecret.slice(-4)
       : '****';
 
-    console.log('当前微信凭证：');
+    console.log('微信凭证：');
     console.log(`  APP_ID:    ${cred.appId}`);
     console.log(`  APP_SECRET: ${masked}`);
-    console.log(`  来源: ${describeSource()}`);
-  } catch {
-    console.log('未找到微信凭证。');
+    console.log(`  来源: ${describeCredSource()}`);
+  } else {
+    console.log('微信凭证：未配置');
+  }
+
+  const serverConfig = getServerConfig();
+  console.log('');
+  console.log('中转服务器配置：');
+  if (serverConfig.serverUrl && serverConfig.apiKey) {
+    const maskedKey = serverConfig.apiKey.length > 8
+      ? serverConfig.apiKey.slice(0, 4) + '****' + serverConfig.apiKey.slice(-4)
+      : '****';
+    console.log(`  服务器: ${serverConfig.serverUrl}`);
+    console.log(`  API Key: ${maskedKey}`);
+    console.log(`  来源: ${describeServerSource()}`);
+  } else {
+    console.log('  未配置（使用直连模式时无需配置）');
+  }
+
+  if (!hasCred) {
+    console.log('');
     console.log('请通过以下任一方式配置：');
     console.log('  1. wx-newspic credential set --app-id <id> --app-secret <secret>');
     console.log('  2. 环境变量 WECHAT_APP_ID / WECHAT_APP_SECRET');
@@ -73,6 +102,8 @@ async function handleShow(): Promise<void> {
 async function handleSet(options: Record<string, string>): Promise<void> {
   let appId = options.appId;
   let appSecret = options.appSecret;
+  let serverUrl = options.server;
+  let apiKey = options.apiKey;
 
   // 从文件导入
   if (options.file) {
@@ -85,10 +116,12 @@ async function handleSet(options: Record<string, string>): Promise<void> {
     const vars = parseDotenv(content);
     appId = vars.WECHAT_APP_ID || vars.APP_ID || appId;
     appSecret = vars.WECHAT_APP_SECRET || vars.APP_SECRET || appSecret;
+    serverUrl = vars.SERVER || vars.WECHAT_SERVER_URL || vars.WX_NEWSPIC_SERVER || serverUrl;
+    apiKey = vars.API_KEY || vars.WECHAT_API_KEY || vars.WX_NEWSPIC_API_KEY || apiKey;
   }
 
-  if (!appId || !appSecret) {
-    console.error('错误：请提供 --app-id 和 --app-secret，或使用 --file 导入 .env 文件');
+  if (!appId && !appSecret && !serverUrl && !apiKey) {
+    console.error('错误：请提供至少一项配置（--app-id / --app-secret / --server / --api-key），或使用 --file 导入 .env 文件');
     process.exit(1);
   }
 
@@ -98,16 +131,43 @@ async function handleSet(options: Record<string, string>): Promise<void> {
     mkdirSync(envDir, { recursive: true });
   }
 
-  // 写入 .env 文件
-  const content = [
-    '# wx-newspic 微信凭证',
-    `APP_ID=${appId}`,
-    `APP_SECRET=${appSecret}`,
-    '',
-  ].join('\n');
+  // 读取现有 .env 内容（保留已有字段）
+  const existing: Record<string, string> = {};
+  if (existsSync(NEW_ENV_PATH)) {
+    const existingContent = readFileSync(NEW_ENV_PATH, 'utf-8');
+    Object.assign(existing, parseDotenv(existingContent));
+  }
 
-  writeFileSync(NEW_ENV_PATH, content, 'utf-8');
-  console.log(`凭证已写入: ${NEW_ENV_PATH}`);
+  // 合并：CLI 参数覆盖 .env 中的值
+  const mergedAppId = appId || existing.APP_ID || '';
+  const mergedAppSecret = appSecret || existing.APP_SECRET || '';
+  const mergedServerUrl = serverUrl || existing.SERVER || existing.WECHAT_SERVER_URL || '';
+  const mergedApiKey = apiKey || existing.API_KEY || existing.WECHAT_API_KEY || '';
+
+  // 写入 .env 文件
+  const lines: string[] = [
+    '# wx-newspic 微信凭证',
+    `APP_ID=${mergedAppId}`,
+    `APP_SECRET=${mergedAppSecret}`,
+    '',
+  ];
+
+  if (mergedServerUrl || mergedApiKey) {
+    lines.push('# 中转服务器配置');
+    if (mergedServerUrl) lines.push(`SERVER=${mergedServerUrl}`);
+    if (mergedApiKey) lines.push(`API_KEY=${mergedApiKey}`);
+    lines.push('');
+  }
+
+  writeFileSync(NEW_ENV_PATH, lines.join('\n'), 'utf-8');
+
+  const written: string[] = [];
+  if (mergedAppId) written.push('APP_ID');
+  if (mergedAppSecret) written.push('APP_SECRET');
+  if (mergedServerUrl) written.push('SERVER');
+  if (mergedApiKey) written.push('API_KEY');
+  console.log(`配置已写入: ${NEW_ENV_PATH}`);
+  console.log(`  字段: ${written.join(', ')}`);
 }
 
 /**
@@ -145,7 +205,7 @@ async function handleCheck(): Promise<void> {
 /**
  * 描述凭证来源
  */
-function describeSource(): string {
+function describeCredSource(): string {
   if (process.env.WECHAT_APP_ID && process.env.WECHAT_APP_SECRET) {
     return '环境变量 WECHAT_APP_ID / WECHAT_APP_SECRET';
   }
@@ -158,25 +218,13 @@ function describeSource(): string {
   return '未知';
 }
 
-/**
- * 简易 .env 文件解析器
- *
- * 支持读取多种键名格式，兼容旧版（WECHAT_APP_ID / WECHAT_APP_SECRET）和新版（APP_ID / APP_SECRET）
- */
-function parseDotenv(content: string): Record<string, string> {
-  const result: Record<string, string> = {};
-  for (const line of content.split('\n')) {
-    const trimmed = line.trim();
-    if (!trimmed || trimmed.startsWith('#')) continue;
-    const eqIndex = trimmed.indexOf('=');
-    if (eqIndex === -1) continue;
-    const key = trimmed.slice(0, eqIndex).trim();
-    let value = trimmed.slice(eqIndex + 1).trim();
-    if ((value.startsWith('"') && value.endsWith('"')) ||
-        (value.startsWith("'") && value.endsWith("'"))) {
-      value = value.slice(1, -1);
-    }
-    result[key] = value;
+function describeServerSource(): string {
+  if (process.env.WECHAT_SERVER_URL || process.env.WX_NEWSPIC_SERVER) {
+    return '环境变量';
   }
-  return result;
+  if (existsSync(NEW_ENV_PATH)) {
+    return `.env 文件 (${NEW_ENV_PATH})`;
+  }
+  return '未知';
 }
+

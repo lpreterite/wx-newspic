@@ -2,7 +2,7 @@ import { readFileSync, statSync } from 'node:fs';
 import { extname, basename } from 'node:path';
 import { Command } from 'commander';
 import { globbySync } from 'globby';
-import { getCredential } from '../config/credential.js';
+import { getCredential, getServerConfig } from '../config/credential.js';
 import { WechatClientError } from '../wechat/client.js';
 
 /** 支持的图片格式 */
@@ -76,9 +76,10 @@ async function handlePublish(options: Record<string, string | string[]>): Promis
     appSecret: options.appSecret as string | undefined,
   });
 
-  // 4. 确定服务器地址
-  const serverUrl = (options.server as string) || process.env.WECHAT_SERVER_URL || process.env.WX_NEWSPIC_SERVER || '';
-  const apiKey = (options.apiKey as string) || process.env.WECHAT_API_KEY || process.env.WX_NEWSPIC_API_KEY || '';
+  // 4. 确定服务器地址（优先级: CLI参数 > 环境变量 > .env文件）
+  const { serverUrl: fileServerUrl, apiKey: fileApiKey } = getServerConfig();
+  const serverUrl = (options.server as string) || process.env.WECHAT_SERVER_URL || process.env.WX_NEWSPIC_SERVER || fileServerUrl || '';
+  const apiKey = (options.apiKey as string) || process.env.WECHAT_API_KEY || process.env.WX_NEWSPIC_API_KEY || fileApiKey || '';
 
   // 5. 执行发布
   const result = await executePublish({
