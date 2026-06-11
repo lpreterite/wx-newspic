@@ -14,6 +14,7 @@ interface CreateDraftBody {
   content?: string;
   digest?: string;
   thumb_media_id?: string;
+  content_source_url?: string;
   image_list?: Array<{ image_media_id: string }>;
   need_open_comment?: number;
   only_fans_can_comment?: number;
@@ -41,6 +42,14 @@ export function registerDraftRoute(app: FastifyInstance, options: DraftRouteOpti
 
     const articleType = body.article_type === 'news' ? 'news' : 'newspic';
 
+    if (articleType === 'news' && !body.thumb_media_id) {
+      reply.status(400).send({
+        success: false,
+        error: { code: 'MISSING_THUMB_MEDIA_ID', message: '图文消息需要封面图 thumb_media_id' },
+      });
+      return;
+    }
+
     if (articleType === 'newspic' && (!body.image_list || body.image_list.length === 0)) {
       reply.status(400).send({
         success: false,
@@ -55,6 +64,7 @@ export function registerDraftRoute(app: FastifyInstance, options: DraftRouteOpti
           article_type: 'news',
           content: body.content || '',
           thumb_media_id: body.thumb_media_id,
+          content_source_url: body.content_source_url,
           author: body.author,
           need_open_comment: body.need_open_comment ?? 1,
           only_fans_can_comment: body.only_fans_can_comment ?? 0,
