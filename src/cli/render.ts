@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve, extname, basename } from 'node:path';
 import { execSync } from 'node:child_process';
 import { Command } from 'commander';
@@ -14,6 +14,7 @@ export function registerRenderCommand(program: Command): void {
     .requiredOption('--md, -m <path>', 'Markdown 文件路径（必填）')
     .option('--theme <string>', '排版主题（默认 default）')
     .option('--hl-theme <string>', '代码高亮主题')
+    .option('--theme-file <path>', '自定义主题 CSS 文件路径（与 --theme 配合使用）')
     .option('--output, -o <path>', '输出 HTML 文件路径（默认 ./{文件名}.html）')
     .option('--open, -O', '渲染后用默认浏览器打开')
     .action(handleRender);
@@ -23,9 +24,14 @@ export async function handleRender(options: Record<string, string>): Promise<voi
   const mdPath = resolve(String(options.md));
   const theme = (options.theme as string) || 'default';
   const hlTheme = options.hlTheme as string | undefined;
+  const themeFile = options.themeFile ? resolve(String(options.themeFile)) : undefined;
+
+  if (themeFile) {
+    validateThemeFile(themeFile);
+  }
 
   const markdown = readFileSync(mdPath, 'utf-8');
-  const result = await renderArticle({ content: markdown, theme, hlTheme });
+  const result = await renderArticle({ content: markdown, theme, hlTheme, themeFile });
 
   const outputPath = resolve(
     String(options.output || basename(mdPath, extname(mdPath)) + '.html'),
@@ -36,5 +42,17 @@ export async function handleRender(options: Record<string, string>): Promise<voi
 
   if (options.open || options.O) {
     execSync(`open "${outputPath}"`);
+  }
+}
+
+export function validateThemeFile(themeFile: string): void {
+  if (!existsSync(themeFile)) {
+    console.error(`错误：主题文件不存在: ${themeFile}`);
+    process.exit(1);
+  }
+  const ext = extname(themeFile).toLowerCase();
+  if (ext !== '.css') {
+    console.error(`错误：主题文件必须是 .css 格式，当前: ${ext}`);
+    process.exit(1);
   }
 }
