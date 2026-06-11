@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { registerPublishCommand } from './publish.js';
+import { registerRenderCommand } from './render.js';
 import { registerServeCommand } from './serve.js';
 import { registerCredentialCommand } from './credential.js';
 
@@ -36,6 +37,7 @@ export async function runCLI(): Promise<void> {
 
   // 注册子命令
   registerPublishCommand(program);
+  registerRenderCommand(program);
   registerServeCommand(program);
   registerCredentialCommand(program);
 
