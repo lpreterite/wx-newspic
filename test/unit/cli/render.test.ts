@@ -4,10 +4,12 @@ const mockReadFileSync = vi.fn();
 const mockWriteFileSync = vi.fn();
 const mockExecSync = vi.fn();
 const mockRenderArticle = vi.fn();
+const mockExistsSync = vi.fn();
 
 vi.mock('node:fs', () => ({
   readFileSync: mockReadFileSync,
   writeFileSync: mockWriteFileSync,
+  existsSync: mockExistsSync,
 }));
 
 vi.mock('node:child_process', () => ({
@@ -90,5 +92,33 @@ describe('render command', () => {
     await handleRender({ md: '/tmp/article.md' });
 
     expect(mockExecSync).not.toHaveBeenCalled();
+  });
+
+  it('supports --theme-file option', async () => {
+    mockExistsSync.mockReturnValue(true);
+    const { handleRender } = await import('../../../src/cli/render.js');
+
+    await handleRender({
+      md: '/tmp/article.md',
+      theme: 'mytheme',
+      themeFile: '/tmp/mytheme.css',
+    });
+
+    expect(mockRenderArticle).toHaveBeenCalledWith({
+      content: '# Hello\n\nWorld',
+      theme: 'mytheme',
+      hlTheme: undefined,
+      themeFile: '/tmp/mytheme.css',
+    });
+  });
+
+  it('validates theme file existence', async () => {
+    mockExistsSync.mockReturnValue(false);
+    const { handleRender } = await import('../../../src/cli/render.js');
+
+    await expect(handleRender({
+      md: '/tmp/article.md',
+      themeFile: '/tmp/nonexistent.css',
+    })).rejects.toThrow();
   });
 });

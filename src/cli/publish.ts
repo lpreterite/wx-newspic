@@ -1,5 +1,5 @@
-import { readFileSync, writeFileSync, statSync } from 'node:fs';
-import { extname, basename } from 'node:path';
+import { existsSync, readFileSync, writeFileSync, statSync } from 'node:fs';
+import { resolve, extname, basename } from 'node:path';
 import { Command } from 'commander';
 import { globbySync } from 'globby';
 import { getCredential, getServerConfig } from '../config/credential.js';
@@ -40,6 +40,7 @@ export function registerPublishCommand(program: Command): void {
     .option('--md, -m <path>', 'Markdown 文件路径（news 模式，与 --content 二选一）')
     .option('--images, -i <path...>', '图片路径列表（newspic 模式必填，支持 glob）')
     .option('--theme <string>', '排版主题（news 模式，默认 default）')
+    .option('--theme-file <path>', '自定义主题 CSS 文件路径（news 模式，与 --theme 配合使用）')
     .option('--author, -a <string>', '作者')
     .option('--digest, -d <string>', '摘要（仅 newspic）')
     .option('--server, -s <url>', '中转服务器地址')
@@ -61,6 +62,19 @@ async function handlePublish(options: Record<string, string | string[]>): Promis
 
 async function handleNewsPublish(options: Record<string, string | string[]>): Promise<void> {
   const theme = (options.theme as string) || 'default';
+  const themeFile = options.themeFile ? resolve(String(options.themeFile)) : undefined;
+
+  if (themeFile) {
+    if (!existsSync(themeFile)) {
+      console.error(`错误：主题文件不存在: ${themeFile}`);
+      process.exit(1);
+    }
+    const ext = extname(themeFile).toLowerCase();
+    if (ext !== '.css') {
+      console.error(`错误：主题文件必须是 .css 格式，当前: ${ext}`);
+      process.exit(1);
+    }
+  }
 
   const title = String(options.title || '').trim();
   const mdContent = options.md
@@ -68,7 +82,7 @@ async function handleNewsPublish(options: Record<string, string | string[]>): Pr
     : String(options.content || '').trim();
 
   // 渲染 Markdown
-  const rendered = await renderArticle({ content: mdContent, theme });
+  const rendered = await renderArticle({ content: mdContent, theme, themeFile });
 
   // 标题优先级: --title > frontmatter title
   const finalTitle = title || rendered.title || '';

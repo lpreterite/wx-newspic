@@ -1,6 +1,6 @@
 # wx-newspic 项目状态
 
-> 最后更新：2026-06-11（Milestone M8 长文发布完成）
+> 最后更新：2026-06-11（Milestone #30 自定义主题加载完成）
 > 项目总览：[README.md](../README.md)
 
 ---
@@ -50,6 +50,7 @@
 | T3.4 credential 命令 | ✅ 完成 | — | show/set/check |
 | T3.5 CLI 路由 | ✅ 完成 | — | Commander 集成 |
 | T3.6 单元测试 | ✅ 完成 | 17/17 | 参数校验全覆盖 |
+| T3.7 theme 子命令 | ✅ 完成 | — | theme add/remove/list 管理自定义主题 |
 
 ### M4: Skill 封装 ✅ 完成
 
@@ -80,14 +81,14 @@
 | T7.1 @wenyan-md/core 集成 | ✅ 完成 | 8/8 | 渲染内核，HTML/纯文本双输出 |
 | T7.2 主题管理 themes.ts | ✅ 完成 | 4/4 | 注册式主题机制，3 内置主题 |
 | T7.3 图片提取 images.ts | ✅ 完成 | 13/13 | 纯函数提取，覆盖本地/远程/base64 |
-| T7.4 render 命令 | ✅ 完成 | 5/5 | --output/--theme/--open |
+| T7.4 render 命令 | ✅ 完成 | 7/7 | --output/--theme/--hl-theme/--open/--theme-file |
 
 ### M8: 长文发布 ✅ 完成
 
 | 任务 | 状态 | 测试 | 说明 |
 |------|------|------|------|
 | T8.1 设计文档 tech-design-002 | ✅ 完成 | — | 架构设计 + API 定义 |
-| T8.2 publish 命令 news 模式 | ✅ 完成 | 19/19 | --type/--md/--theme，渲染+提取+上传+发布 |
+| T8.2 publish 命令 news 模式 | ✅ 完成 | 19/19 | --type/--md/--theme/--theme-file，渲染+提取+上传+发布 |
 | T8.3 SKILL.md + publish.sh 更新 | ✅ 完成 | — | type/md/theme 参数透传，双模式支持 |
 
 ---
@@ -104,11 +105,11 @@
 | server/middleware/error.test.ts | 5 | ✅ |
 | server/integration/server.test.ts | 12 | ✅ |
 | cli/publish.test.ts | 19 | ✅ |
-| cli/render.test.ts | 5 | ✅ |
+| cli/render.test.ts | 7 | ✅ |
 | renderer/index.test.ts | 8 | ✅ |
 | renderer/themes.test.ts | 4 | ✅ |
 | renderer/images.test.ts | 13 | ✅ |
-| **总计** | **113** | **✅ 全部通过** |
+| **总计** | **116** | **✅ 全部通过** |
 
 ---
 

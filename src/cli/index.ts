@@ -6,6 +6,7 @@ import { registerPublishCommand } from './publish.js';
 import { registerRenderCommand } from './render.js';
 import { registerServeCommand } from './serve.js';
 import { registerCredentialCommand } from './credential.js';
+import { registerThemeCommand } from './theme.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -40,6 +41,7 @@ export async function runCLI(): Promise<void> {
   registerRenderCommand(program);
   registerServeCommand(program);
   registerCredentialCommand(program);
+  registerThemeCommand(program);
 
   await program.parseAsync(process.argv);
 }
