@@ -1,13 +1,13 @@
 # wx-newspic 项目状态
 
-> 最后更新：2026-05-19（Issue #9 修复完成）
+> 最后更新：2026-06-11（Milestone M8 长文发布完成）
 > 项目总览：[README.md](../README.md)
 
 ---
 
 ## 当前阶段
 
-**执行阶段** — M5 文档完善已完成，M6 实战发布测试中。
+**执行阶段** — M7 渲染管线完成，M8 长文发布完成。M6 实战发布待启动。
 
 ## 已知问题
 
@@ -73,6 +73,23 @@
 | T6.1 配置中转服务器 | ⏳ 待启动 | 需要 VPS/云服务器（固定 IP） |
 | T6.2 发布 HyperFrames 短文 | ⏳ 待启动 | 需要微信凭证 + 服务器 |
 
+### M7: 渲染管线 ✅ 完成
+
+| 任务 | 状态 | 测试 | 说明 |
+|------|------|------|------|
+| T7.1 @wenyan-md/core 集成 | ✅ 完成 | 8/8 | 渲染内核，HTML/纯文本双输出 |
+| T7.2 主题管理 themes.ts | ✅ 完成 | 4/4 | 注册式主题机制，3 内置主题 |
+| T7.3 图片提取 images.ts | ✅ 完成 | 13/13 | 纯函数提取，覆盖本地/远程/base64 |
+| T7.4 render 命令 | ✅ 完成 | 5/5 | --output/--theme/--open |
+
+### M8: 长文发布 ✅ 完成
+
+| 任务 | 状态 | 测试 | 说明 |
+|------|------|------|------|
+| T8.1 设计文档 tech-design-002 | ✅ 完成 | — | 架构设计 + API 定义 |
+| T8.2 publish 命令 news 模式 | ✅ 完成 | 19/19 | --type/--md/--theme，渲染+提取+上传+发布 |
+| T8.3 SKILL.md + publish.sh 更新 | ✅ 完成 | — | type/md/theme 参数透传，双模式支持 |
+
 ---
 
 ## 测试总览
@@ -85,9 +102,13 @@
 | wechat/draft.test.ts | 8 | ✅ |
 | server/middleware/auth.test.ts | 4 | ✅ |
 | server/middleware/error.test.ts | 5 | ✅ |
-| server/integration/server.test.ts | 11 | ✅ |
-| cli/publish.test.ts | 17 | ✅ |
-| **总计** | **80** | **✅ 全部通过** |
+| server/integration/server.test.ts | 12 | ✅ |
+| cli/publish.test.ts | 19 | ✅ |
+| cli/render.test.ts | 5 | ✅ |
+| renderer/index.test.ts | 8 | ✅ |
+| renderer/themes.test.ts | 4 | ✅ |
+| renderer/images.test.ts | 13 | ✅ |
+| **总计** | **113** | **✅ 全部通过** |
 
 ---
 
@@ -104,6 +125,9 @@
 | [#7](https://github.com/lpreterite/wx-newspic/issues/7) | DOCS-002: 注释描述的键名与实际代码不符 | P2 | ✅ resolved |
 | [#8](https://github.com/lpreterite/wx-newspic/issues/8) | ENH-002: 提供 OpenClaw 自动安装手册 | P2 | ✅ verified |
 | [#9](https://github.com/lpreterite/wx-newspic/issues/9) | BUG-005: article_type 未传递，草稿箱生成普通文章而非小绿书 | P0 | ✅ resolved |
+| [#16](https://github.com/lpreterite/wx-newspic/issues/16) | TECH-DESIGN-002: 长文发布渲染管线设计文档 | P2 | ✅ resolved |
+| [#24](https://github.com/lpreterite/wx-newspic/issues/24) | FEAT: publish 命令支持 --type news 长文发布 | P1 | ✅ resolved |
+| [#25](https://github.com/lpreterite/wx-newspic/issues/25) | FEAT: SKILL.md + publish.sh 更新支持 news 模式 | P1 | ✅ resolved |
 
 ## 风险项
 
