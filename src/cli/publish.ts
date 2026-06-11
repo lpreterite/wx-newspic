@@ -1,20 +1,15 @@
-import { readFileSync, statSync } from 'node:fs';
+import { readFileSync, writeFileSync, statSync } from 'node:fs';
 import { extname, basename } from 'node:path';
 import { Command } from 'commander';
 import { globbySync } from 'globby';
 import { getCredential, getServerConfig } from '../config/credential.js';
 import { WechatClientError } from '../wechat/client.js';
+import { renderArticle } from '../renderer/index.js';
+import { extractImageSrcs, replaceImageSrcs, extractFirstImage } from '../renderer/images.js';
 
-/** 支持的图片格式 */
 const SUPPORTED_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.gif'];
-
-/** 单张图片大小限制（字节） */
 const MAX_IMAGE_SIZE = 10 * 1024 * 1024;
-
-/** 图片数量限制 */
 const MAX_IMAGE_COUNT = 20;
-
-/** 标题最大长度 */
 const MAX_TITLE_LENGTH = 32;
 
 export interface PublishOptions {
@@ -35,18 +30,18 @@ interface DraftResult {
   success: true;
 }
 
-/**
- * 注册 publish 子命令
- */
 export function registerPublishCommand(program: Command): void {
-  program
+  const cmd = program
     .command('publish')
-    .description('发布图片消息到公众号草稿箱')
-    .requiredOption('--title, -t <string>', '标题（必填，最长 32 字）')
-    .requiredOption('--content, -c <string>', '正文内容（纯文本）')
-    .requiredOption('--images, -i <path...>', '图片路径列表（支持 glob，最多 20 张）')
+    .description('发布到公众号草稿箱（支持图片消息和图文消息）')
+    .option('--type, -T <choice>', '文章类型: news | newspic（默认 newspic）')
+    .option('--title, -t <string>', '标题（必填，最长 32 字）')
+    .option('--content, -c <string>', '正文内容（newspic 为纯文本，news 为 Markdown）')
+    .option('--md, -m <path>', 'Markdown 文件路径（news 模式，与 --content 二选一）')
+    .option('--images, -i <path...>', '图片路径列表（newspic 模式必填，支持 glob）')
+    .option('--theme <string>', '排版主题（news 模式，默认 default）')
     .option('--author, -a <string>', '作者')
-    .option('--digest, -d <string>', '摘要')
+    .option('--digest, -d <string>', '摘要（仅 newspic）')
     .option('--server, -s <url>', '中转服务器地址')
     .option('--app-id <string>', '微信 APP_ID')
     .option('--app-secret <string>', '微信 APP_SECRET')
@@ -54,11 +49,60 @@ export function registerPublishCommand(program: Command): void {
     .action(handlePublish);
 }
 
-/**
- * 处理 publish 命令
- */
 async function handlePublish(options: Record<string, string | string[]>): Promise<void> {
-  // 1. 提取并校验参数
+  const type = (options.type as string) || 'newspic';
+
+  if (type === 'news') {
+    await handleNewsPublish(options);
+  } else {
+    await handleNewspicPublish(options);
+  }
+}
+
+async function handleNewsPublish(options: Record<string, string | string[]>): Promise<void> {
+  const theme = (options.theme as string) || 'default';
+
+  const title = String(options.title || '').trim();
+  const mdContent = options.md
+    ? readFileSync(String(options.md), 'utf-8')
+    : String(options.content || '').trim();
+
+  // 渲染 Markdown
+  const rendered = await renderArticle({ content: mdContent, theme });
+
+  // 标题优先级: --title > frontmatter title
+  const finalTitle = title || rendered.title || '';
+  validateTitle(finalTitle);
+
+  if (!rendered.content) {
+    console.error('错误：渲染后内容为空');
+    process.exit(1);
+  }
+
+  const cred = getCredential({
+    appId: options.appId as string | undefined,
+    appSecret: options.appSecret as string | undefined,
+  });
+
+  const { serverUrl: fileServerUrl, apiKey: fileApiKey } = getServerConfig();
+  const serverUrl = (options.server as string) || process.env.WECHAT_SERVER_URL || process.env.WX_NEWSPIC_SERVER || fileServerUrl || '';
+  const apiKey = (options.apiKey as string) || process.env.WECHAT_API_KEY || process.env.WX_NEWSPIC_API_KEY || fileApiKey || '';
+
+  const result = await executeNewsPublish({
+    title: finalTitle,
+    content: rendered.content,
+    cover: rendered.cover,
+    author: rendered.author || (options.author as string | undefined),
+    serverUrl,
+    apiKey,
+    appId: cred.appId,
+    appSecret: cred.appSecret,
+  });
+
+  console.log(JSON.stringify(result, null, 2));
+}
+
+async function handleNewspicPublish(options: Record<string, string | string[]>): Promise<void> {
   const title = String(options.title || '').trim();
   const content = String(options.content || '').trim();
   const imageArgs = Array.isArray(options.images) ? options.images : [String(options.images)];
@@ -66,23 +110,19 @@ async function handlePublish(options: Record<string, string | string[]>): Promis
   validateTitle(title);
   validateContent(content);
 
-  // 2. 解析图片路径（支持 glob）
   const imagePaths = resolveImagePaths(imageArgs);
   validateImages(imagePaths);
 
-  // 3. 读取凭证
   const cred = getCredential({
     appId: options.appId as string | undefined,
     appSecret: options.appSecret as string | undefined,
   });
 
-  // 4. 确定服务器地址（优先级: CLI参数 > 环境变量 > .env文件）
   const { serverUrl: fileServerUrl, apiKey: fileApiKey } = getServerConfig();
   const serverUrl = (options.server as string) || process.env.WECHAT_SERVER_URL || process.env.WX_NEWSPIC_SERVER || fileServerUrl || '';
   const apiKey = (options.apiKey as string) || process.env.WECHAT_API_KEY || process.env.WX_NEWSPIC_API_KEY || fileApiKey || '';
 
-  // 5. 执行发布
-  const result = await executePublish({
+  const result = await executeNewspicPublish({
     title,
     content,
     imagePaths,
@@ -94,13 +134,9 @@ async function handlePublish(options: Record<string, string | string[]>): Promis
     appSecret: cred.appSecret,
   });
 
-  // 6. 输出结果
   console.log(JSON.stringify(result, null, 2));
 }
 
-/**
- * 校验标题
- */
 export function validateTitle(title: string): void {
   if (!title) {
     console.error('错误：标题不能为空');
@@ -112,9 +148,6 @@ export function validateTitle(title: string): void {
   }
 }
 
-/**
- * 校验正文
- */
 export function validateContent(content: string): void {
   if (!content) {
     console.error('错误：正文不能为空');
@@ -122,9 +155,6 @@ export function validateContent(content: string): void {
   }
 }
 
-/**
- * 解析图片路径列表（支持 glob）
- */
 export function resolveImagePaths(args: string[]): string[] {
   const paths: string[] = [];
 
@@ -133,7 +163,6 @@ export function resolveImagePaths(args: string[]): string[] {
     if (resolved.length > 0) {
       paths.push(...resolved);
     } else {
-      // 尝试作为单个文件路径
       try {
         statSync(arg);
         paths.push(arg);
@@ -144,13 +173,9 @@ export function resolveImagePaths(args: string[]): string[] {
     }
   }
 
-  // 去重并按文件名排序
   return [...new Set(paths)].sort();
 }
 
-/**
- * 校验图片列表
- */
 export function validateImages(imagePaths: string[]): void {
   if (imagePaths.length === 0) {
     console.error('错误：至少需要一张图片');
@@ -163,7 +188,6 @@ export function validateImages(imagePaths: string[]): void {
   }
 
   for (const imgPath of imagePaths) {
-    // 校验文件存在性
     try {
       statSync(imgPath);
     } catch {
@@ -171,14 +195,12 @@ export function validateImages(imagePaths: string[]): void {
       process.exit(1);
     }
 
-    // 校验格式
     const ext = extname(imgPath).toLowerCase();
     if (!SUPPORTED_EXTENSIONS.includes(ext)) {
       console.error(`错误：不支持的图片格式 "${ext}"，仅支持 PNG/JPEG/JPG/GIF: ${imgPath}`);
       process.exit(1);
     }
 
-    // 校验大小
     const stats = statSync(imgPath);
     if (stats.size > MAX_IMAGE_SIZE) {
       const sizeMB = (stats.size / 1024 / 1024).toFixed(2);
@@ -188,12 +210,7 @@ export function validateImages(imagePaths: string[]): void {
   }
 }
 
-/**
- * 执行发布流程
- *
- * 与中转服务器通信，上传图片并创建草稿。
- */
-export async function executePublish(params: {
+export async function executeNewspicPublish(params: {
   title: string;
   content: string;
   imagePaths: string[];
@@ -218,7 +235,6 @@ export async function executePublish(params: {
     ? { 'Authorization': `Bearer ${apiKey}` }
     : {};
 
-  // 3.1 上传图片
   const imageMediaIds: string[] = [];
 
   for (const imagePath of imagePaths) {
@@ -231,9 +247,7 @@ export async function executePublish(params: {
 
     const uploadRes = await fetch(`${baseUrl}/api/wechat/upload-image`, {
       method: 'POST',
-      headers: {
-        ...authHeaders,
-      },
+      headers: { ...authHeaders },
       body: formData,
     });
 
@@ -249,7 +263,6 @@ export async function executePublish(params: {
     imageMediaIds.push(uploadResult.data.image_media_id);
   }
 
-  // 3.2 创建草稿
   const draftBody = {
     article_type: 'newspic',
     title,
@@ -288,4 +301,138 @@ export async function executePublish(params: {
     created_at: draftResult.data.created_at,
     success: true,
   };
+}
+
+/** @deprecated 使用 executeNewspicPublish */
+export const executePublish = executeNewspicPublish;
+
+export async function executeNewsPublish(params: {
+  title: string;
+  content: string;
+  cover?: string;
+  author?: string;
+  serverUrl: string;
+  apiKey: string;
+  appId: string;
+  appSecret: string;
+}): Promise<DraftResult> {
+  const { title, content, cover, author, serverUrl, apiKey } = params;
+
+  if (!serverUrl) {
+    throw new WechatClientError(
+      'SERVER_URL_MISSING',
+      '未指定中转服务器地址。请通过 --server 参数或 WECHAT_SERVER_URL 环境变量指定。',
+    );
+  }
+
+  const baseUrl = serverUrl.replace(/\/+$/, '');
+  const authHeaders: Record<string, string> = apiKey
+    ? { 'Authorization': `Bearer ${apiKey}` }
+    : {};
+
+  // 提取 HTML 中的图片并上传
+  const imageSrcs = extractImageSrcs(content);
+  const srcToMediaId: Record<string, string> = {};
+
+  for (const src of imageSrcs) {
+    if (src.startsWith('data:')) continue;
+
+    let imagePath: string;
+    if (src.startsWith('http://') || src.startsWith('https://')) {
+      imagePath = await downloadImage(src);
+    } else {
+      try {
+        statSync(src);
+        imagePath = src;
+      } catch {
+        continue;
+      }
+    }
+
+    const buffer = readFileSync(imagePath);
+    const filename = basename(imagePath);
+    const blob = new Blob([buffer]);
+
+    const formData = new FormData();
+    formData.append('image', blob, filename);
+
+    const uploadRes = await fetch(`${baseUrl}/api/wechat/upload-image`, {
+      method: 'POST',
+      headers: { ...authHeaders },
+      body: formData,
+    });
+
+    const uploadResult = await uploadRes.json() as { success: boolean; data?: { image_media_id: string; url: string }; error?: { code: string; message: string } };
+
+    if (!uploadResult.success || !uploadResult.data) {
+      throw new WechatClientError(
+        uploadResult.error?.code || 'UPLOAD_FAILED',
+        uploadResult.error?.message || `图片上传失败: ${src}`,
+      );
+    }
+
+    srcToMediaId[src] = uploadResult.data.image_media_id;
+  }
+
+  // 替换 <img src> 为 media_id
+  let htmlContent = replaceImageSrcs(content, srcToMediaId);
+
+  // 确定封面
+  let thumbMediaId: string | undefined;
+  if (cover && srcToMediaId[cover]) {
+    thumbMediaId = srcToMediaId[cover];
+  } else {
+    const firstSrc = extractFirstImage(content);
+    if (firstSrc && srcToMediaId[firstSrc]) {
+      thumbMediaId = srcToMediaId[firstSrc];
+    }
+  }
+
+  const draftBody: Record<string, unknown> = {
+    article_type: 'news',
+    title,
+    content: htmlContent,
+    author,
+    need_open_comment: 1,
+    only_fans_can_comment: 0,
+  };
+  if (thumbMediaId) {
+    draftBody.thumb_media_id = thumbMediaId;
+  }
+
+  const draftRes = await fetch(`${baseUrl}/api/wechat/create-draft`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...authHeaders,
+    },
+    body: JSON.stringify(draftBody),
+  });
+
+  const draftResult = await draftRes.json() as {
+    success: boolean;
+    data?: { media_id: string; created_at: string };
+    error?: { code: string; message: string };
+  };
+
+  if (!draftResult.success || !draftResult.data) {
+    throw new WechatClientError(
+      draftResult.error?.code || 'DRAFT_FAILED',
+      draftResult.error?.message || '创建草稿失败',
+    );
+  }
+
+  return {
+    media_id: draftResult.data.media_id,
+    created_at: draftResult.data.created_at,
+    success: true,
+  };
+}
+
+async function downloadImage(url: string): Promise<string> {
+  const res = await fetch(url);
+  const buffer = Buffer.from(await res.arrayBuffer());
+  const tmpFile = `/tmp/wx-newspic-${Date.now()}-${basename(url)}`;
+  writeFileSync(tmpFile, buffer);
+  return tmpFile;
 }

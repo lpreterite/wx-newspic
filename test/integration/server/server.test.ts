@@ -166,6 +166,22 @@ describe('POST /api/wechat/create-draft', () => {
     const body = JSON.parse(res.body);
     expect(body.success).toBe(false);
   });
+
+  it('news 类型不需要 image_list', async () => {
+    const res = await inject('POST', '/api/wechat/create-draft', {
+      headers: {
+        Authorization: 'Bearer test-api-key-123',
+        'Content-Type': 'application/json',
+      },
+      body: {
+        article_type: 'news',
+        title: '图文消息',
+        content: '<h1>正文</h1>',
+        thumb_media_id: 'cover_media_id',
+      },
+    });
+    expect(res.statusCode).not.toBe(400);
+  });
 });
 
 describe('GET /api/wechat/drafts', () => {
@@ -173,7 +189,6 @@ describe('GET /api/wechat/drafts', () => {
     const res = await inject('GET', '/api/wechat/drafts', {
       headers: { Authorization: 'Bearer test-api-key-123' },
     });
-    // 会先尝试获取 token（无网络 → 502）
     expect(res.statusCode).toBe(502);
     const body = JSON.parse(res.body);
     expect(body.success).toBe(false);

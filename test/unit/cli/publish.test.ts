@@ -3,6 +3,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 // Mock 文件系统操作
 vi.mock('node:fs', () => ({
   readFileSync: vi.fn(() => Buffer.from('fake-image-data')),
+  writeFileSync: vi.fn(),
   statSync: vi.fn(() => ({ size: 1000 })),
   existsSync: vi.fn(() => true),
 }));
@@ -176,7 +177,6 @@ describe('publish command - parameter validation', () => {
     });
 
     it('图片上传失败应抛出错误', async () => {
-      // Mock fetch 返回上传失败
       vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
         json: () => Promise.resolve({
           success: false,
@@ -197,16 +197,13 @@ describe('publish command - parameter validation', () => {
     });
 
     it('完整流程应返回 DraftResult', async () => {
-      // Mock fetch 返回成功
       const mockFetch = vi.fn()
-        // 第一次调用：上传图片成功
         .mockResolvedValueOnce({
           json: () => Promise.resolve({
             success: true,
             data: { image_media_id: 'media_123', url: 'http://mmbiz.qpic.cn/test' },
           }),
         })
-        // 第二次调用：创建草稿成功
         .mockResolvedValueOnce({
           json: () => Promise.resolve({
             success: true,
@@ -232,6 +229,69 @@ describe('publish command - parameter validation', () => {
       expect(result.success).toBe(true);
       expect(result.media_id).toBe('draft_456');
       expect(result.created_at).toBe('2026-05-18T12:00:00Z');
+    });
+  });
+
+  describe('executeNewsPublish', () => {
+    it('缺少 serverUrl 应抛出错误', async () => {
+      const { executeNewsPublish } = await import('../../../src/cli/publish.js');
+      await expect(executeNewsPublish({
+        title: '测试',
+        content: '<h1>Hello</h1>',
+        serverUrl: '',
+        apiKey: '',
+        appId: 'id',
+        appSecret: 'secret',
+      })).rejects.toThrow('未指定中转服务器地址');
+    });
+
+    it('图片上传和封面处理完整流程', async () => {
+      // local.png 上传 + remote.jpg 下载并上传 + 创建草稿 = 4 次 fetch
+      const mockFetch = vi.fn()
+        // 上传 local.png
+        .mockResolvedValueOnce({
+          json: () => Promise.resolve({
+            success: true,
+            data: { image_media_id: 'media_001', url: 'http://mmbiz.qpic.cn/001' },
+          }),
+        })
+        // downloadImage 下载远程图片
+        .mockResolvedValueOnce({
+          arrayBuffer: () => Promise.resolve(new ArrayBuffer(8)),
+        })
+        // 上传 remote.jpg
+        .mockResolvedValueOnce({
+          json: () => Promise.resolve({
+            success: true,
+            data: { image_media_id: 'media_002', url: 'http://mmbiz.qpic.cn/002' },
+          }),
+        })
+        // 创建草稿
+        .mockResolvedValueOnce({
+          json: () => Promise.resolve({
+            success: true,
+            data: { media_id: 'draft_789', created_at: '2026-05-18T12:00:00Z' },
+          }),
+        });
+
+      vi.stubGlobal('fetch', mockFetch);
+
+      const { statSync } = await import('node:fs');
+      (statSync as any).mockReturnValue({ size: 5000 });
+
+      const { executeNewsPublish } = await import('../../../src/cli/publish.js');
+      const result = await executeNewsPublish({
+        title: '图文消息',
+        content: '<p>正文</p><img src="local.png"><img src="https://example.com/img.jpg">',
+        author: '作者',
+        serverUrl: 'http://localhost:3000',
+        apiKey: 'test-key',
+        appId: 'id',
+        appSecret: 'secret',
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.media_id).toBe('draft_789');
     });
   });
 });
