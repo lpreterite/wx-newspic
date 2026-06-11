@@ -1,10 +1,14 @@
 #!/usr/bin/env bash
-# wx-newspic: 发布图片消息（小绿书）到微信公众号草稿箱
+# wx-newspic: 发布图片消息（小绿书）或图文消息（长文）到微信公众号草稿箱
 # Usage: ./publish.sh --title "标题" --content "正文" --images "path1.png,path2.png"
+#        ./publish.sh --type news --title "标题" --md ./article.md --theme "github"
 #
 # 可选参数：
 #   --author, -a    <string>    作者
 #   --digest, -d    <string>    摘要
+#   --type, -T      <string>    发布类型：newspic（默认）| news
+#   --md            <path>      Markdown 文件路径（仅 news 模式）
+#   --theme         <string>    样式主题（仅 news 模式）
 #   --server, -s    <url>       中转服务器地址（默认取自环境变量 WECHAT_SERVER_URL）
 #   --api-key, -k   <string>    中转服务器 API Key（默认取自环境变量 WECHAT_API_KEY）
 #   --json, -j                 以 JSON 格式输出结果
@@ -77,6 +81,9 @@ parse_args() {
     TITLE=""
     CONTENT=""
     IMAGES=""
+    TYPE="newspic"
+    MD_FILE=""
+    THEME=""
     AUTHOR=""
     DIGEST=""
     SERVER="${WECHAT_SERVER_URL:-${WX_NEWSPIC_SERVER:-}}"
@@ -90,6 +97,12 @@ parse_args() {
                 shift; CONTENT="$1" ;;
             --images|-i)
                 shift; IMAGES="$1" ;;
+            --type|-T)
+                shift; TYPE="$1" ;;
+            --md)
+                shift; MD_FILE="$1" ;;
+            --theme)
+                shift; THEME="$1" ;;
             --author|-a)
                 shift; AUTHOR="$1" ;;
             --digest|-d)
@@ -114,18 +127,39 @@ parse_args() {
 # ============================================================
 
 validate_args() {
+    if [ "$TYPE" != "newspic" ] && [ "$TYPE" != "news" ]; then
+        error "发布类型无效: $TYPE。支持: newspic（默认）, news。"
+    fi
+
     if [ -z "$TITLE" ]; then
         error "标题不能为空，请使用 --title 参数指定。"
     fi
-    if [ ${#TITLE} -gt 32 ]; then
-        error "标题不能超过 32 个字符，当前 ${#TITLE} 个字符。"
+
+    if [ "$TYPE" = "newspic" ]; then
+        if [ ${#TITLE} -gt 32 ]; then
+            error "标题不能超过 32 个字符，当前 ${#TITLE} 个字符。"
+        fi
+        if [ -z "$CONTENT" ]; then
+            error "正文不能为空，请使用 --content 参数指定。"
+        fi
+        if [ -z "$IMAGES" ]; then
+            error "图片路径不能为空，请使用 --images 参数指定。"
+        fi
+    elif [ "$TYPE" = "news" ]; then
+        if [ ${#TITLE} -gt 64 ]; then
+            error "标题不能超过 64 个字符，当前 ${#TITLE} 个字符。"
+        fi
+        if [ -z "$CONTENT" ] && [ -z "$MD_FILE" ]; then
+            error "正文不能为空，请使用 --content 或 --md 参数指定 Markdown 内容。"
+        fi
+        if [ -n "$CONTENT" ] && [ -n "$MD_FILE" ]; then
+            error "--content 和 --md 不能同时使用。请选择其中一种。"
+        fi
+        if [ -n "$MD_FILE" ] && [ ! -f "$MD_FILE" ]; then
+            error "Markdown 文件不存在: $MD_FILE"
+        fi
     fi
-    if [ -z "$CONTENT" ]; then
-        error "正文不能为空，请使用 --content 参数指定。"
-    fi
-    if [ -z "$IMAGES" ]; then
-        error "图片路径不能为空，请使用 --images 参数指定。"
-    fi
+
     if [ -z "$SERVER" ]; then
         error "未指定中转服务器地址。请通过 --server 参数或 WECHAT_SERVER_URL 环境变量指定。"
     fi
@@ -139,25 +173,39 @@ show_help() {
     cat <<EOF
 用法: $(basename "$0") [选项]
 
-发布图片消息（小绿书）到微信公众号草稿箱。
+发布图片消息（小绿书）或图文消息（长文）到微信公众号草稿箱。
 
-必填选项:
+模式:
+  newspic（默认）  发布图片消息（小绿书），需指定 --images
+  news             发布图文消息（长文），支持 Markdown 渲染
+
+图片消息（newspic）必填:
   --title, -t     <string>    标题（最长 32 字）
   --content, -c   <string>    正文内容（纯文本）
   --images, -i    <string>    图片路径列表，逗号分隔（最多 20 张）
 
-可选选项:
+图文消息（news）必填:
+  --title, -t     <string>    标题（最长 64 字）
+  --content, -c   <string>    正文内容（Markdown 格式）
+  --md            <path>      Markdown 文件路径（与 --content 二选一）
+  --theme         <string>    样式主题（可选）
+
+通用可选:
   --author, -a    <string>    作者（最长 16 字）
   --digest, -d    <string>    摘要（最长 128 字）
+  --type, -T      <string>    发布类型：newspic（默认）| news
   --server, -s    <url>       中转服务器地址（默认: \$WECHAT_SERVER_URL）
   --api-key, -k   <string>    中转服务器 API Key（默认: \$WECHAT_API_KEY）
   --json, -j                  以 JSON 格式输出结果
   --help, -h                  查看帮助
 
 示例:
-  $(basename "$0") --title "标题" --content "正文" --images "./output/slide-1.png,./output/slide-2.png"
-  $(basename "$0") --title "标题" --content "正文" --images "./output/*.png" --author "叶帕奇"
-  $(basename "$0") -t "标题" -c "正文" -i "./slides/*.png" --json
+  # 图片消息
+  $(basename "$0") --title "标题" --content "正文" --images "./output/slide-*.png"
+  # 图文消息（直接指定 Markdown）
+  $(basename "$0") --type news --title "标题" --content "# Markdown 内容" --theme "github"
+  # 图文消息（使用 Markdown 文件）
+  $(basename "$0") --type news --title "标题" --md ./article.md --theme "newsprint"
 
 环境变量:
   WECHAT_SERVER_URL     中转服务器地址（旧名 WX_NEWSPIC_SERVER 仍兼容）
@@ -234,7 +282,11 @@ main() {
         exit 0
     fi
 
-    info "${CYAN}📱 wx-newspic — 小绿书图片消息发布${NC}"
+    if [ "$TYPE" = "news" ]; then
+        info "${CYAN}📄 wx-newspic — 图文消息长文发布${NC}"
+    else
+        info "${CYAN}📱 wx-newspic — 小绿书图片消息发布${NC}"
+    fi
     info ""
 
     validate_args
@@ -242,29 +294,41 @@ main() {
     CLI=$(find_cli) || error "wx-newspic CLI 未安装。请执行: npm install -g @packy-tang/wx-newspic"
     info "${GREEN}✅ 使用 CLI: $CLI${NC}"
 
-    info "🔍 解析图片路径..."
-    EXPANDED_IMAGES=$(expand_images "$IMAGES")
-    IFS=',' read -ra IMAGE_LIST <<< "$EXPANDED_IMAGES"
-    local img_count=${#IMAGE_LIST[@]}
-    info "   共找到 $img_count 张图片"
-
-    if [ "$img_count" -gt 20 ]; then
-        error "图片数量不能超过 20 张，当前 $img_count 张。"
-    fi
-
     # 构建 CLI 参数（使用数组避免 eval）
     CLI_ARGS=()
     CLI_ARGS+=(publish)
     CLI_ARGS+=(--title "$TITLE")
-    CLI_ARGS+=(--content "$CONTENT")
+    CLI_ARGS+=(--type "$TYPE")
 
-    local images_arg=""
-    local img_sep=""
-    for img in "${IMAGE_LIST[@]}"; do
-        images_arg="${images_arg}${img_sep}$(echo "$img" | xargs)"
-        img_sep=","
-    done
-    CLI_ARGS+=(--images "$images_arg")
+    if [ "$TYPE" = "news" ]; then
+        if [ -n "$MD_FILE" ]; then
+            CLI_ARGS+=(--md "$MD_FILE")
+            info "📄 Markdown 文件: $MD_FILE"
+        else
+            CLI_ARGS+=(--content "$CONTENT")
+        fi
+        [ -n "$THEME" ] && CLI_ARGS+=(--theme "$THEME")
+        [ -n "$THEME" ] && info "🎨 主题: $THEME"
+    else
+        CLI_ARGS+=(--content "$CONTENT")
+        info "🔍 解析图片路径..."
+        EXPANDED_IMAGES=$(expand_images "$IMAGES")
+        IFS=',' read -ra IMAGE_LIST <<< "$EXPANDED_IMAGES"
+        local img_count=${#IMAGE_LIST[@]}
+        info "   共找到 $img_count 张图片"
+
+        if [ "$img_count" -gt 20 ]; then
+            error "图片数量不能超过 20 张，当前 $img_count 张。"
+        fi
+
+        local images_arg=""
+        local img_sep=""
+        for img in "${IMAGE_LIST[@]}"; do
+            images_arg="${images_arg}${img_sep}$(echo "$img" | xargs)"
+            img_sep=","
+        done
+        CLI_ARGS+=(--images "$images_arg")
+    fi
 
     [ -n "$AUTHOR" ] && CLI_ARGS+=(--author "$AUTHOR")
     [ -n "$DIGEST" ] && CLI_ARGS+=(--digest "$DIGEST")
@@ -274,7 +338,7 @@ main() {
     info ""
     info "${YELLOW}📤 正在发布...${NC}"
     info "   标题: $TITLE"
-    info "   图片: $img_count 张"
+    info "   类型: $TYPE"
     [ -n "$AUTHOR" ] && info "   作者: $AUTHOR"
     info "   服务器: $SERVER"
 
