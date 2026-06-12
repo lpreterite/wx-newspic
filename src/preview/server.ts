@@ -1,6 +1,7 @@
 import { createServer as createHttpServer, type IncomingMessage, type ServerResponse } from 'node:http';
 import { renderPreviewPage } from './template.js';
 import { DEFAULT_MARKDOWN } from './default-content.js';
+import { renderArticle } from '../renderer/index.js';
 
 const BUILTIN_THEMES = [
   { id: 'default', name: 'Default' },
@@ -50,6 +51,11 @@ async function handleRequest(req: IncomingMessage, res: ServerResponse): Promise
   const url = req.url ?? '/';
   const method = req.method ?? 'GET';
 
+  if (method === 'POST' && url === '/render') {
+    await handleRenderRequest(req, res);
+    return;
+  }
+
   if (method === 'GET' && url === '/') {
     const html = renderPreviewPage(DEFAULT_MARKDOWN, BUILTIN_THEMES);
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
@@ -65,4 +71,51 @@ async function handleRequest(req: IncomingMessage, res: ServerResponse): Promise
 
   res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
   res.end('Not Found');
+}
+
+function collectBody(req: IncomingMessage): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const chunks: Buffer[] = [];
+    req.on('data', (chunk: Buffer) => chunks.push(chunk));
+    req.on('end', () => resolve(Buffer.concat(chunks).toString('utf-8')));
+    req.on('error', reject);
+  });
+}
+
+async function handleRenderRequest(req: IncomingMessage, res: ServerResponse): Promise<void> {
+  let body: string;
+  try {
+    body = await collectBody(req);
+  } catch {
+    res.writeHead(400, { 'Content-Type': 'text/plain; charset=utf-8' });
+    res.end('读取请求体失败');
+    return;
+  }
+
+  let params: { content?: string; theme?: string };
+  try {
+    params = JSON.parse(body);
+  } catch {
+    res.writeHead(400, { 'Content-Type': 'text/plain; charset=utf-8' });
+    res.end('JSON 解析失败');
+    return;
+  }
+
+  if (!params.content || typeof params.content !== 'string') {
+    res.writeHead(400, { 'Content-Type': 'text/plain; charset=utf-8' });
+    res.end('缺少 content 字段');
+    return;
+  }
+
+  try {
+    const result = await renderArticle({
+      content: params.content,
+      theme: params.theme ?? 'default',
+    });
+    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+    res.end(result.content);
+  } catch (err) {
+    res.writeHead(500, { 'Content-Type': 'text/plain; charset=utf-8' });
+    res.end(`渲染失败: ${String(err)}`);
+  }
 }
