@@ -7,9 +7,3 @@ coverage/
 
 # reference/ 是另一个项目的参考代码，不含开源授权
 reference/
-
-# Test artifacts
-skills/typora2wenyan/test/themes/*.wenyan.css
-skills/typora2wenyan/test/themes/screenshots/
-skills/typora2wenyan/test/themes/ursine-umbra.css
-.playwright-mcp/
