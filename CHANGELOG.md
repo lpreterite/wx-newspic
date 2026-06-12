@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.1.2 (2026-06-12)
+
+### Added
+
+- CLI: `--theme-file` 支持 render/publish 临时加载自定义主题 CSS
+- CLI: `theme add/remove/list` 子命令持久管理自定义主题
+- CLI: `preview` 预览服务（分屏编辑器 + 即时主题切换）
+
+### Fixed
+
+- `theme.ts` homedir import 修复（`node:path` → `node:os`）
+
 ## v0.1.1 (2026-05-20)
 
 ### Changed

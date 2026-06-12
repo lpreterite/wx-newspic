@@ -1,6 +1,6 @@
 # wx-newspic 项目状态
 
-> 最后更新：2026-06-11（Milestone #30 自定义主题加载完成）
+> 最后更新：2026-06-12（Milestone #30 自定义主题加载完成）
 > 项目总览：[README.md](../README.md)
 
 ---
@@ -129,6 +129,7 @@
 | [#16](https://github.com/lpreterite/wx-newspic/issues/16) | TECH-DESIGN-002: 长文发布渲染管线设计文档 | P2 | ✅ resolved |
 | [#24](https://github.com/lpreterite/wx-newspic/issues/24) | FEAT: publish 命令支持 --type news 长文发布 | P1 | ✅ resolved |
 | [#25](https://github.com/lpreterite/wx-newspic/issues/25) | FEAT: SKILL.md + publish.sh 更新支持 news 模式 | P1 | ✅ resolved |
+
 
 ## 风险项
 
