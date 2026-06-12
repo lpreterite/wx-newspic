@@ -6,6 +6,8 @@
 **文档状态**：草稿
 **当前版本**：v0.1
 **发布日期**：2026-04-04
+**来源仓库**：`lpreterite/ai-engineering`
+**源文件路径**：`guide/07-repo-directory-guide.md`
 
 ---
 
@@ -32,11 +34,13 @@
 ```
 步骤 1：创建顶层 docs/ 目录
 步骤 2：创建各子目录
-步骤 3：写入 STATUS.md
+步骤 3：写入 STATUS.md（必选——详见 4.1 模板，含项目名称、当前阶段、里程碑列表）
 步骤 4：写入 README.md（文档索引）
 步骤 5：创建占位文件（确保目录结构可被 Git 追踪）
 步骤 6：验证目录结构完整性
 ```
+
+> **注意**：STATUS.md 必须在项目初始化时即创建（步骤 3），不可推迟。它是 Orchestrator Agent 的核心输入/输出，缺失将导致进度不可追踪。
 
 ---
 
@@ -46,7 +50,7 @@
 
 ```
 docs/
-├── STATUS.md                      # 项目状态卡（PM Agent 核心输入/输出）
+├── STATUS.md                      # 项目状态卡（Orchestrator Agent 核心输入/输出）
 ├── README.md                      # 项目文档索引
 │
 ├── product/                       # 产品相关文档
@@ -75,12 +79,12 @@ docs/
 
 | 目录 | 用途 | 维护者 | 创建时机 |
 |------|------|--------|----------|
-| `docs/` | 所有文档的根目录 | PM Agent | 项目初始化时 |
+| `docs/` | 所有文档的根目录 | Orchestrator Agent | 项目初始化时 |
 | `docs/product/` | PRD、用户故事等需求文档 | PO Agent | 打磨阶段开始时 |
-| `docs/engineering/` | 技术规格、架构设计 | Developer Agent | Gate 1 通过后 |
+| `docs/engineering/` | 技术规格、架构设计 | Full-stack Developer Agent | Gate 1 通过后 |
 | `docs/design/` | 设计系统、页面设计、资源文件 | UI/UX Agent | Gate 1 通过后 |
-| `docs/project-management/` | 项目计划、里程碑、风险管理 | PM Agent | 项目初始化时 |
-| `docs/project-tasks/` | 按周组织的任务和问题跟踪 | PM Agent | 执行阶段开始时 |
+| `docs/project-management/` | 项目计划、里程碑、风险管理 | Orchestrator Agent | 项目初始化时 |
+| `docs/project-tasks/` | 按周组织的任务和问题跟踪 | Orchestrator Agent | 执行阶段开始时 |
 
 ---
 
@@ -197,14 +201,46 @@ W{nn}/
 
 | 事件 | 操作 | 执行者 |
 |------|------|--------|
-| 项目初始化 | 创建完整 `docs/` 目录结构 | PM Agent |
+| 项目初始化 | 创建完整 `docs/` 目录结构 | Orchestrator Agent |
 | 进入打磨阶段 | 创建 `product/PRD.md` | PO Agent |
-| Gate 1 通过 | 创建 `engineering/` 和 `design/` 目录内容 | Developer Agent / UI/UX Agent |
-| 进入执行阶段 | 创建 `project-tasks/W{nn}/` | PM Agent |
-| 每周开始 | 创建新的 `W{nn}/` 目录 | PM Agent |
-| 里程碑完成 | 更新 `STATUS.md` | PM Agent |
+| Gate 1 通过 | 创建 `engineering/` 和 `design/` 目录内容 | Full-stack Developer Agent / UI/UX Agent |
+| 进入执行阶段 | 创建 `project-tasks/W{nn}/` | Orchestrator Agent |
+| 每周开始 | 创建新的 `W{nn}/` 目录 | Orchestrator Agent |
+| 里程碑完成 | 更新 `STATUS.md` | Orchestrator Agent |
 
-### 6.2 禁止操作
+### 6.2 重命名操作规范
+
+重命名（文件、目录、标识符、命令名）时，全局替换可能误改不应变更的内容。须遵守以下规范：
+
+#### 6.2.1 操作步骤
+
+```
+步骤 1：搜索确认范围
+  grep -rn "旧名称" 查看所有出现位置
+  区分哪些该改、哪些不该改（项目名 vs 命令名 vs 变量名）
+
+步骤 2：精确匹配优先
+  使用单词边界匹配（如 \b旧名称\b）而非子串匹配
+  避免将项目名内部的前缀也一并替换
+
+步骤 3：分步替换
+  先替换精确匹配的场景（命令名、文件名、标识符）
+  再单独处理项目名等不替换的场景
+
+步骤 4：替换后验证
+  grep -rn "新名称" 反向检查是否有不该出现的替换
+  确认项目名等不应变更的引用未被误改
+```
+
+#### 6.2.2 安全原则
+
+| 原则 | 说明 |
+|------|------|
+| 替换前先搜索 | 永远不要直接全局替换，先了解旧名称的出现上下文 |
+| 按范围分层 | 文件名 → 代码标识符 → 文档引用，分层次逐步替换 |
+| 验证闭环 | 替换完成后必须做反向验证，确保无意外替换 |
+
+### 6.3 禁止操作
 
 | 禁止 | 原因 |
 |------|------|
@@ -249,4 +285,4 @@ Agent 完成目录初始化后，应执行以下检查：
 
 | 版本 | 日期 | 修订内容 |
 |------|------|----------|
-| v0.1 | 2026-04-04 | 初始版本 |
+| v0.2 | 2026-05-24 | 新增 6.2 重命名操作规范 |

@@ -4,8 +4,10 @@
 
 **所属目录**：`ai-engineering/guide/`
 **文档状态**：草稿
-**当前版本**：v0.7
+**当前版本**：v0.8
 **发布日期**：2026-04-04
+**来源仓库**：`lpreterite/ai-engineering`
+**源文件路径**：`guide/01-principles.md`
 
 ---
 
@@ -50,6 +52,31 @@ AI 软件研发是指在 AI 原生开发模式下，人与 Agent 形成混合智
 | 进度汇报 | ✅ 生成标准化报告 | 撰写解读性结论 |
 | 需求优先级 | 提供数据支持 | 最终决策 |
 | 团队协调 | 安排会议、发送提醒 | 主持评审、推动共识 |
+
+### 1.4 通道隔离原则
+
+Issue/PR 评论触发的事件被定义为**对话处理通道**——它们是用户与 Agent 之间的对话入口，职责限于分析、回复、讨论，不直接修改代码。
+
+| 通道类型 | 事件 | 权限范围 | 职责 |
+|----------|------|---------|------|
+| 对话通道 | 评论（`issue_comment` / `pull_request_review_comment`） | 只读（contents: read） | 分析、回复、讨论 |
+| 代码通道 | 创建事件（`pull_request` / `issues`） | 读写（contents: write） | 审查、修改、推送 |
+
+**设计理由：** 对话通道关注的是理解与交流；代码通道关注的是执行与产出。混合两者会导致 AI 在对话上下文中误读 prompt 为代码需求，从而意外修改 workflow 文件。
+
+**工作流映射：**
+
+```yaml
+# 对话通道（只读）：
+on:
+  issue_comment: [created]
+  pull_request_review_comment: [created]
+
+# 代码通道（读写）：
+on:
+  issues: [opened]
+  pull_request: [opened, synchronize, reopened, ready_for_review]
+```
 
 ---
 

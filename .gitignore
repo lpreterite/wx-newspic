@@ -7,3 +7,6 @@ coverage/
 
 # reference/ 是另一个项目的参考代码，不含开源授权
 reference/
+
+# ai-engineering 同步备份
+**/.backups/

@@ -4,8 +4,11 @@
 
 **所属目录**：`ai-engineering/guide/`
 **文档状态**：草稿
-**当前版本**：v0.2
+**当前版本**：v0.3
 **发布日期**：2026-04-04
+**来源仓库**：`lpreterite/ai-engineering`
+**源文件路径**：`guide/03-collaboration.md`
+> **Skill 引用**：Developer-Tester 移交 → `skills/developer-tester-loop`；分歧处理 → 嵌入 Orchestrator 角色
 
 ---
 
@@ -30,6 +33,24 @@
 | **Product Manager (PM)** | 人类，流程协调、进度管控 |
 | **Agent** | 增强型搭档，执行层负责 |
 
+### 1.3 通道隔离规则
+
+GitHub Actions 工作流中的事件按通道类型隔离：
+
+| 通道类型 | 事件 | 权限 | 职责 |
+|----------|------|------|------|
+| 对话通道 | `issue_comment` / `pull_request_review_comment` | `contents: read` / `pull-requests: read` / `issues: read` | 分析、回复、讨论 |
+| 代码通道 | `issues: [opened]` / `pull_request` | `contents: write` / `pull-requests: write` / `issues: write` | 分类、审查、修改、推送 |
+
+**对话通道约定：**
+- Agent 不得在对话通道中修改任何代码或 workflow 文件
+- Agent 仅通过评论与用户交流
+- 用户如需修改代码，应在 Issue 中通过 `/oc` 发起，或开启新 PR 触发自动审查
+
+**代码通道约定：**
+- `issues: [opened]`：Agent 自动分类 + 询问是否需修复
+- `pull_request`：Agent 自动审查代码质量
+
 ---
 
 ## 2. 打磨阶段人机协作
@@ -43,9 +64,9 @@
 | 需求收集 | ✅ 用户诉求原始语料收集 | - |
 | 需求分析 | - | PO Agent：动机提取、线路图设计 |
 | PRD 起草 | - | PO Agent：用户故事、验收标准 |
-| 技术方案 | 验收 | PM Agent + Developer Agent：起草 |
+| 技术方案 | 验收 | Orchestrator Agent + Full-stack Developer Agent：起草 |
 | 用户方案 | 验收 | UI/UX Agent：起草 |
-| 里程碑规划 | 验收 | PO Agent + PM Agent：起草 |
+| 里程碑规划 | 验收 | PO Agent + Orchestrator Agent：起草 |
 
 ### 2.2 打磨阶段流程
 
@@ -136,9 +157,9 @@ Agent 提取关键信息
 
 | 特点 | 说明 |
 |------|------|
-| **Agent 自主协作** | Developer Agent 与 Tester Agent 在 PM Agent 协调下自主执行 |
+| **Agent 自主协作** | Full-stack Developer Agent 与 Tester Agent 在 Orchestrator Agent 编排下自主执行 |
 | **人类关键介入** | Gate 3（可使用软件验收）和 Gate 4（可维护软件验收）进行最终确认 |
-| **PM Agent 协调** | 处理分歧、监控进度、触发升级 |
+| **Orchestrator Agent 编排** | 处理分歧、监控进度、触发升级 |
 
 ### 4.2 执行阶段流程
 
@@ -146,15 +167,15 @@ Agent 提取关键信息
 需求就绪
      │
      ▼
-PM Agent 分配任务
+Orchestrator Agent 分配任务
      │
      ▼
 ┌─────────────────┐     ┌─────────────────┐
-│ Developer Agent │◄───►│  Tester Agent   │
+│ Full-stack Developer Agent  │◄───►│  Tester Agent   │
 │   执行开发       │     │   执行测试       │
 └────────┬────────┘     └────────┬────────┘
          │                      │
-         │    PM Agent 协调     │
+          │    Orchestrator Agent 编排     │
          │    （基于风险优先级） │
          │                      │
          └──────────┬───────────┘
@@ -201,8 +222,8 @@ PM Agent 分配任务
 | 风险等级 | 处理方式 | 决策方 |
 |----------|----------|--------|
 | **低风险** | Agent 自行协调 | Agent |
-| **中风险** | PM Agent 介入协调 | PM Agent |
-| **高风险** | 升级人类 PM 决策 | 人工 PM |
+| **中风险** | Orchestrator Agent 介入编排 | Orchestrator Agent |
+| **高风险** | 升级人类决策 | 人类 |
 
 ### 5.3 分歧处理流程
 
@@ -217,7 +238,7 @@ PM Agent 分配任务
     │              ▼
     │         更新状态
     │
-    ├── 中风险 → PM Agent 介入协调
+    ├── 中风险 → Orchestrator Agent 介入编排
     │              │
     │              ▼
     │         提出解决方案
@@ -225,7 +246,7 @@ PM Agent 分配任务
     │              ▼
     │         人类确认（如需要）
     │
-    └── 高风险 → 升级人工 PM
+    └── 高风险 → 升级人类
                    │
                    ▼
               人类决策
@@ -236,11 +257,11 @@ PM Agent 分配任务
 
 ### 5.4 Developer-Tester 特定处理
 
-当 Developer Agent 与 Tester Agent 出现分歧时：
-- 由 PM Agent 根据风险优先级处理
+当 Full-stack Developer Agent 与 Tester Agent 出现分歧时：
+- 由 Orchestrator Agent 根据风险优先级处理
 - 优先基于已批准的文档
 - 其次基于最后更新
-- 争议升级人工 PM
+- 争议升级人类
 
 ---
 
@@ -261,14 +282,14 @@ PM Agent 分配任务
 检测到升级条件
     │
     ▼
-PM Agent 记录并通知
+Orchestrator Agent 记录并通知
     │
     ▼
 评估是否可自行解决
     │
     ├── 可解决 → 协调解决，更新状态
     │
-    └── 不可解决 → 升级人工 PM
+    └── 不可解决 → 升级人类
                       │
                       ▼
                  人工决策
@@ -322,7 +343,7 @@ Agent 承担重做成本
 | **响应时效** | 紧急（阻塞）< 5min，建议 < 1h，状态更新 < 24h |
 | **确认机制** | 重要消息需接收方确认（`ack: true`） |
 | **上下文传递** | 跨 Agent 共享项目上下文，通过知识库而非消息链 |
-| **冲突解决** | 优先基于已批准的文档，其次基于最后更新，争议升级人工 PM |
+| **冲突解决** | 优先基于已批准的文档，其次基于最后更新，争议升级人类 |
 
 ### 8.2 UI/UX 协作补充协议
 
@@ -331,7 +352,7 @@ Agent 承担重做成本
 | **设计交付物标准** | UI/UX Agent 提交的设计稿需包含标注规范、尺寸要求、交互说明 |
 | **设计评审规则** | 设计初稿完成后必须经过相关干系人评审，评审通过方可进入开发 |
 | **设计变更管理** | 设计定稿后的变更需评估影响范围，重大变更需重新评审 |
-| **与 Developer 协作** | 设计稿需同步给 Developer Agent，提供设计标注和交接说明 |
+| **与 Developer 协作** | 设计稿需同步给 Full-stack Developer Agent，提供设计标注和交接说明 |
 
 ---
 
