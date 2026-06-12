@@ -1,6 +1,6 @@
 # wx-newspic 项目状态
 
-> 最后更新：2026-06-12（Milestone #37/#38 门禁验收通过，M9 全步完成）
+> 最后更新：2026-06-12（PR #40 merged → main，M9 全量交付完成）
 > 项目总览：[README.md](../README.md)
 
 ---
