@@ -7,6 +7,7 @@ import { registerRenderCommand } from './render.js';
 import { registerServeCommand } from './serve.js';
 import { registerCredentialCommand } from './credential.js';
 import { registerThemeCommand } from './theme.js';
+import { registerPreviewCommand } from './preview.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -42,6 +43,7 @@ export async function runCLI(): Promise<void> {
   registerServeCommand(program);
   registerCredentialCommand(program);
   registerThemeCommand(program);
+  registerPreviewCommand(program);
 
   await program.parseAsync(process.argv);
 }
