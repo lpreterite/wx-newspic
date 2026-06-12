@@ -1,6 +1,5 @@
 import { copyFileSync, existsSync, mkdirSync, readdirSync, unlinkSync, writeFileSync } from 'node:fs';
-import { resolve, extname, basename } from 'node:path';
-import { homedir } from 'node:os';
+import { resolve, extname, basename, homedir } from 'node:path';
 import { Command } from 'commander';
 import { listThemes } from '../renderer/themes.js';
 
