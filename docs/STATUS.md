@@ -1,13 +1,13 @@
 # wx-newspic 项目状态
 
-> 最后更新：2026-06-12（Milestone #30 自定义主题加载完成）
+> 最后更新：2026-06-12（Milestone #37/#38 门禁验收通过，M9 全步完成）
 > 项目总览：[README.md](../README.md)
 
 ---
 
 ## 当前阶段
 
-**执行阶段** — M7 渲染管线完成，M8 长文发布完成。M6 实战发布待启动。
+**执行阶段** — M7 渲染管线完成，M8 长文发布完成，M9 预览服务完成。M6 实战发布待启动。
 
 ## 已知问题
 
@@ -91,6 +91,26 @@
 | T8.2 publish 命令 news 模式 | ✅ 完成 | 19/19 | --type/--md/--theme/--theme-file，渲染+提取+上传+发布 |
 | T8.3 SKILL.md + publish.sh 更新 | ✅ 完成 | — | type/md/theme 参数透传，双模式支持 |
 
+### M9: 预览服务 ✅ 完成
+
+| 任务 | 状态 | 说明 |
+|------|------|------|
+| T9.1 (#33) CLI 预览命令 + HTTP 骨架 | ✅ 完成 | `wx-newspic preview` 命令，`node:http` 服务器，3 个路由 |
+| T9.2 (#34) 渲染 API + EasyMDE 编辑器 | ✅ 完成 | `POST /render` 调用 `renderArticle()`，编辑器 CDN 集成 |
+| T9.3 (#36) 自定义主题集成 + 体验打磨 | ✅ 完成 | 主题扫描注册、防抖、loading、错误态、快捷键、响应式 |
+| T9.4 (#37) 门禁验收 Step 1+2 | ✅ 完成 | CLI 命令 + 渲染交互 — 12/12 通过 |
+| T9.5 (#38) 门禁验收 Step 3+4 | ✅ 完成 | 主题集成 + 体验打磨 — 12/12 通过 |
+| T9.6 (#39) 交付准备 | ⏳ 待开始 | STATUS.md + CHANGELOG + Release |
+
+#### M9 关键决策
+
+| 决策 | 结论 |
+|------|------|
+| 编辑器选型 | **EasyMDE**（SimpleMDE fork）— CDN 加载，零服务端耦合，含 Markdown 工具栏 |
+| 加载方式 | `cdn.jsdelivr.net/npm/easymde`（JS + CSS）+ `cdnjs.cloudflare.com Font Awesome 4.7`（图标） |
+| 渲染引擎 | 复用 `renderArticle()` 管线，`node:http` 服务端零外部依赖 |
+| 工单精简 | #35 与 #30 重叠 → 关闭 #35，合并至 #36，不再有独立 Step 3 |
+
 ---
 
 ## 测试总览
@@ -110,9 +130,6 @@
 | renderer/themes.test.ts | 4 | ✅ |
 | renderer/images.test.ts | 13 | ✅ |
 | **总计** | **116** | **✅ 全部通过** |
-
----
-
 ## 已知问题（GitHub Issues）
 
 | Issue | 标题 | 优先级 | 状态 |
@@ -129,7 +146,15 @@
 | [#16](https://github.com/lpreterite/wx-newspic/issues/16) | TECH-DESIGN-002: 长文发布渲染管线设计文档 | P2 | ✅ resolved |
 | [#24](https://github.com/lpreterite/wx-newspic/issues/24) | FEAT: publish 命令支持 --type news 长文发布 | P1 | ✅ resolved |
 | [#25](https://github.com/lpreterite/wx-newspic/issues/25) | FEAT: SKILL.md + publish.sh 更新支持 news 模式 | P1 | ✅ resolved |
-
+| [#30](https://github.com/lpreterite/wx-newspic/issues/30) | FEAT: --theme-file + theme 子命令 | P1 | ✅ closed |
+| [#31](https://github.com/lpreterite/wx-newspic/issues/31) | FEAT: 本地样式预览服务 — markdown 编辑器 + 即时主题切换 | P1 | 🔄 in progress |
+| [#33](https://github.com/lpreterite/wx-newspic/issues/33) | Step 1: CLI 预览命令 + HTTP 服务骨架 | P1 | ✅ closed |
+| [#34](https://github.com/lpreterite/wx-newspic/issues/34) | Step 2: 渲染 API + 编辑/预览交互 | P1 | 🔄 in progress |
+| [#35](https://github.com/lpreterite/wx-newspic/issues/35) | Step 3: 自定义主题集成 | P2 | ❌ closed（合并至 #36） |
+| [#36](https://github.com/lpreterite/wx-newspic/issues/36) | Step 3+4: 自定义主题集成 + 预览体验打磨 | P1 | ✅ completed |
+| [#37](https://github.com/lpreterite/wx-newspic/issues/37) | 门禁验收：Step 1+2 | P1 | ✅ closed |
+| [#38](https://github.com/lpreterite/wx-newspic/issues/38) | 门禁验收：Step 3+4 | P2 | ✅ closed |
+| [#39](https://github.com/lpreterite/wx-newspic/issues/39) | 交付：STATUS.md 更新 + CHANGELOG + Release | P2 | ⏳ todo |
 
 ## 风险项
 

@@ -1,12 +1,31 @@
 # Changelog
 
+## v0.1.3 (2026-06-12)
+
+### Added
+
+- Preview: `POST /render` API 调用 renderArticle() 渲染 Markdown 为微信内联样式 HTML
+- Preview: EasyMDE 编辑器集成（CDN 加载，含完整 Markdown 工具栏）
+- Preview: `GET /themes` 返回内置 + 自定义主题 JSON 列表
+- Preview: 启动时扫描 `~/.wx-newspic/themes/*.css` 自动注册自定义主题
+- Preview: `wx-newspic preview -f/--theme-file` 单次临时主题加载
+- Preview: 编辑区 500ms 防抖自动触发渲染
+- Preview: 渲染加载态（spinner + 按钮禁用 + iframe 过渡）
+- Preview: 渲染失败保留上一次成功预览（不销毁内容）
+- Preview: Cmd/Ctrl+S 快捷键触发渲染
+- Preview: 手机屏幕响应式布局
+
+### Fixed
+
+- `renderer/index.ts` 导出 `registerThemeFromFile()` 供预览服务复用
+
 ## v0.1.2 (2026-06-12)
 
 ### Added
 
 - CLI: `--theme-file` 支持 render/publish 临时加载自定义主题 CSS
 - CLI: `theme add/remove/list` 子命令持久管理自定义主题
-- CLI: `preview` 预览服务（分屏编辑器 + 即时主题切换）
+- CLI: `preview` 预览命令 + HTTP 服务骨架
 
 ### Fixed
 
