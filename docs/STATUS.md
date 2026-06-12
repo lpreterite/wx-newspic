@@ -143,11 +143,13 @@
 | [#7](https://github.com/lpreterite/wx-newspic/issues/7) | DOCS-002: 注释描述的键名与实际代码不符 | P2 | ✅ resolved |
 | [#8](https://github.com/lpreterite/wx-newspic/issues/8) | ENH-002: 提供 OpenClaw 自动安装手册 | P2 | ✅ verified |
 | [#9](https://github.com/lpreterite/wx-newspic/issues/9) | BUG-005: article_type 未传递，草稿箱生成普通文章而非小绿书 | P0 | ✅ resolved |
+| [#15](https://github.com/lpreterite/wx-newspic/issues/15) | 整合 wenyan 长文发布功能到 wx-newspic | P1 | ✅ closed |
 | [#16](https://github.com/lpreterite/wx-newspic/issues/16) | TECH-DESIGN-002: 长文发布渲染管线设计文档 | P2 | ✅ resolved |
 | [#24](https://github.com/lpreterite/wx-newspic/issues/24) | FEAT: publish 命令支持 --type news 长文发布 | P1 | ✅ resolved |
 | [#25](https://github.com/lpreterite/wx-newspic/issues/25) | FEAT: SKILL.md + publish.sh 更新支持 news 模式 | P1 | ✅ resolved |
+| [#27](https://github.com/lpreterite/wx-newspic/issues/27) | v2 端到端综合验收 | P1 | ✅ closed |
 | [#30](https://github.com/lpreterite/wx-newspic/issues/30) | FEAT: --theme-file + theme 子命令 | P1 | ✅ closed |
-| [#31](https://github.com/lpreterite/wx-newspic/issues/31) | FEAT: 本地样式预览服务 — markdown 编辑器 + 即时主题切换 | P1 | 🔄 in progress |
+| [#31](https://github.com/lpreterite/wx-newspic/issues/31) | FEAT: 本地样式预览服务 — markdown 编辑器 + 即时主题切换 | P1 | ✅ closed |
 | [#33](https://github.com/lpreterite/wx-newspic/issues/33) | Step 1: CLI 预览命令 + HTTP 服务骨架 | P1 | ✅ closed |
 | [#34](https://github.com/lpreterite/wx-newspic/issues/34) | Step 2: 渲染 API + 编辑/预览交互 | P1 | 🔄 in progress |
 | [#35](https://github.com/lpreterite/wx-newspic/issues/35) | Step 3: 自定义主题集成 | P2 | ❌ closed（合并至 #36） |
