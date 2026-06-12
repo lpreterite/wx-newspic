@@ -1,6 +1,6 @@
 # wx-newspic 项目状态
 
-> 最后更新：2026-06-12（PR #40 merged → main，M9 全量交付完成）
+> 最后更新：2026-06-12（#41 内联样式丢失修复）
 > 项目总览：[README.md](../README.md)
 
 ---
@@ -155,6 +155,7 @@
 | [#37](https://github.com/lpreterite/wx-newspic/issues/37) | 门禁验收：Step 1+2 | P1 | ✅ closed |
 | [#38](https://github.com/lpreterite/wx-newspic/issues/38) | 门禁验收：Step 3+4 | P2 | ✅ closed |
 | [#39](https://github.com/lpreterite/wx-newspic/issues/39) | 交付：STATUS.md 更新 + CHANGELOG + Release | P2 | ⏳ todo |
+| [#41](https://github.com/lpreterite/wx-newspic/issues/41) | 内联样式丢失 — renderArticle() 容器缺 id="wenyan" | P2 | ✅ closed |
 
 ## 风险项
 
