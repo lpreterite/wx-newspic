@@ -24,7 +24,7 @@ async function getCore(): Promise<Awaited<ReturnType<typeof createWenyanCore>>> 
 
 const dom = new JSDOM('<!DOCTYPE html>');
 
-function registerThemeFromFile(themeFile: string, themeId: string): void {
+export function registerThemeFromFile(themeFile: string, themeId: string): void {
   const css = readFileSync(themeFile, 'utf-8');
   const name = basename(themeFile, '.css');
   const theme: Theme = {
