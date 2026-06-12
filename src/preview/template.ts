@@ -1,6 +1,4 @@
-export function renderPreviewPage(markdown: string, themes: { id: string; name: string }[]): string {
-  const themeOptions = themes.map((t) => `<option value="${t.id}">${t.name}</option>`).join('');
-
+export function renderPreviewPage(markdown: string): string {
   return `<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -19,7 +17,7 @@ html, body { height: 100%; font-family: system-ui, -apple-system, sans-serif; ba
   background: #fff; border-bottom: 1px solid #ddd;
   position: sticky; top: 0; z-index: 10;
 }
-.header h1 { font-size: 15px; font-weight: 600; margin-right: auto; }
+.header h1 { font-size: 15px; font-weight: 600; margin-right: auto; white-space: nowrap; }
 .header select {
   padding: 4px 8px; font-size: 13px;
   border: 1px solid #ccc; border-radius: 4px;
@@ -29,9 +27,10 @@ html, body { height: 100%; font-family: system-ui, -apple-system, sans-serif; ba
   padding: 4px 16px; font-size: 13px;
   border: 1px solid #07c; border-radius: 4px;
   background: #07c; color: #fff; cursor: pointer;
+  transition: opacity .15s;
 }
 .header button:hover { background: #069; }
-.header .status { font-size: 12px; color: #999; min-width: 60px; }
+.header button:disabled { opacity: .5; cursor: not-allowed; }
 
 .split {
   display: flex; height: calc(100vh - 48px);
@@ -48,13 +47,23 @@ html, body { height: 100%; font-family: system-ui, -apple-system, sans-serif; ba
   flex: 1;
   min-height: 0;
 }
-.EasyMDE .editor-statusbar {
-  flex-shrink: 0;
-}
+.EasyMDE .editor-statusbar { flex-shrink: 0; }
 
 .split iframe {
   flex: 1; border: none; background: #fff;
+  transition: opacity .2s;
 }
+
+.spinner {
+  display: inline-block;
+  width: 14px; height: 14px;
+  border: 2px solid #ccc;
+  border-top-color: #07c;
+  border-radius: 50%;
+  animation: spin .6s linear infinite;
+  vertical-align: middle;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
 
 @media (max-width: 768px) {
   .split { flex-direction: column; }
@@ -66,9 +75,9 @@ html, body { height: 100%; font-family: system-ui, -apple-system, sans-serif; ba
 
 <div class="header">
   <h1>Wenyan Preview</h1>
-  <select id="themeSelect">${themeOptions}</select>
-  <button onclick="render()">Render</button>
-  <span class="status" id="status"></span>
+  <select id="themeSelect"></select>
+  <button id="renderBtn" onclick="render()">Render</button>
+  <span id="statusIndicator"></span>
 </div>
 
 <div class="split">
@@ -81,7 +90,8 @@ html, body { height: 100%; font-family: system-ui, -apple-system, sans-serif; ba
 const textarea = document.getElementById('editor');
 const preview = document.getElementById('preview');
 const themeSelect = document.getElementById('themeSelect');
-const status = document.getElementById('status');
+const renderBtn = document.getElementById('renderBtn');
+const statusIndicator = document.getElementById('statusIndicator');
 
 const editor = new EasyMDE({
   element: textarea,
@@ -91,8 +101,56 @@ const editor = new EasyMDE({
   toolbar: ['bold', 'italic', 'heading', '|', 'code', 'quote', 'unordered-list', 'ordered-list', '|', 'link', 'image', '|', 'guide'],
 });
 
+let lastHtml = '';
+let renderTimeout;
+
+editor.codemirror.on('changes', () => {
+  clearTimeout(renderTimeout);
+  renderTimeout = setTimeout(render, 500);
+});
+
+document.addEventListener('keydown', (e) => {
+  if ((e.metaKey || e.ctrlKey) && e.key === 's') {
+    e.preventDefault();
+    clearTimeout(renderTimeout);
+    render();
+  }
+});
+
+var allThemes = [];
+
+fetch('/themes')
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    allThemes = data.builtin.concat(data.custom);
+    themeSelect.innerHTML = '';
+    allThemes.forEach(function(t) {
+      var opt = document.createElement('option');
+      opt.value = t.id;
+      opt.textContent = t.name;
+      themeSelect.appendChild(opt);
+    });
+    render();
+  })
+  .catch(function() {
+    themeSelect.innerHTML = '<option value="default">Default</option>';
+    render();
+  });
+
+function setLoading(on) {
+  if (on) {
+    statusIndicator.innerHTML = '<span class="spinner"></span>';
+    renderBtn.disabled = true;
+    preview.style.opacity = '.5';
+  } else {
+    statusIndicator.innerHTML = '';
+    renderBtn.disabled = false;
+    preview.style.opacity = '1';
+  }
+}
+
 async function render() {
-  status.textContent = '渲染中…';
+  setLoading(true);
   try {
     const res = await fetch('/render', {
       method: 'POST',
@@ -103,27 +161,20 @@ async function render() {
       }),
     });
     if (!res.ok) {
-      const err = await res.text();
-      status.textContent = '错误';
-      preview.srcdoc = '<p style="color:red;padding:16px">渲染失败: ' + escapeHtml(err) + '</p>';
+      var err = await res.text();
+      setLoading(false);
+      if (lastHtml) preview.srcdoc = lastHtml;
       return;
     }
-    const html = await res.text();
+    var html = await res.text();
+    lastHtml = html;
     preview.srcdoc = html;
-    status.textContent = '\u2713';
+    setLoading(false);
   } catch (e) {
-    status.textContent = '错误';
-    preview.srcdoc = '<p style="color:red;padding:16px">请求失败: ' + escapeHtml(String(e)) + '</p>';
+    setLoading(false);
+    if (lastHtml) preview.srcdoc = lastHtml;
   }
 }
-
-function escapeHtml(s) {
-  const d = document.createElement('div');
-  d.textContent = s;
-  return d.innerHTML;
-}
-
-render();
 </script>
 </body>
 </html>`;

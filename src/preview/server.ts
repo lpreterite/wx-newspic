@@ -1,8 +1,12 @@
 import { createServer as createHttpServer, type IncomingMessage, type ServerResponse } from 'node:http';
+import { readdirSync, existsSync } from 'node:fs';
+import { resolve, basename } from 'node:path';
+import { homedir } from 'node:os';
 import { renderPreviewPage } from './template.js';
 import { DEFAULT_MARKDOWN } from './default-content.js';
-import { renderArticle } from '../renderer/index.js';
+import { renderArticle, registerThemeFromFile } from '../renderer/index.js';
 
+const THEMES_DIR = resolve(homedir(), '.wx-newspic', 'themes');
 const BUILTIN_THEMES = [
   { id: 'default', name: 'Default' },
   { id: 'orangeheart', name: 'Orange Heart' },
@@ -15,13 +19,43 @@ const BUILTIN_THEMES = [
   { id: 'nord', name: 'Nord' },
 ];
 
+function listCustomThemes(): { id: string; name: string }[] {
+  if (!existsSync(THEMES_DIR)) return [];
+  const files = readdirSync(THEMES_DIR);
+  return files
+    .filter((f) => f.endsWith('.css'))
+    .map((f) => {
+      const id = basename(f, '.css');
+      return { id, name: id };
+    });
+}
+
+function registerCustomThemes(): void {
+  if (!existsSync(THEMES_DIR)) return;
+  const files = readdirSync(THEMES_DIR);
+  for (const f of files) {
+    if (!f.endsWith('.css')) continue;
+    const id = basename(f, '.css');
+    const filePath = resolve(THEMES_DIR, f);
+    registerThemeFromFile(filePath, id);
+  }
+}
+
 export interface PreviewServerOptions {
   port: number;
   onReady?: (port: number) => void;
+  themeFile?: string;
 }
 
 export async function createPreviewServer(options: PreviewServerOptions): Promise<void> {
-  const { port } = options;
+  const { port, themeFile } = options;
+
+  if (themeFile) {
+    const themeId = basename(themeFile, '.css');
+    registerThemeFromFile(themeFile, themeId);
+  }
+
+  registerCustomThemes();
 
   const server = createHttpServer(async (req: IncomingMessage, res: ServerResponse) => {
     try {
@@ -57,9 +91,16 @@ async function handleRequest(req: IncomingMessage, res: ServerResponse): Promise
   }
 
   if (method === 'GET' && url === '/') {
-    const html = renderPreviewPage(DEFAULT_MARKDOWN, BUILTIN_THEMES);
+    const html = renderPreviewPage(DEFAULT_MARKDOWN);
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
     res.end(html);
+    return;
+  }
+
+  if (method === 'GET' && url === '/themes') {
+    const data = JSON.stringify({ builtin: BUILTIN_THEMES, custom: listCustomThemes() });
+    res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+    res.end(data);
     return;
   }
 
