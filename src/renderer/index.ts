@@ -67,6 +67,7 @@ export async function renderArticle(options: RenderOptions): Promise<RenderedArt
   const html = await core.renderMarkdown(mdBody);
 
   const el = dom.window.document.createElement('div');
+  el.id = 'wenyan';
   el.innerHTML = html;
 
   const styledContent = await core.applyStylesWithTheme(el, {
