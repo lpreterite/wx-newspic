@@ -156,8 +156,11 @@ wx-newspic serve --api-key "sk-your-key" --port 3000
 | 命令 | 说明 |
 |------|------|
 | `wx-newspic publish` | 发布图片消息到公众号草稿箱 |
+| `wx-newspic render` | 本地预览 Markdown 渲染效果 |
 | `wx-newspic serve` | 启动中转 HTTP 服务 |
 | `wx-newspic credential` | 管理微信凭证 |
+| `wx-newspic theme` | 管理自定义主题 |
+| `wx-newspic preview` | 本地预览服务（分屏编辑器 + 即时主题切换） |
 
 ### wx-newspic publish
 
@@ -235,6 +238,33 @@ wx-newspic credential set --file ./path/to/.env
 wx-newspic credential check
 ```
 
+### wx-newspic preview
+
+启动本地分屏预览服务，左侧 Markdown 编辑器、右侧实时渲染效果预览，用于微调 Wenyan 主题样式。
+
+```bash
+wx-newspic preview --port 3000
+```
+
+浏览器打开 `http://localhost:3000` 即可使用。
+
+参数说明：
+
+| 参数 | 必填 | 默认值 | 说明 |
+|------|------|--------|------|
+| `--port, -p` | 否 | 3030 | 监听端口 |
+| `--theme-file, -f` | 否 | — | 自定义主题 CSS 文件路径（单次加载） |
+
+**功能特性：**
+
+- **主题切换** — 内置 9 个 Wenyan 主题（default、orangeheart、rainbow、lapis、pie、maize、purple、phycat、nord），也支持下拉选择
+- **自定义主题** — 自动扫描 `~/.wx-newspic/themes/*.css`，持久化添加的主题自动出现在下拉列表
+- **单次临时主题** — `--theme-file dracula.css` 参数加载一个不常驻的主题
+- **自动渲染** — 编辑内容后 500ms 防抖自动触发渲染
+- **错误保护** — 渲染失败保留上一次成功预览，不会丢失内容
+- **快捷键** — `Cmd/Ctrl+S` 手动触发渲染
+- **响应式** — 手机屏幕自动竖排布局
+
 ## 使用示例
 
 ### 本地直接发布
@@ -277,7 +307,9 @@ wx-newspic publish \
 ## 完整链路
 
 ```
-html-ppt 截图 → wx-newspic publish → 中转服务器（固定IP） → 微信公众号 API → 小绿书草稿
+html-ppt 截图 → wx-newspic render  → wx-newspic publish → 中转服务器（固定IP） → 微信公众号 API → 小绿书草稿
+                                    ↗
+                           wx-newspic preview（样式 QC）
 ```
 
 ## 项目组成
