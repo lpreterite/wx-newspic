@@ -1,0 +1,3 @@
+[submodule "vendor/ai-engineering"]
+	path = vendor/ai-engineering
+	url = git@github.com:lpreterite/ai-engineering.git

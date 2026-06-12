@@ -2,17 +2,24 @@
   "manifest_version": "1.0",
   "source": {
     "repository": "lpreterite/ai-engineering",
-    "deployed_at": "2026-05-27T00:00:00Z"
+    "deployed_at": "2026-06-12T00:00:00Z"
   },
   "files": {
-    "principles.md": { "source": "guide/01-principles.md", "version": "v0.7", "customized": false, "previous_version": null },
-    "process.md": { "source": "guide/02-process.md", "version": "v0.8", "customized": false, "previous_version": "v0.7" },
-    "collaboration.md": { "source": "guide/03-collaboration.md", "version": "v0.2", "customized": false, "previous_version": null },
-    "checklists.md": { "source": "guide/04-checklists.md", "version": "v0.9", "customized": false, "previous_version": "v0.2" },
-    "deliverables.md": { "source": "guide/05-deliverables.md", "version": "v0.7", "customized": false, "previous_version": "v0.2" },
-    "document-management.md": { "source": "guide/06-document-management.md", "version": "v0.2", "customized": false, "previous_version": null },
-    "repo-directory-guide.md": { "source": "guide/07-repo-directory-guide.md", "version": "v0.1", "customized": false, "previous_version": null },
-    "tool-integration-guide.md": { "source": "guide/08-tool-integration-guide.md", "version": "v0.6", "customized": false, "previous_version": null },
-    "issue-workflow.md": { "source": "guide/issue-workflow.md", "version": "v0.3", "customized": false, "previous_version": "v0.1" }
+    "01-principles.md": { "source": "guide/01-principles.md", "version": "v0.8", "customized": false, "previous_version": "v0.7", "category": "guide", "local_name": "principles.md" },
+    "02-process.md": { "source": "guide/02-process.md", "version": "v0.9", "customized": false, "previous_version": "v0.8", "category": "guide", "local_name": "process.md" },
+    "03-collaboration.md": { "source": "guide/03-collaboration.md", "version": "v0.3", "customized": false, "previous_version": "v0.2", "category": "guide", "local_name": "collaboration.md" },
+    "04-checklists.md": { "source": "guide/04-checklists.md", "version": "v1.0", "customized": false, "previous_version": "v0.9", "category": "guide", "local_name": "checklists.md" },
+    "05-deliverables.md": { "source": "guide/05-deliverables.md", "version": "v0.8", "customized": false, "previous_version": "v0.7", "category": "guide", "local_name": "deliverables.md" },
+    "06-document-management.md": { "source": "guide/06-document-management.md", "version": "v0.2", "customized": false, "previous_version": "v0.2", "category": "guide", "local_name": "document-management.md" },
+    "07-repo-directory-guide.md": { "source": "guide/07-repo-directory-guide.md", "version": "v0.1", "customized": false, "previous_version": "v0.1", "category": "guide", "local_name": "repo-directory-guide.md" },
+    "08-tool-integration-guide.md": { "source": "guide/08-tool-integration-guide.md", "version": "v0.7", "customized": false, "previous_version": "v0.6", "category": "guide", "local_name": "tool-integration-guide.md" },
+    "09-downstream-sync-guide.md": { "source": "guide/09-downstream-sync-guide.md", "version": "v0.3", "customized": false, "previous_version": null, "category": "guide", "local_name": "downstream-sync-guide.md" },
+    "issue-workflow.md": { "source": "guide/issue-workflow.md", "version": "v1.0", "customized": false, "previous_version": "v0.3", "category": "guide", "local_name": "issue-workflow.md" },
+    "README.md": { "source": "agents/README.md", "version": "v0.3", "category": "agent" },
+    "orchestrator-agent.md": { "source": "agents/orchestrator-agent.md", "version": "v0.6", "category": "agent" },
+    "po-agent.md": { "source": "agents/po-agent.md", "version": "v0.3", "category": "agent" },
+    "uiux-agent.md": { "source": "agents/uiux-agent.md", "version": "v0.3", "category": "agent" },
+    "fullstack-developer.md": { "source": "agents/fullstack-developer.md", "version": "v0.4", "category": "agent" },
+    "tester-agent.md": { "source": "agents/tester-agent.md", "version": "v0.4", "category": "agent" }
   }
 }
