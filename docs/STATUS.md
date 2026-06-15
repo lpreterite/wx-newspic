@@ -1,6 +1,6 @@
 # wx-newspic 项目状态
 
-> 最后更新：2026-06-12（#15 #27 #31 关闭 — v2 长文发布全量完成）
+> 最后更新：2026-06-12（#42 质量门禁调研完成，#43 样式定制技能启动）
 > 项目总览：[README.md](../README.md)
 
 ---
@@ -151,13 +151,15 @@
 | [#30](https://github.com/lpreterite/wx-newspic/issues/30) | FEAT: --theme-file + theme 子命令 | P1 | ✅ closed |
 | [#31](https://github.com/lpreterite/wx-newspic/issues/31) | FEAT: 本地样式预览服务 — markdown 编辑器 + 即时主题切换 | P1 | ✅ closed |
 | [#33](https://github.com/lpreterite/wx-newspic/issues/33) | Step 1: CLI 预览命令 + HTTP 服务骨架 | P1 | ✅ closed |
-| [#34](https://github.com/lpreterite/wx-newspic/issues/34) | Step 2: 渲染 API + 编辑/预览交互 | P1 | 🔄 in progress |
+| [#34](https://github.com/lpreterite/wx-newspic/issues/34) | Step 2: 渲染 API + 编辑/预览交互 | P1 | ✅ closed |
 | [#35](https://github.com/lpreterite/wx-newspic/issues/35) | Step 3: 自定义主题集成 | P2 | ❌ closed（合并至 #36） |
 | [#36](https://github.com/lpreterite/wx-newspic/issues/36) | Step 3+4: 自定义主题集成 + 预览体验打磨 | P1 | ✅ completed |
 | [#37](https://github.com/lpreterite/wx-newspic/issues/37) | 门禁验收：Step 1+2 | P1 | ✅ closed |
 | [#38](https://github.com/lpreterite/wx-newspic/issues/38) | 门禁验收：Step 3+4 | P2 | ✅ closed |
-| [#39](https://github.com/lpreterite/wx-newspic/issues/39) | 交付：STATUS.md 更新 + CHANGELOG + Release | P2 | ⏳ todo |
+| [#39](https://github.com/lpreterite/wx-newspic/issues/39) | 交付：STATUS.md 更新 + CHANGELOG + Release | P2 | ✅ closed |
 | [#41](https://github.com/lpreterite/wx-newspic/issues/41) | 内联样式丢失 — renderArticle() 容器缺 id="wenyan" | P2 | ✅ closed |
+| [#42](https://github.com/lpreterite/wx-newspic/issues/42) | 公众号文章可读性质量门禁标准调研 | P2 | ✅ resolved |
+| [#43](https://github.com/lpreterite/wx-newspic/issues/43) | 公众号文章样式定制技能 | P2 | 🔄 in progress |
 
 ## 风险项
 
