@@ -1,6 +1,6 @@
 # wx-newspic 项目状态
 
-> 最后更新：2026-06-12（#42 质量门禁调研完成，#43 样式定制技能启动）
+> 最后更新：2026-06-15（#43 S1 全部完成 + 提取脚本新增行内强调色阶段）
 > 项目总览：[README.md](../README.md)
 
 ---
@@ -91,6 +91,16 @@
 | T8.2 publish 命令 news 模式 | ✅ 完成 | 19/19 | --type/--md/--theme/--theme-file，渲染+提取+上传+发布 |
 | T8.3 SKILL.md + publish.sh 更新 | ✅ 完成 | — | type/md/theme 参数透传，双模式支持 |
 
+### S1: 样式定制技能 ✅ 完成
+
+| 任务 | 状态 | 说明 |
+|------|------|------|
+| S1.1 Step 1: Skill 入口 + 助手脚本 | ✅ 完成 | SKILL.md + validate-theme.sh + fetch-article.mjs |
+| S1.2 Step 2: 文章爬取 + 视觉提取 | ✅ 完成 | extract-visual.mjs 含阶段 2 行内强调色推断（boldAccent/italicAccent/linkColor），修复 textstyle 误匹配 |
+| S1.3 Step 3: 质量门禁集成 (修正循环) | ✅ 完成 | apply-correction.mjs + save-theme.sh，支持 3 轮修正 |
+| S1.4 Step 4: 存盘 + 渲染预览 | ✅ 完成 | preview-theme.sh 渲染 + 浏览器打开 |
+| S1.5 Step 5: skill-optimizer 审计 | ✅ 完成 | 7 维审计 → 3 references 拆分 + 自由度标注 + 完成标准 |
+
 ### M9: 预览服务 ✅ 完成
 
 | 任务 | 状态 | 说明 |
@@ -159,7 +169,7 @@
 | [#39](https://github.com/lpreterite/wx-newspic/issues/39) | 交付：STATUS.md 更新 + CHANGELOG + Release | P2 | ✅ closed |
 | [#41](https://github.com/lpreterite/wx-newspic/issues/41) | 内联样式丢失 — renderArticle() 容器缺 id="wenyan" | P2 | ✅ closed |
 | [#42](https://github.com/lpreterite/wx-newspic/issues/42) | 公众号文章可读性质量门禁标准调研 | P2 | ✅ resolved |
-| [#43](https://github.com/lpreterite/wx-newspic/issues/43) | 公众号文章样式定制技能 | P2 | 🔄 in progress |
+| [#43](https://github.com/lpreterite/wx-newspic/issues/43) | 公众号文章样式定制技能 | P2 | ✅ closed |
 
 ## 风险项
 

@@ -14,7 +14,7 @@ export function registerRenderCommand(program: Command): void {
     .requiredOption('--md, -m <path>', 'Markdown 文件路径（必填）')
     .option('--theme <string>', '排版主题（默认 default）')
     .option('--hl-theme <string>', '代码高亮主题')
-    .option('--theme-file <path>', '自定义主题 CSS 文件路径（与 --theme 配合使用）')
+    .option('--theme-file <path>', '自定义主题 CSS（需同时指定 --theme <名称>）')
     .option('--output, -o <path>', '输出 HTML 文件路径（默认 ./{文件名}.html）')
     .option('--open, -O', '渲染后用默认浏览器打开')
     .action(handleRender);
