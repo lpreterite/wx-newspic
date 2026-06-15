@@ -40,6 +40,7 @@ export function registerPublishCommand(program: Command): void {
     .option('--md, -m <path>', 'Markdown 文件路径（news 模式，与 --content 二选一）')
     .option('--images, -i <path...>', '图片路径列表（newspic 模式必填，支持 glob）')
     .option('--theme <string>', '排版主题（news 模式，默认 default）')
+    .option('--hl-theme <string>', '代码高亮主题（news 模式）')
     .option('--theme-file <path>', '自定义主题 CSS 文件路径（news 模式，与 --theme 配合使用）')
     .option('--author, -a <string>', '作者')
     .option('--digest, -d <string>', '摘要（仅 newspic）')
@@ -50,7 +51,7 @@ export function registerPublishCommand(program: Command): void {
     .action(handlePublish);
 }
 
-async function handlePublish(options: Record<string, string | string[]>): Promise<void> {
+export async function handlePublish(options: Record<string, string | string[]>): Promise<void> {
   const type = (options.type as string) || 'newspic';
 
   if (type === 'news') {
@@ -62,6 +63,7 @@ async function handlePublish(options: Record<string, string | string[]>): Promis
 
 async function handleNewsPublish(options: Record<string, string | string[]>): Promise<void> {
   const theme = (options.theme as string) || 'default';
+  const hlTheme = options.hlTheme as string | undefined;
   const themeFile = options.themeFile ? resolve(String(options.themeFile)) : undefined;
 
   if (themeFile) {
@@ -82,7 +84,7 @@ async function handleNewsPublish(options: Record<string, string | string[]>): Pr
     : String(options.content || '').trim();
 
   // 渲染 Markdown
-  const rendered = await renderArticle({ content: mdContent, theme, themeFile });
+  const rendered = await renderArticle({ content: mdContent, theme, hlTheme, themeFile });
 
   // 标题优先级: --title > frontmatter title
   const finalTitle = title || rendered.title || '';

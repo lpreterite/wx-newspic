@@ -170,7 +170,7 @@
 | [#41](https://github.com/lpreterite/wx-newspic/issues/41) | 内联样式丢失 — renderArticle() 容器缺 id="wenyan" | P2 | ✅ closed |
 | [#42](https://github.com/lpreterite/wx-newspic/issues/42) | 公众号文章可读性质量门禁标准调研 | P2 | ✅ resolved |
 | [#43](https://github.com/lpreterite/wx-newspic/issues/43) | 公众号文章样式定制技能 | P2 | ✅ closed |
-| [#44](https://github.com/lpreterite/wx-newspic/issues/44) | 代码块语法高亮暴露 --hl-theme CLI 参数 | P2 | ⏳ open |
+| [#44](https://github.com/lpreterite/wx-newspic/issues/44) | 代码块语法高亮暴露 --hl-theme CLI 参数 | P2 | ✅ closed |
 | [#45](https://github.com/lpreterite/wx-newspic/issues/45) | README 补充样式定制技能使用说明 | P2 | ⏳ open |
 
 ## 风险项

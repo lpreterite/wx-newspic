@@ -20,14 +20,21 @@
 | B3 | 图片 max-width | `100%` | 防止图片溢出屏幕 |
 | B4 | 表格 border-collapse | `collapse` | 表格线对齐 |
 | B5 | blockquote 左边框 | `border-left: ...` | 引用块视觉标识 |
-| B6 | p code 底色 | `background: ...` | 行内代码与正文区分 |
+| B6 | 行内代码区分（p code） | `background: ...` | 行内 `<code>` 与正文区分 |
 | B7 | 标题层级区分 | h1、h2 各自独立定义 | 至少 font-size 不同 |
+| B8 | 代码块背景协调 | `.hljs` 背景亮度与 `bodyColor` 亮度区间一致 | 深色文章不宜搭配浅色 hljs 主题 |
 
 ### 维度 C：移动端中文阅读（1 项）
 
 | ID | 检查项 | 建议值 | 原因 |
 |----|--------|--------|------|
 | C1 | 正文避免纯黑 | `#3f3f3f` | 纯黑 #000 在 OLED 屏刺眼 |
+
+### 维度 D：代码高亮协调（1 项，AI 视觉审查）
+
+| ID | 检查项 | 判定方式 | 说明 |
+|----|--------|---------|------|
+| D1 (原 B8) | hljs 主题与文章背景协调 | AI 视觉审查 | 深色文章（`isDarkBackground: true`）应搭配深色 hljs 主题如 `dracula`/`atom-one-dark`/`monokai`；浅色文章搭配 `atom-one-light`/`github`/`xcode` |
 
 ## 命令
 

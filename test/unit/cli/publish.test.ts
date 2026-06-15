@@ -1,5 +1,17 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
+// Mock 渲染管线
+const mockRenderArticle = vi.fn();
+
+vi.mock('../../../src/config/credential.js', () => ({
+  getCredential: vi.fn(() => ({ appId: 'test_app_id', appSecret: 'test_app_secret' })),
+  getServerConfig: vi.fn(() => ({ serverUrl: '', apiKey: '' })),
+}));
+
+vi.mock('../../../src/renderer/index.js', () => ({
+  renderArticle: mockRenderArticle,
+}));
+
 // Mock 文件系统操作
 vi.mock('node:fs', () => ({
   readFileSync: vi.fn(() => Buffer.from('fake-image-data')),
@@ -11,11 +23,6 @@ vi.mock('node:fs', () => ({
 // Mock globby
 vi.mock('globby', () => ({
   globbySync: vi.fn(),
-}));
-
-// Mock config/credential
-vi.mock('../../../src/config/credential.js', () => ({
-  getCredential: vi.fn(() => ({ appId: 'test_app_id', appSecret: 'test_app_secret' })),
 }));
 
 describe('publish command - parameter validation', () => {
@@ -292,6 +299,39 @@ describe('publish command - parameter validation', () => {
 
       expect(result.success).toBe(true);
       expect(result.media_id).toBe('draft_789');
+    });
+  });
+
+  describe('handleNewsPublish', () => {
+    it('透传 hlTheme 到 renderArticle', async () => {
+      mockRenderArticle.mockResolvedValue({
+        content: '<h1>Hello</h1>',
+        title: 'Hello',
+      });
+
+      const mockFetch = vi.fn()
+        .mockResolvedValueOnce({
+          json: () => Promise.resolve({
+            success: true,
+            data: { media_id: 'draft_999', created_at: '2026-06-15T12:00:00Z' },
+          }),
+        });
+
+      vi.stubGlobal('fetch', mockFetch);
+
+      const { handlePublish } = await import('../../../src/cli/publish.js');
+      await handlePublish({
+        type: 'news',
+        title: '测试',
+        content: '# Hello',
+        hlTheme: 'dracula',
+        server: 'http://localhost:3000',
+        apiKey: 'test-key',
+      });
+
+      expect(mockRenderArticle).toHaveBeenCalledWith(
+        expect.objectContaining({ hlTheme: 'dracula' }),
+      );
     });
   });
 });

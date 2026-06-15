@@ -25,6 +25,19 @@ function normalizeColor(val) {
   return NAMED_COLORS[v] || val;
 }
 
+function hexToLuminance(hex) {
+  const h = hex.replace('#', '');
+  if (h.length < 6) return 255;
+  const r = parseInt(h.slice(0, 2), 16);
+  const g = parseInt(h.slice(2, 4), 16);
+  const b = parseInt(h.slice(4, 6), 16);
+  return 0.299 * r + 0.587 * g + 0.114 * b;
+}
+
+function suggestHlTheme(isDark) {
+  return isDark ? 'atom-one-dark' : 'atom-one-light';
+}
+
 function parseInlineStyle(styleStr) {
   const props = {};
   for (const decl of styleStr.split(';')) {
@@ -161,7 +174,10 @@ for (const inst of inlineInstances) {
   otherColorFreq[inst.color] = (otherColorFreq[inst.color] || 0) + 1;
 }
 
-const inlineAccents = { bodyColor };
+const isDarkBackground = hexToLuminance(bodyColor) < 128;
+const suggestedHlTheme = suggestHlTheme(isDarkBackground);
+
+const inlineAccents = { bodyColor, isDarkBackground, suggestedHlTheme };
 
 // 构建 boldAccent：取频数最高的非 bodyColor 加粗色
 const sortedBold = Object.entries(boldColorFreq).sort((a, b) => b[1] - a[1]);
