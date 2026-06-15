@@ -34,7 +34,21 @@
 
 | ID | 检查项 | 判定方式 | 说明 |
 |----|--------|---------|------|
-| D1 (原 B8) | hljs 主题与文章背景协调 | AI 视觉审查 | wenyan-core 内建 9 个 hljs 主题：深色: `atom-one-dark`/`dracula`/`github-dark`/`monokai`/`solarized-dark`；浅色: `atom-one-light`/`github`/`solarized-light`/`xcode` |
+| D1 (原 B8) | hljs 主题与文章背景协调 | AI 视觉审查 | 深色文章应搭配深色 hljs 主题，浅色文章搭配浅色 hljs 主题 |
+
+wenyan-core 内置 **9 个 hljs 主题**，提取脚本 `suggestedHlTheme.comment` 输出匹配的注释块：
+
+| 文章背景 | 推荐 `--hl-theme` | 备选 |
+|---------|-------------------|------|
+| 深色 (`isDarkBackground: true`) | `atom-one-dark` | dracula, github-dark, monokai, solarized-dark |
+| 浅色 (`isDarkBackground: false`) | `atom-one-light` | github, solarized-light, xcode |
+
+提取脚本输出的 CSS 注释块可直接复制到主题文件头部：
+
+```css
+/* hljs-theme: atom-one-dark */
+/* 深色背景文章推荐搭配 dark hljs 主题，可用 --hl-theme <名称> 指定 */
+```
 
 ## 命令
 
