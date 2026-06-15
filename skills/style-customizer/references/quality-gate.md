@@ -34,7 +34,7 @@
 
 | ID | 检查项 | 判定方式 | 说明 |
 |----|--------|---------|------|
-| D1 (原 B8) | hljs 主题与文章背景协调 | AI 视觉审查 | 深色文章（`isDarkBackground: true`）应搭配深色 hljs 主题如 `dracula`/`atom-one-dark`/`monokai`；浅色文章搭配 `atom-one-light`/`github`/`xcode` |
+| D1 (原 B8) | hljs 主题与文章背景协调 | AI 视觉审查 | wenyan-core 内建 9 个 hljs 主题：深色: `atom-one-dark`/`dracula`/`github-dark`/`monokai`/`solarized-dark`；浅色: `atom-one-light`/`github`/`solarized-light`/`xcode` |
 
 ## 命令
 

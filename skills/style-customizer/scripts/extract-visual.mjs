@@ -35,7 +35,18 @@ function hexToLuminance(hex) {
 }
 
 function suggestHlTheme(isDark) {
-  return isDark ? 'atom-one-dark' : 'atom-one-light';
+  if (isDark) {
+    return {
+      theme: 'atom-one-dark',
+      alternatives: ['dracula', 'github-dark', 'monokai', 'solarized-dark'],
+      comment: '/* hljs-theme: atom-one-dark */\n/* 深色背景文章推荐搭配 dark hljs 主题，可用 --hl-theme <名称> 指定 */',
+    };
+  }
+  return {
+    theme: 'atom-one-light',
+    alternatives: ['github', 'solarized-light', 'xcode'],
+    comment: '/* hljs-theme: atom-one-light */\n/* 浅色背景文章推荐搭配 light hljs 主题，可用 --hl-theme <名称> 指定 */',
+  };
 }
 
 function parseInlineStyle(styleStr) {
