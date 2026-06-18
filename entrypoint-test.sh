@@ -42,9 +42,12 @@ case "$RUN_MODE" in
       echo "RUN_MODE=CUSTOM requires CLI_ARGS environment variable"
       exit 1
     fi
-    exec $CLI_ARGS
+    eval set -- "$CLI_ARGS"
+    exec "$@"
     ;;
 
+  # MOCK_SERVER: 暂未实现。如需在 Docker 中运行 mock WeChat API server，
+  # 可使用内置 proxy server（SERVER 模式）配合环境变量实现。
   *)
     echo "Unknown RUN_MODE: $RUN_MODE"
     echo "Valid modes: DRY_RUN, SERVER, CUSTOM"

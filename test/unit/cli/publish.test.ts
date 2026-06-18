@@ -388,6 +388,26 @@ describe('publish command - parameter validation', () => {
       expect(result.success).toBe(true);
       expect(result.media_id).toBe('dry-run');
     });
+
+    it('executeNewsPublish dry-run 应跳过远程图片下载', async () => {
+      const fetchSpy = vi.fn();
+      vi.stubGlobal('fetch', fetchSpy);
+      const { executeNewsPublish } = await import('../../../src/cli/publish.js');
+      const content = '<p>正文</p><img src="https://example.com/remote.jpg">';
+      const result = await executeNewsPublish({
+        title: '测试',
+        content,
+        serverUrl: '',
+        apiKey: '',
+        appId: 'id',
+        appSecret: 'secret',
+        dryRun: true,
+      });
+      expect(result.success).toBe(true);
+      expect(result.media_id).toBe('dry-run');
+      expect(fetchSpy).not.toHaveBeenCalled();
+      vi.unstubAllGlobals();
+    });
   });
 
   describe('handleNewsPublish', () => {

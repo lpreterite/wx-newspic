@@ -380,6 +380,11 @@ export async function executeNewsPublish(params: {
 
     let imagePath: string;
     if (src.startsWith('http://') || src.startsWith('https://')) {
+      if (dryRun) {
+        console.log(`[dry-run] 跳过远程图片下载: ${src}`);
+        srcToMediaId[src] = `dry-run-img-${Object.keys(srcToMediaId).length + 1}`;
+        continue;
+      }
       imagePath = await downloadImage(src);
     } else {
       const decodedSrc = decodeURIComponent(src);
