@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.1](https://github.com/lpreterite/wx-newspic/compare/v0.2.0...v0.2.1) (2026-06-18)
+
+
+### Bug Fixes
+
+* --version 编译注入修复（Close [#48](https://github.com/lpreterite/wx-newspic/issues/48)） ([d71bc8c](https://github.com/lpreterite/wx-newspic/commit/d71bc8cb93bc3ad741002b18aa6643f87caccd6a)), closes [#28](https://github.com/lpreterite/wx-newspic/issues/28)
+
 # [0.2.0](https://github.com/lpreterite/wx-newspic/compare/v0.1.1...v0.2.0) (2026-06-18)
 
 
