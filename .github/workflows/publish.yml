@@ -7,7 +7,7 @@ on:
 
 permissions:
   id-token: write
-  contents: read
+  contents: write
 
 jobs:
   publish:
@@ -18,9 +18,13 @@ jobs:
         with:
           node-version: '23'
           registry-url: 'https://registry.npmjs.org'
-          package-manager-cache: false
       - run: npm ci
-      - run: npm run build --if-present
+      - run: npm run build
       - run: npm test
-      - run: npm i -g npm@11 --force
-      - run: npm publish --access public
+      - run: npm publish --access public --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - uses: softprops/action-gh-release@v2
+        with:
+          body_path: CHANGELOG.md
+          generate_release_notes: true

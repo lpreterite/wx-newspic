@@ -6,11 +6,10 @@
     "tagAnnotation": "Release v${version}"
   },
   "npm": {
-    "publish": true
+    "publish": false
   },
   "github": {
-    "release": true,
-    "releaseName": "v${version}"
+    "release": false
   },
   "plugins": {
     "@release-it/conventional-changelog": {
