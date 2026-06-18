@@ -1,6 +1,6 @@
 # wx-newspic 项目状态
 
-> 最后更新：2026-06-15（#43 S1 全部完成 + 提取脚本新增行内强调色阶段）
+> 最后更新：2026-06-18（用户文档迁移至 GitHub Wiki，#45 关闭，#46 创建）
 > 项目总览：[README.md](../README.md)
 
 ---
@@ -66,6 +66,7 @@
 | T5.1 README 安装与使用说明 | ✅ 完成 | 环境要求、安装方式、命令参考、使用示例、故障排查 |
 | T5.2 创建 .env.example | ✅ 完成 | 环境变量模板文件 |
 | T5.3 修正 skills/wx-newspic/SKILL.md | ✅ 完成 | 安装命令改为源码构建流程，快速开始使用全局命令 |
+| T5.4 用户文档迁移至 GitHub Wiki | ✅ 完成 | README 精简（469→82 行），13 个 Wiki 页面创建，_Sidebar 导航 |
 
 ### M6: 实战发布 ⏳ 待启动
 
@@ -139,7 +140,10 @@
 | renderer/index.test.ts | 8 | ✅ |
 | renderer/themes.test.ts | 4 | ✅ |
 | renderer/images.test.ts | 13 | ✅ |
-| **总计** | **116** | **✅ 全部通过** |
+| cli/publish.test.ts | 21 | ✅ |
+| cli/credential.test.ts | 3 | ✅ |
+| cli/serve.test.ts | 2 | ✅ |
+| **总计** | **117** | **✅ 全部通过** |
 ## 已知问题（GitHub Issues）
 
 | Issue | 标题 | 优先级 | 状态 |
@@ -171,7 +175,8 @@
 | [#42](https://github.com/lpreterite/wx-newspic/issues/42) | 公众号文章可读性质量门禁标准调研 | P2 | ✅ resolved |
 | [#43](https://github.com/lpreterite/wx-newspic/issues/43) | 公众号文章样式定制技能 | P2 | ✅ closed |
 | [#44](https://github.com/lpreterite/wx-newspic/issues/44) | 代码块语法高亮暴露 --hl-theme CLI 参数 | P2 | ✅ closed |
-| [#45](https://github.com/lpreterite/wx-newspic/issues/45) | README 补充样式定制技能使用说明 | P2 | ⏳ open |
+| [#45](https://github.com/lpreterite/wx-newspic/issues/45) | README 补充样式定制技能使用说明 | P2 | ✅ closed |
+| [#46](https://github.com/lpreterite/wx-newspic/issues/46) | DOCS: 迁移用户文档到 GitHub Wiki | P2 | ⏳ open |
 
 ## 风险项
 
