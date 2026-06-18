@@ -8,11 +8,11 @@ import { renderArticle, registerThemeFromFile } from '../renderer/index.js';
 
 const THEMES_DIR = resolve(homedir(), '.wx-newspic', 'themes');
 const HL_THEMES = [
+  { id: 'github-dark', name: 'GitHub Dark' },
   { id: '', name: '默认' },
   { id: 'atom-one-dark', name: 'Atom One Dark' },
   { id: 'atom-one-light', name: 'Atom One Light' },
   { id: 'dracula', name: 'Dracula' },
-  { id: 'github-dark', name: 'GitHub Dark' },
   { id: 'github', name: 'GitHub' },
   { id: 'monokai', name: 'Monokai' },
   { id: 'solarized-dark', name: 'Solarized Dark' },

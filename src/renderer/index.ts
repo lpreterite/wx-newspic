@@ -50,7 +50,7 @@ export function registerThemeFromFile(themeFile: string, themeId: string): void 
  * 仅做内容转换，不涉及网络 IO（图片上传等由上层处理）。
  */
 export async function renderArticle(options: RenderOptions): Promise<RenderedArticle> {
-  const { content, theme = 'default', hlTheme, themeFile } = options;
+  const { content, theme = 'default', hlTheme = 'github-dark', themeFile } = options;
 
   if (!content) {
     return { content: '', title: '' };
