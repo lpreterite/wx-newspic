@@ -12,9 +12,7 @@
 ## 已知问题
 
 - **BUG-001**: 中转服务器 TokenManager 缓存过期 token 不自刷新（[GitHub Issue #12](https://github.com/lpreterite/wx-newspic/issues/12)）
-  - 触发条件：另一服务使用同一凭证刷新 token 后，wx-newspic relay 缓存失效
-  - 影响范围：`upload-image` 和 `create-draft` 两个路由
-  - 解决方向：40001 时触发强制刷新，或与 wenyan relay 共享 token 缓存
+  - 解决：`TokenManager.executeWithToken()` 遇 40001 自动清缓存→刷新→重试一次（commit eb4f9a3）
 
 ---
 
