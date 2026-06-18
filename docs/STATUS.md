@@ -1,6 +1,6 @@
 # wx-newspic 项目状态
 
-> 最后更新：2026-06-18（v0.2.0 GitHub Actions 发布失败修复，#47 待重新发布）
+> 最后更新：2026-06-18（v0.2.0 通过 Node 24 + OIDC 成功发布至 npm，#47 closed）
 > 项目总览：[README.md](../README.md)
 
 ---
@@ -109,7 +109,7 @@
 | T9.3 (#36) 自定义主题集成 + 体验打磨 | ✅ 完成 | 主题扫描注册、防抖、loading、错误态、快捷键、响应式 |
 | T9.4 (#37) 门禁验收 Step 1+2 | ✅ 完成 | CLI 命令 + 渲染交互 — 12/12 通过 |
 | T9.5 (#38) 门禁验收 Step 3+4 | ✅ 完成 | 主题集成 + 体验打磨 — 12/12 通过 |
-| T9.6 (#39) 交付准备 | ⏳ 待开始 | STATUS.md + CHANGELOG + Release |
+| T9.6 (#39) 交付准备 | ✅ 完成 | STATUS.md + CHANGELOG + Release (#47 closed) |
 
 #### M9 关键决策
 
@@ -175,7 +175,7 @@
 | [#44](https://github.com/lpreterite/wx-newspic/issues/44) | 代码块语法高亮暴露 --hl-theme CLI 参数 | P2 | ✅ closed |
 | [#45](https://github.com/lpreterite/wx-newspic/issues/45) | README 补充样式定制技能使用说明 | P2 | ✅ closed |
 | [#46](https://github.com/lpreterite/wx-newspic/issues/46) | DOCS: 迁移用户文档到 GitHub Wiki | P2 | ✅ closed |
-| [#47](https://github.com/lpreterite/wx-newspic/issues/47) | RELEASE: 首次使用 release-it 发布 v0.2.0 | P1 | ⏳ open — Actions npm publish 失败（NODE_AUTH_TOKEN 步级覆盖），已修复待重新发布 |
+| [#47](https://github.com/lpreterite/wx-newspic/issues/47) | RELEASE: 首次使用 release-it 发布 v0.2.0 | P1 | ✅ closed — Node 24 + registry-url，npm 11.5.1+ 原生 OIDC 发布成功 |
 
 ## 风险项
 
