@@ -179,7 +179,7 @@
 | [#48](https://github.com/lpreterite/wx-newspic/issues/48) | BUG-006: publish.ts 运行时路径解析导致版本标识错误 | P1 | ✅ closed — 编译时版本注入替代运行时 path.resolve |
 | [#49](https://github.com/lpreterite/wx-newspic/issues/49) | BUG-007: Markdown 中文图片路径导致 FormData ByteString 错误 | P1 | ✅ fixed — decodeURIComponent + safeBasename + --dry-run |
 | [#50](https://github.com/lpreterite/wx-newspic/issues/50) | 验收 #49：中文路径 ByteString 修复 | P1 | ✅ closed — 128/128 测试通过，Docker dry-run 3/3 通过 |
-| [#51](https://github.com/lpreterite/wx-newspic/issues/51) | DOCS: #49 修复相关架构刷新（ByteString + safeBasename + dry-run） | P2 | ⏳ pending |
+| [#51](https://github.com/lpreterite/wx-newspic/issues/51) | DOCS: #49 修复相关架构刷新（ByteString + safeBasename + dry-run） | P2 | ✅ closed — tech-design-001 §2.3 + tech-design-002 §5.2 + checklists G3-03 |
 | [#52](https://github.com/lpreterite/wx-newspic/issues/52) | Docker 测试架构：构建一次、多次复用 | P2 | ✅ closed — Dockerfile.test + entrypoint-test.sh + docker-compose.yml |
 
 ## 风险项

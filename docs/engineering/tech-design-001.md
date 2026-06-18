@@ -96,6 +96,10 @@ wx-newspic/
 │   ├── docker-compose.yml        # 本地开发用
 │   └── nginx.conf                # 反向代理（可选）
 │
+├── Dockerfile.test               # Docker 测试镜像（构建一次、多次复用）
+├── entrypoint-test.sh            # 测试入口脚本（DRY_RUN / SERVER / CUSTOM）
+├── docker-compose.yml            # 测试服务编排（test-dryrun / test-server）
+│
 └── docs/                         # 文档
     ├── engineering/
     │   └── tech-design-001.md    # 本文档
@@ -155,6 +159,7 @@ Options:
   --app-id        <string>    微信 APP_ID（可选，默认从凭证配置读取）
   --app-secret    <string>    微信 APP_SECRET（可选，默认从凭证配置读取）
   --api-key       <string>    中转服务器 API Key（可选，默认从配置读取）
+  --dry-run                   验证模式：处理但不实际调用微信 API（可选，用于本地/Docker 隔离验证）
 
 示例:
   # 基础用法：发布 3 张 slide 截图
@@ -178,6 +183,13 @@ Options:
     --images ./slides/*.png \
     --app-id "wx_xxx" \
     --app-secret "secret_xxx"
+
+  # 验证模式（无需微信凭证和服务器）
+  wx-newspic publish \
+    --title "测试" \
+    --content "正文" \
+    --images ./slides/*.png \
+    --dry-run
 ```
 
 **参数优先级**（凭证相关）：
@@ -206,19 +218,64 @@ Options:
    ├── 每张图片 ≤ 10MB
    └── 格式校验
 
-2. 读取凭证
-   ├── 优先 CLI 参数
-   ├── 其次环境变量
-   └── 最后自动读取 ~/.openclaw/skills/wechat-publisher/.env
+2. 读取凭证（--dry-run 时跳过）
 
-3. 与中转服务器通信
+3. 图片处理
+   ├── safeBasename() → 消除 FormData filename 中的非 ASCII 字符
+   ├── readFileSync → Buffer → Blob
+   └── --dry-run: 仅读取并打印日志，跳过上传
+
+4. 与中转服务器通信（--dry-run 时跳过，返回 mock DraftResult）
    ├── POST /api/wechat/upload-image  × N 张
    └── POST /api/wechat/create-draft
 
-4. 输出结果
+5. 输出结果
    ├── 成功: { media_id, status: "draft_created" }
+   ├── dry-run: { media_id: "dry-run", success: true }
    └── 失败: { error, code, detail }
 ```
+
+### 2.3 中文路径与文件上传
+
+#### 问题背景
+
+Node.js 的 FormData `append(name, blob, filename)` 要求 `filename` 仅含 ASCII 字符。当文件路径包含中文（如 `OpenClaw梦境/cover.png`）时，直接传入 `basename(path)` 可能导致 `ByteString` 校验错误（value 值 > 255），在某些 Node 22 minor 版本上触发 `DOMException`。
+
+此外，wenyan-md 渲染的 `<img src>` 采用 percent-encoding 编码非 ASCII 字符（如 `梦境` → `%E6%A2%A6%E5%A2%83`），直接 `statSync(src)` 会因路径含 `%xx` 而失败。
+
+#### 解决方案
+
+**`decodeURIComponent`（仅 `executeNewsPublish`）**：
+
+```
+用户 Markdown 中的 <img src="OpenClaw%E6%A2%A6%E5%A2%83/cover.png">
+   ↓
+extractImageSrcs → 提取出 src = "OpenClaw%E6%A2%A6%E5%A2%83/cover.png"
+   ↓
+decodeURIComponent(src) → "OpenClaw梦境/cover.png"
+   ↓
+try statSync(decodedSrc) → 成功读取
+   ↓
+fallback statSync(src)     → 纯 ASCII 路径的向后兼容
+```
+
+**`safeBasename(path)`（全局）**：
+
+```
+function safeBasename(filePath: string): string {
+  const ext = extname(filePath);         // 保留原始扩展名
+  const hash = createHash('md5')         // MD5(绝对路径) 前 8 位 hex
+    .update(filePath)
+    .digest('hex')
+    .slice(0, 8);
+  return `img-${hash}${ext}`;           // 例: img-aabbccdd.png
+}
+```
+
+`safeBasename` 在所有 3 处 `formData.append('image', blob, filename)` 调用中替换原始 `basename(path)`，确保：
+- FormData filename 始终为纯 ASCII（`img-xxxx.png`）
+- 单项目内路径冲突概率极低（8 hex 位 → 4B 组合）
+- 保留原始扩展名（微信图片校验依赖扩展名）
 
 ---
 

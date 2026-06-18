@@ -269,6 +269,9 @@ v1 现有参数保持不变，新增以下参数：
   --type, -T    <choice>   文章类型（可选: news | newspic，默认: newspic）
   --md, -m      <path>     Markdown 文件路径（news 模式，与 --content 二选一）
   --theme       <string>   排版主题（news 模式，默认: default）
+  --hl-theme    <string>   代码高亮主题（news 模式，可选）
+  --theme-file  <path>     自定义主题 CSS 文件路径（news 模式，与 --theme 配合使用）
+  --dry-run                验证模式：本地处理但不调用微信 API（可选，跨类型通用）
 
 示例:
   # 发布图文消息（读取 Markdown 文件）
@@ -303,16 +306,24 @@ v1 现有参数保持不变，新增以下参数：
 
 **v1（newspic）流程**：
 ```
-参数校验 → 凭证读取 → 图片上传(N次) → 创建草稿(article_type: wx-newspic) → 输出
+参数校验 → 凭证读取（--dry-run 时跳过） → safeBasename() → 图片上传(N次)（--dry-run 时跳过） → 创建草稿 → 输出
 ```
 
 **v2（news）流程**：
 ```
-参数校验 → 凭证读取 → 渲染 Markdown(frontmatter解析 + 主题+CSS注入)
-         → 从 HTML 提取图片路径 → 图片上传(N次)
+参数校验 → 凭证读取（--dry-run 时跳过）
+         → 渲染 Markdown(frontmatter解析 + 主题+CSS注入)
+         → 从 HTML 提取图片路径
+         → 解码路径（decodeURIComponent 还原 percent-encoded 中文路径）
+         → safeBasename() 生成纯 ASCII 文件名
+         → 图片上传(N次)（--dry-run 时跳过，仅读取文件）
          → 替换 <img src> 为微信 media_id
-         → 创建草稿(article_type: news) → 输出
+         → 创建草稿(article_type: news)（--dry-run 时返回 mock 结果） → 输出
 ```
+
+> **路径解码**：wenyan-md 渲染的 `<img src>` 对非 ASCII 字符使用 percent-encoding（如 `梦境` → `%E6%A2%A6%E5%A2%83`）。`executeNewsPublish` 通过 `decodeURIComponent(src)` 还原后 `statSync`，fallback 到原始 `src` 以向后兼容纯 ASCII 路径。
+>
+> **safeBasename**：`MD5(path).slice(0,8) + ext` 确保 `FormData.append('image', blob, filename)` 的 filename 始终为纯 ASCII，避免部分 Node 22 版本的 `ByteString` 校验错误。详见 tech-design-001 §2.3。
 
 ### 5.3 `render` 命令（本地预览）
 

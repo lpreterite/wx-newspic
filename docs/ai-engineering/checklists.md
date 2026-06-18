@@ -208,6 +208,7 @@
 □ 2. 回归测试通过
 □ 3. 性能测试通过（如适用）
 □ 4. 安全测试通过（如适用）
+□ 5. Docker 隔离验证通过（`docker compose build test-dryrun && docker compose run --rm test-dryrun`）
 ```
 
 ### G3-04 人工验收通过
