@@ -160,6 +160,7 @@
 | [#24](https://github.com/lpreterite/wx-newspic/issues/24) | FEAT: publish 命令支持 --type news 长文发布 | P1 | ✅ resolved |
 | [#25](https://github.com/lpreterite/wx-newspic/issues/25) | FEAT: SKILL.md + publish.sh 更新支持 news 模式 | P1 | ✅ resolved |
 | [#27](https://github.com/lpreterite/wx-newspic/issues/27) | v2 端到端综合验收 | P1 | ✅ closed |
+| [#28](https://github.com/lpreterite/wx-newspic/issues/28) | DOCS: v2 长文发布文档补全 | P2 | ✅ resolved（Wiki 已覆盖，综合文档已删除） |
 | [#30](https://github.com/lpreterite/wx-newspic/issues/30) | FEAT: --theme-file + theme 子命令 | P1 | ✅ closed |
 | [#31](https://github.com/lpreterite/wx-newspic/issues/31) | FEAT: 本地样式预览服务 — markdown 编辑器 + 即时主题切换 | P1 | ✅ closed |
 | [#33](https://github.com/lpreterite/wx-newspic/issues/33) | Step 1: CLI 预览命令 + HTTP 服务骨架 | P1 | ✅ closed |

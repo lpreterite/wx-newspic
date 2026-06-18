@@ -10,3 +10,6 @@ reference/
 
 # ai-engineering 同步备份
 **/.backups/
+
+# 编译时自动生成，由 scripts/inject-version.mjs 注入
+src/cli/version.ts

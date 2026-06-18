@@ -1,0 +1,13 @@
+FROM node:22-alpine
+WORKDIR /pkg
+
+COPY . .
+
+# 构建产出（含 inject-version）
+RUN npm run build
+
+# 用 npm link 模拟全局安装
+RUN npm link
+
+# 验证
+CMD wx-newspic --version

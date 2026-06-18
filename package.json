@@ -31,7 +31,7 @@
     "cli"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "node scripts/inject-version.mjs && tsc",
     "dev": "tsx watch src/index.ts",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
