@@ -1,25 +1,5 @@
 # Changelog
 
-## [0.2.3](https://github.com/lpreterite/wx-newspic/compare/v0.2.1...v0.2.2) (2026-06-18)
-
-## [0.2.2](https://github.com/lpreterite/wx-newspic/compare/v0.2.1...v0.2.2) (2026-06-18)
-
-## [0.2.2](https://github.com/lpreterite/wx-newspic/compare/v0.2.0...v0.2.1) (2026-06-18)
-
-## [0.2.1](https://github.com/lpreterite/wx-newspic/compare/v0.2.0...v0.2.1) (2026-06-18)
-
-
-### Bug Fixes
-
-* 移除 publish.yml 中多余的 NODE_AUTH_TOKEN 覆盖，避免 step 级空值覆盖 job 级认证 ([97a5377](https://github.com/lpreterite/wx-newspic/commit/97a53778edd3e5b6d5e045e2f4769a5be6b0afea))
-
-## [0.2.1](https://github.com/lpreterite/wx-newspic/compare/v0.1.1...v0.2.0) (2026-06-18)
-
-
-### Bug Fixes
-
-* 移除 publish.yml 中多余的 NODE_AUTH_TOKEN 覆盖，避免 step 级空值覆盖 job 级认证 ([97a5377](https://github.com/lpreterite/wx-newspic/commit/97a53778edd3e5b6d5e045e2f4769a5be6b0afea))
-
 # [0.2.0](https://github.com/lpreterite/wx-newspic/compare/v0.1.1...v0.2.0) (2026-06-18)
 
 
