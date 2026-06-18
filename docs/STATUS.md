@@ -1,6 +1,6 @@
 # wx-newspic 项目状态
 
-> 最后更新：2026-06-18（用户文档迁移至 GitHub Wiki，#45 关闭，#46 创建）
+> 最后更新：2026-06-18（v0.2.0 GitHub Actions 发布失败修复，#47 待重新发布）
 > 项目总览：[README.md](../README.md)
 
 ---
@@ -127,7 +127,7 @@
 | 测试文件 | 用例数 | 状态 |
 |---------|--------|------|
 | wechat/client.test.ts | 17 | ✅ |
-| wechat/token.test.ts | 9 | ✅ |
+| wechat/token.test.ts | 14 | ✅ |
 | wechat/material.test.ts | 9 | ✅ |
 | wechat/draft.test.ts | 8 | ✅ |
 | server/middleware/auth.test.ts | 4 | ✅ |
@@ -141,7 +141,7 @@
 | cli/publish.test.ts | 21 | ✅ |
 | cli/credential.test.ts | 3 | ✅ |
 | cli/serve.test.ts | 2 | ✅ |
-| **总计** | **117** | **✅ 全部通过** |
+| **总计** | **122** | **✅ 全部通过** |
 ## 已知问题（GitHub Issues）
 
 | Issue | 标题 | 优先级 | 状态 |
@@ -175,7 +175,7 @@
 | [#44](https://github.com/lpreterite/wx-newspic/issues/44) | 代码块语法高亮暴露 --hl-theme CLI 参数 | P2 | ✅ closed |
 | [#45](https://github.com/lpreterite/wx-newspic/issues/45) | README 补充样式定制技能使用说明 | P2 | ✅ closed |
 | [#46](https://github.com/lpreterite/wx-newspic/issues/46) | DOCS: 迁移用户文档到 GitHub Wiki | P2 | ✅ closed |
-| [#47](https://github.com/lpreterite/wx-newspic/issues/47) | RELEASE: 首次使用 release-it 发布 v0.2.0 | P1 | ⏳ open |
+| [#47](https://github.com/lpreterite/wx-newspic/issues/47) | RELEASE: 首次使用 release-it 发布 v0.2.0 | P1 | ⏳ open — Actions npm publish 失败（NODE_AUTH_TOKEN 步级覆盖），已修复待重新发布 |
 
 ## 风险项
 
