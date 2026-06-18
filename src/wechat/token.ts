@@ -1,4 +1,4 @@
-import { WechatClient, WechatClientError } from './client.js';
+import { WechatClient, WechatClientError, AppErrorCode } from './client.js';
 
 /**
  * Token 存储结构
@@ -140,6 +140,29 @@ export class TokenManager {
     if (this.refreshTimer) {
       clearTimeout(this.refreshTimer);
       this.refreshTimer = null;
+    }
+  }
+
+  /**
+   * 获取 token 并执行操作，遇 40001 自动刷新重试
+   *
+   * 当微信 API 返回 `TOKEN_INVALID`（40001）时，说明 token 已被其他服务作废。
+   * 此方法会自动清空缓存、强制刷新 token，然后用新 token 重试一次。
+   *
+   * @param fn - 接收 access_token 并返回 Promise 的操作函数
+   * @throws 非 40001 错误原样上抛；二次 40001 也上抛（最多一次重试）
+   */
+  async executeWithToken<T>(fn: (token: string) => Promise<T>): Promise<T> {
+    const token = await this.getToken();
+    try {
+      return await fn(token);
+    } catch (err) {
+      if (err instanceof WechatClientError && err.code === 'TOKEN_INVALID') {
+        this.store = null;
+        const freshToken = await this.refreshToken();
+        return await fn(freshToken);
+      }
+      throw err;
     }
   }
 

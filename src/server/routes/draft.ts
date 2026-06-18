@@ -80,8 +80,9 @@ export function registerDraftRoute(app: FastifyInstance, options: DraftRouteOpti
           only_fans_can_comment: body.only_fans_can_comment ?? 0,
         }];
 
-    const accessToken = await options.tokenManager.getToken();
-    const result = await options.draftManager.createDraft(articles, accessToken);
+    const result = await options.tokenManager.executeWithToken(
+      (token) => options.draftManager.createDraft(articles, token),
+    );
 
     reply.send({
       success: true,

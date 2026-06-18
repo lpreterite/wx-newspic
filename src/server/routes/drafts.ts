@@ -25,8 +25,9 @@ export function registerDraftsRoute(app: FastifyInstance, options: DraftsRouteOp
     const count = Number(query.count) || 20;
     const noContent = Number(query.no_content) || 0;
 
-    const accessToken = await options.tokenManager.getToken();
-    const result = await options.draftManager.listDrafts(accessToken, offset, count, noContent);
+    const result = await options.tokenManager.executeWithToken(
+      (token) => options.draftManager.listDrafts(token, offset, count, noContent),
+    );
 
     reply.send({
       success: true,

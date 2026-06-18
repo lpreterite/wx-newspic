@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { TokenManager } from '../../../src/wechat/token.js';
-import { WechatClient } from '../../../src/wechat/client.js';
+import { WechatClient, WechatClientError } from '../../../src/wechat/client.js';
 
 function createMockClient(fetchFn: typeof globalThis.fetch): WechatClient {
   return new WechatClient({ timeout: 5000, fetch: fetchFn });
@@ -143,6 +143,81 @@ describe('TokenManager', () => {
       vi.advanceTimersByTime(6900 * 1000);
       expect(mockFetch).toHaveBeenCalledTimes(1); // 没有自动刷新
       vi.useRealTimers();
+    });
+  });
+
+  describe('executeWithToken', () => {
+    it('正常执行应返回 fn 结果', async () => {
+      mockFetch.mockResolvedValue(mockJsonResponse({ access_token: 'test_token', expires_in: 7200 }));
+      const client = createMockClient(mockFetch);
+      const tokenManager = new TokenManager({ appId: 'wx_test', appSecret: 'secret', client });
+
+      const result = await tokenManager.executeWithToken(async (token) => {
+        return `result_${token}`;
+      });
+
+      expect(result).toBe('result_test_token');
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+    });
+
+    it('遇 40001 应刷新 token 并重试一次', async () => {
+      let callCount = 0;
+      mockFetch
+        .mockResolvedValueOnce(mockJsonResponse({ access_token: 'stale', expires_in: 7200 }))
+        .mockResolvedValueOnce(mockJsonResponse({ access_token: 'fresh', expires_in: 7200 }));
+
+      const client = createMockClient(mockFetch);
+      const tokenManager = new TokenManager({ appId: 'wx_test', appSecret: 'secret', client });
+
+      const result = await tokenManager.executeWithToken(async (token) => {
+        callCount++;
+        if (callCount === 1 && token === 'stale') {
+          throw new WechatClientError('TOKEN_INVALID', 'access_token 无效或过期');
+        }
+        return `ok_${token}`;
+      });
+
+      expect(result).toBe('ok_fresh');
+      expect(mockFetch).toHaveBeenCalledTimes(2); // 首次获取 + 刷新
+    });
+
+    it('遇其他错误应原样上抛', async () => {
+      mockFetch.mockResolvedValue(mockJsonResponse({ access_token: 'token', expires_in: 7200 }));
+      const client = createMockClient(mockFetch);
+      const tokenManager = new TokenManager({ appId: 'wx_test', appSecret: 'secret', client });
+
+      await expect(tokenManager.executeWithToken(async () => {
+        throw new Error('some other error');
+      })).rejects.toThrow('some other error');
+
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+    });
+
+    it('遇非 TOKEN_INVALID 的 WechatClientError 应原样上抛', async () => {
+      mockFetch.mockResolvedValue(mockJsonResponse({ access_token: 'token', expires_in: 7200 }));
+      const client = createMockClient(mockFetch);
+      const tokenManager = new TokenManager({ appId: 'wx_test', appSecret: 'secret', client });
+
+      await expect(tokenManager.executeWithToken(async () => {
+        throw new WechatClientError('RATE_LIMITED', 'API 调用频率限制');
+      })).rejects.toThrow('API 调用频率限制');
+
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+    });
+
+    it('刷新后仍遇 40001 应上抛（最多一次重试）', async () => {
+      mockFetch
+        .mockResolvedValueOnce(mockJsonResponse({ access_token: 'stale', expires_in: 7200 }))
+        .mockResolvedValueOnce(mockJsonResponse({ access_token: 'also_stale', expires_in: 7200 }));
+
+      const client = createMockClient(mockFetch);
+      const tokenManager = new TokenManager({ appId: 'wx_test', appSecret: 'secret', client });
+
+      await expect(tokenManager.executeWithToken(async () => {
+        throw new WechatClientError('TOKEN_INVALID', 'access_token 无效或过期');
+      })).rejects.toThrow(WechatClientError);
+
+      expect(mockFetch).toHaveBeenCalledTimes(2); // 首次获取 + 刷新，重试后不再次刷新
     });
   });
 

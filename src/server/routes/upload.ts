@@ -59,9 +59,10 @@ export function registerUploadRoute(app: FastifyInstance, options: UploadRouteOp
       // 写入临时文件
       writeFileSync(tmpPath, buffer);
 
-      // 获取 token 并上传
-      const accessToken = await options.tokenManager.getToken();
-      const result = await options.materialManager.uploadImage(tmpPath, accessToken);
+      // 获取 token 并上传（遇 40001 自动刷新重试）
+      const result = await options.tokenManager.executeWithToken(
+        (token) => options.materialManager.uploadImage(tmpPath, token),
+      );
 
       reply.send({
         success: true,
