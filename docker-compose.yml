@@ -1,0 +1,35 @@
+services:
+  test-dryrun:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    environment:
+      RUN_MODE: DRY_RUN
+
+  test-server:
+    image: wx-newspic-test
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    environment:
+      RUN_MODE: SERVER
+      HTTP_PROXY: ${HTTP_PROXY:-}
+      HTTPS_PROXY: ${HTTPS_PROXY:-}
+      http_proxy: ${http_proxy:-}
+      https_proxy: ${https_proxy:-}
+      NO_PROXY: ${NO_PROXY:-}
+    network_mode: host
+
+  test-custom:
+    image: wx-newspic-test
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    environment:
+      RUN_MODE: CUSTOM
+      HTTP_PROXY: ${HTTP_PROXY:-}
+      HTTPS_PROXY: ${HTTPS_PROXY:-}
+      http_proxy: ${http_proxy:-}
+      https_proxy: ${https_proxy:-}
+      NO_PROXY: ${NO_PROXY:-}
+    network_mode: host

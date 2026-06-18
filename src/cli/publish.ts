@@ -1,4 +1,5 @@
 import { existsSync, readFileSync, writeFileSync, statSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { resolve, extname, basename } from 'node:path';
 import { Command } from 'commander';
 import { globbySync } from 'globby';
@@ -48,20 +49,22 @@ export function registerPublishCommand(program: Command): void {
     .option('--app-id <string>', '微信 APP_ID')
     .option('--app-secret <string>', '微信 APP_SECRET')
     .option('--api-key <string>', '中转服务器 API Key')
+    .option('--dry-run', '验证模式：处理但不实际调用微信 API')
     .action(handlePublish);
 }
 
-export async function handlePublish(options: Record<string, string | string[]>): Promise<void> {
+export async function handlePublish(options: Record<string, string | string[] | boolean>): Promise<void> {
   const type = (options.type as string) || 'newspic';
+  const dryRun = !!options.dryRun;
 
   if (type === 'news') {
-    await handleNewsPublish(options);
+    await handleNewsPublish(options, dryRun);
   } else {
-    await handleNewspicPublish(options);
+    await handleNewspicPublish(options, dryRun);
   }
 }
 
-async function handleNewsPublish(options: Record<string, string | string[]>): Promise<void> {
+async function handleNewsPublish(options: Record<string, string | string[] | boolean>, dryRun: boolean): Promise<void> {
   const theme = (options.theme as string) || 'default';
   const hlTheme = options.hlTheme as string | undefined;
   const themeFile = options.themeFile ? resolve(String(options.themeFile)) : undefined;
@@ -95,10 +98,12 @@ async function handleNewsPublish(options: Record<string, string | string[]>): Pr
     process.exit(1);
   }
 
-  const cred = getCredential({
-    appId: options.appId as string | undefined,
-    appSecret: options.appSecret as string | undefined,
-  });
+  const cred = dryRun
+    ? { appId: '', appSecret: '' }
+    : getCredential({
+        appId: options.appId as string | undefined,
+        appSecret: options.appSecret as string | undefined,
+      });
 
   const { serverUrl: fileServerUrl, apiKey: fileApiKey } = getServerConfig();
   const serverUrl = (options.server as string) || process.env.WECHAT_SERVER_URL || process.env.WX_NEWSPIC_SERVER || fileServerUrl || '';
@@ -113,12 +118,13 @@ async function handleNewsPublish(options: Record<string, string | string[]>): Pr
     apiKey,
     appId: cred.appId,
     appSecret: cred.appSecret,
+    dryRun,
   });
 
   console.log(JSON.stringify(result, null, 2));
 }
 
-async function handleNewspicPublish(options: Record<string, string | string[]>): Promise<void> {
+async function handleNewspicPublish(options: Record<string, string | string[] | boolean>, dryRun: boolean): Promise<void> {
   const title = String(options.title || '').trim();
   const content = String(options.content || '').trim();
   const imageArgs = Array.isArray(options.images) ? options.images : [String(options.images)];
@@ -129,10 +135,12 @@ async function handleNewspicPublish(options: Record<string, string | string[]>):
   const imagePaths = resolveImagePaths(imageArgs);
   validateImages(imagePaths);
 
-  const cred = getCredential({
-    appId: options.appId as string | undefined,
-    appSecret: options.appSecret as string | undefined,
-  });
+  const cred = dryRun
+    ? { appId: '', appSecret: '' }
+    : getCredential({
+        appId: options.appId as string | undefined,
+        appSecret: options.appSecret as string | undefined,
+      });
 
   const { serverUrl: fileServerUrl, apiKey: fileApiKey } = getServerConfig();
   const serverUrl = (options.server as string) || process.env.WECHAT_SERVER_URL || process.env.WX_NEWSPIC_SERVER || fileServerUrl || '';
@@ -148,6 +156,7 @@ async function handleNewspicPublish(options: Record<string, string | string[]>):
     apiKey,
     appId: cred.appId,
     appSecret: cred.appSecret,
+    dryRun,
   });
 
   console.log(JSON.stringify(result, null, 2));
@@ -236,17 +245,18 @@ export async function executeNewspicPublish(params: {
   apiKey: string;
   appId: string;
   appSecret: string;
+  dryRun?: boolean;
 }): Promise<DraftResult> {
-  const { title, content, imagePaths, author, digest, serverUrl, apiKey } = params;
+  const { title, content, imagePaths, author, digest, serverUrl, apiKey, dryRun } = params;
 
-  if (!serverUrl) {
+  if (!serverUrl && !dryRun) {
     throw new WechatClientError(
       'SERVER_URL_MISSING',
       '未指定中转服务器地址。请通过 --server 参数或 WECHAT_SERVER_URL 环境变量指定。',
     );
   }
 
-  const baseUrl = serverUrl.replace(/\/+$/, '');
+  const baseUrl = serverUrl?.replace(/\/+$/, '') || '';
   const authHeaders: Record<string, string> = apiKey
     ? { 'Authorization': `Bearer ${apiKey}` }
     : {};
@@ -255,11 +265,16 @@ export async function executeNewspicPublish(params: {
 
   for (const imagePath of imagePaths) {
     const buffer = readFileSync(imagePath);
-    const filename = basename(imagePath);
     const blob = new Blob([buffer]);
 
+    if (dryRun) {
+      console.log(`[dry-run] 图片已读取: ${imagePath} (${buffer.length} bytes)`);
+      imageMediaIds.push(`dry-run-img-${imageMediaIds.length + 1}`);
+      continue;
+    }
+
     const formData = new FormData();
-    formData.append('image', blob, filename);
+    formData.append('image', blob, safeBasename(imagePath));
 
     const uploadRes = await fetch(`${baseUrl}/api/wechat/upload-image`, {
       method: 'POST',
@@ -272,11 +287,20 @@ export async function executeNewspicPublish(params: {
     if (!uploadResult.success || !uploadResult.data) {
       throw new WechatClientError(
         uploadResult.error?.code || 'UPLOAD_FAILED',
-        uploadResult.error?.message || `图片上传失败: ${filename}`,
+        uploadResult.error?.message || `图片上传失败: ${imagePath}`,
       );
     }
 
     imageMediaIds.push(uploadResult.data.image_media_id);
+  }
+
+  if (dryRun) {
+    console.log(`[dry-run] 草稿体准备完毕: { title: "${title}", images: ${imageMediaIds.length} }`);
+    return {
+      media_id: 'dry-run',
+      created_at: new Date().toISOString(),
+      success: true,
+    };
   }
 
   const draftBody = {
@@ -331,17 +355,18 @@ export async function executeNewsPublish(params: {
   apiKey: string;
   appId: string;
   appSecret: string;
+  dryRun?: boolean;
 }): Promise<DraftResult> {
-  const { title, content, cover, author, serverUrl, apiKey } = params;
+  const { title, content, cover, author, serverUrl, apiKey, dryRun } = params;
 
-  if (!serverUrl) {
+  if (!serverUrl && !dryRun) {
     throw new WechatClientError(
       'SERVER_URL_MISSING',
       '未指定中转服务器地址。请通过 --server 参数或 WECHAT_SERVER_URL 环境变量指定。',
     );
   }
 
-  const baseUrl = serverUrl.replace(/\/+$/, '');
+  const baseUrl = serverUrl?.replace(/\/+$/, '') || '';
   const authHeaders: Record<string, string> = apiKey
     ? { 'Authorization': `Bearer ${apiKey}` }
     : {};
@@ -357,20 +382,31 @@ export async function executeNewsPublish(params: {
     if (src.startsWith('http://') || src.startsWith('https://')) {
       imagePath = await downloadImage(src);
     } else {
+      const decodedSrc = decodeURIComponent(src);
       try {
-        statSync(src);
-        imagePath = src;
+        statSync(decodedSrc);
+        imagePath = decodedSrc;
       } catch {
-        continue;
+        try {
+          statSync(src);
+          imagePath = src;
+        } catch {
+          continue;
+        }
       }
     }
 
     const buffer = readFileSync(imagePath);
-    const filename = basename(imagePath);
     const blob = new Blob([buffer]);
 
+    if (dryRun) {
+      console.log(`[dry-run] 图片已读取: ${imagePath} (${buffer.length} bytes)`);
+      srcToMediaId[src] = `dry-run-img-${Object.keys(srcToMediaId).length + 1}`;
+      continue;
+    }
+
     const formData = new FormData();
-    formData.append('image', blob, filename);
+    formData.append('image', blob, safeBasename(imagePath));
 
     const uploadRes = await fetch(`${baseUrl}/api/wechat/upload-image`, {
       method: 'POST',
@@ -391,7 +427,7 @@ export async function executeNewsPublish(params: {
   }
 
   // 替换 <img src> 为 media_id
-  let htmlContent = replaceImageSrcs(content, srcToMediaId);
+  const htmlContent = replaceImageSrcs(content, srcToMediaId);
 
   // 确定封面
   let thumbMediaId: string | undefined;
@@ -402,6 +438,15 @@ export async function executeNewsPublish(params: {
     if (firstSrc && srcToMediaId[firstSrc]) {
       thumbMediaId = srcToMediaId[firstSrc];
     }
+  }
+
+  if (dryRun) {
+    console.log(`[dry-run] 草稿体准备完毕: { title: "${title}", images: ${imageSrcs.length}, thumb: ${thumbMediaId || 'none'} }`);
+    return {
+      media_id: 'dry-run',
+      created_at: new Date().toISOString(),
+      success: true,
+    };
   }
 
   const draftBody: Record<string, unknown> = {
@@ -443,6 +488,12 @@ export async function executeNewsPublish(params: {
     created_at: draftResult.data.created_at,
     success: true,
   };
+}
+
+export function safeBasename(filePath: string): string {
+  const ext = extname(filePath);
+  const hash = createHash('md5').update(filePath).digest('hex').slice(0, 8);
+  return `img-${hash}${ext}`;
 }
 
 async function downloadImage(url: string): Promise<string> {

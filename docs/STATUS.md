@@ -1,6 +1,6 @@
 # wx-newspic 项目状态
 
-> 最后更新：2026-06-18（v0.2.0 通过 Node 24 + OIDC 成功发布至 npm，#47 closed）
+> 最后更新：2026-06-18（#49 fixed — decodeURIComponent + safeBasename + --dry-run 模式）
 > 项目总览：[README.md](../README.md)
 
 ---
@@ -133,15 +133,14 @@
 | server/middleware/auth.test.ts | 4 | ✅ |
 | server/middleware/error.test.ts | 5 | ✅ |
 | server/integration/server.test.ts | 12 | ✅ |
-| cli/publish.test.ts | 19 | ✅ |
+| cli/publish.test.ts | 26 | ✅ |
 | cli/render.test.ts | 7 | ✅ |
 | renderer/index.test.ts | 8 | ✅ |
 | renderer/themes.test.ts | 4 | ✅ |
 | renderer/images.test.ts | 13 | ✅ |
-| cli/publish.test.ts | 21 | ✅ |
 | cli/credential.test.ts | 3 | ✅ |
 | cli/serve.test.ts | 2 | ✅ |
-| **总计** | **122** | **✅ 全部通过** |
+| **总计** | **128** | **✅ 全部通过** |
 ## 已知问题（GitHub Issues）
 
 | Issue | 标题 | 优先级 | 状态 |
@@ -177,6 +176,11 @@
 | [#45](https://github.com/lpreterite/wx-newspic/issues/45) | README 补充样式定制技能使用说明 | P2 | ✅ closed |
 | [#46](https://github.com/lpreterite/wx-newspic/issues/46) | DOCS: 迁移用户文档到 GitHub Wiki | P2 | ✅ closed |
 | [#47](https://github.com/lpreterite/wx-newspic/issues/47) | RELEASE: 首次使用 release-it 发布 v0.2.0 | P1 | ✅ closed — Node 24 + registry-url，npm 11.5.1+ 原生 OIDC 发布成功 |
+| [#48](https://github.com/lpreterite/wx-newspic/issues/48) | BUG-006: publish.ts 运行时路径解析导致版本标识错误 | P1 | ✅ closed — 编译时版本注入替代运行时 path.resolve |
+| [#49](https://github.com/lpreterite/wx-newspic/issues/49) | BUG-007: Markdown 中文图片路径导致 FormData ByteString 错误 | P1 | ✅ fixed — decodeURIComponent + safeBasename + --dry-run |
+| [#50](https://github.com/lpreterite/wx-newspic/issues/50) | 验收 #49：中文路径 ByteString 修复 | P1 | ✅ closed — 128/128 测试通过，Docker dry-run 3/3 通过 |
+| [#51](https://github.com/lpreterite/wx-newspic/issues/51) | DOCS: #49 修复相关架构刷新（ByteString + safeBasename + dry-run） | P2 | ⏳ pending |
+| [#52](https://github.com/lpreterite/wx-newspic/issues/52) | Docker 测试架构：构建一次、多次复用 | P2 | ✅ closed — Dockerfile.test + entrypoint-test.sh + docker-compose.yml |
 
 ## 风险项
 

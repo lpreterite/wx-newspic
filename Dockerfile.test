@@ -3,11 +3,13 @@ WORKDIR /pkg
 
 COPY . .
 
-# 构建产出（含 inject-version）
 RUN npm run build
 
-# 用 npm link 模拟全局安装
 RUN npm link
 
-# 验证
-CMD wx-newspic --version
+RUN node -e "const fs=require('fs'),p=require('path');const d='/tmp/test-fixtures/OpenClaw梦境';fs.mkdirSync(d,{recursive:true});fs.writeFileSync(p.join(d,'cover.png'),Buffer.from([0x89,0x50,0x4E,0x47,0x0D,0x0A,0x1A,0x0A]));fs.writeFileSync(p.join(d,'photo.jpg'),Buffer.from([0xFF,0xD8,0xFF,0xE0]));fs.writeFileSync('/tmp/test-fixtures/梦境文章.md','# 梦境测试\n\n正文内容！\n\n<img src=\"/tmp/test-fixtures/OpenClaw%E6%A2%A6%E5%A2%83/cover.png\">\n');fs.writeFileSync('/tmp/test-fixtures/newspic-content.txt','测试正文')"
+
+COPY entrypoint-test.sh /entrypoint-test.sh
+RUN chmod +x /entrypoint-test.sh
+
+ENTRYPOINT ["/entrypoint-test.sh"]

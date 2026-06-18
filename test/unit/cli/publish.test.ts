@@ -14,10 +14,20 @@ vi.mock('../../../src/renderer/index.js', () => ({
 
 // Mock 文件系统操作
 vi.mock('node:fs', () => ({
-  readFileSync: vi.fn(() => Buffer.from('fake-image-data')),
+  readFileSync: vi.fn((path: string) => path.includes('梦境')
+    ? Buffer.from('chinese-path-image-data')
+    : Buffer.from('fake-image-data')),
   writeFileSync: vi.fn(),
   statSync: vi.fn(() => ({ size: 1000 })),
   existsSync: vi.fn(() => true),
+}));
+
+// Mock crypto
+vi.mock('node:crypto', () => ({
+  createHash: vi.fn(() => ({
+    update: vi.fn().mockReturnThis(),
+    digest: vi.fn(() => 'aabbccdd11223344'),
+  })),
 }));
 
 // Mock globby
@@ -299,6 +309,84 @@ describe('publish command - parameter validation', () => {
 
       expect(result.success).toBe(true);
       expect(result.media_id).toBe('draft_789');
+    });
+  });
+
+  describe('safeBasename', () => {
+    it('应为中文路径生成无中文 basename', async () => {
+      const { safeBasename } = await import('../../../src/cli/publish.js');
+      const result = safeBasename('/path/OpenClaw梦境/cover.png');
+      expect(result).toBe('img-aabbccdd.png');
+    });
+
+    it('应为普通路径生成一致的结果', async () => {
+      const { safeBasename } = await import('../../../src/cli/publish.js');
+      const result = safeBasename('/path/image.jpg');
+      expect(result).toBe('img-aabbccdd.jpg');
+    });
+  });
+
+  describe('dry-run mode', () => {
+    it('executeNewspicPublish dry-run 应跳过 serverUrl 检查', async () => {
+      const { executeNewspicPublish } = await import('../../../src/cli/publish.js');
+      const result = await executeNewspicPublish({
+        title: '干跑测试',
+        content: '正文',
+        imagePaths: ['/path/img.png'],
+        serverUrl: '',
+        apiKey: '',
+        appId: 'id',
+        appSecret: 'secret',
+        dryRun: true,
+      });
+      expect(result.success).toBe(true);
+      expect(result.media_id).toBe('dry-run');
+    });
+
+    it('executeNewspicPublish dry-run 中文路径应正常读取图片', async () => {
+      const { executeNewspicPublish } = await import('../../../src/cli/publish.js');
+      const result = await executeNewspicPublish({
+        title: '测试',
+        content: '正文',
+        imagePaths: ['/path/OpenClaw梦境/cover.png'],
+        serverUrl: '',
+        apiKey: '',
+        appId: 'id',
+        appSecret: 'secret',
+        dryRun: true,
+      });
+      expect(result.success).toBe(true);
+    });
+
+    it('executeNewsPublish dry-run 应跳过 serverUrl 检查', async () => {
+      const { executeNewsPublish } = await import('../../../src/cli/publish.js');
+      const result = await executeNewsPublish({
+        title: '干跑测试',
+        content: '<p>test</p>',
+        serverUrl: '',
+        apiKey: '',
+        appId: 'id',
+        appSecret: 'secret',
+        dryRun: true,
+      });
+      expect(result.success).toBe(true);
+      expect(result.media_id).toBe('dry-run');
+    });
+
+    it('executeNewsPublish dry-run 应处理 percent-encoded 中文图片路径', async () => {
+      const { executeNewsPublish } = await import('../../../src/cli/publish.js');
+      const content = '<p>正文</p><img src="assets/OpenClaw%E6%A2%A6%E5%A2%83/cover.png">';
+      const result = await executeNewsPublish({
+        title: '测试',
+        content,
+        serverUrl: '',
+        apiKey: '',
+        appId: 'id',
+        appSecret: 'secret',
+        dryRun: true,
+      });
+      expect(result.success).toBe(true);
+      expect(result.media_id).toBe('dry-run');
     });
   });
 
