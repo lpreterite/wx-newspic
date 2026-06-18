@@ -1,5 +1,13 @@
 # Changelog
 
+# [0.3.0](https://github.com/lpreterite/wx-newspic/compare/v0.2.1...v0.3.0) (2026-06-18)
+
+
+### Bug Fixes
+
+* **#49:** decodeURIComponent + safeBasename + dry-run + Docker test architecture ([b8be8ec](https://github.com/lpreterite/wx-newspic/commit/b8be8ecfb1bc06121a20e34996be812de2c4bca8)), closes [#49](https://github.com/lpreterite/wx-newspic/issues/49) [#49](https://github.com/lpreterite/wx-newspic/issues/49) [#50](https://github.com/lpreterite/wx-newspic/issues/50) [#52](https://github.com/lpreterite/wx-newspic/issues/52)
+* **review:** dry-run 跳过远程图片下载 + entrypoint CLI_ARGS 引号安全 ([88bb9d7](https://github.com/lpreterite/wx-newspic/commit/88bb9d78ead8032cb325e8d6b481ec9e071c5194))
+
 ## [0.2.1](https://github.com/lpreterite/wx-newspic/compare/v0.2.0...v0.2.1) (2026-06-18)
 
 
