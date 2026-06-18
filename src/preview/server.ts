@@ -7,6 +7,19 @@ import { DEFAULT_MARKDOWN } from './default-content.js';
 import { renderArticle, registerThemeFromFile } from '../renderer/index.js';
 
 const THEMES_DIR = resolve(homedir(), '.wx-newspic', 'themes');
+const HL_THEMES = [
+  { id: '', name: '默认' },
+  { id: 'atom-one-dark', name: 'Atom One Dark' },
+  { id: 'atom-one-light', name: 'Atom One Light' },
+  { id: 'dracula', name: 'Dracula' },
+  { id: 'github-dark', name: 'GitHub Dark' },
+  { id: 'github', name: 'GitHub' },
+  { id: 'monokai', name: 'Monokai' },
+  { id: 'solarized-dark', name: 'Solarized Dark' },
+  { id: 'solarized-light', name: 'Solarized Light' },
+  { id: 'xcode', name: 'Xcode' },
+];
+
 const BUILTIN_THEMES = [
   { id: 'default', name: 'Default' },
   { id: 'orangeheart', name: 'Orange Heart' },
@@ -45,10 +58,11 @@ export interface PreviewServerOptions {
   port: number;
   onReady?: (port: number) => void;
   themeFile?: string;
+  hlTheme?: string;
 }
 
 export async function createPreviewServer(options: PreviewServerOptions): Promise<void> {
-  const { port, themeFile } = options;
+  const { port, themeFile, hlTheme } = options;
 
   if (themeFile) {
     const themeId = basename(themeFile, '.css');
@@ -104,6 +118,12 @@ async function handleRequest(req: IncomingMessage, res: ServerResponse): Promise
     return;
   }
 
+  if (method === 'GET' && url === '/hl-themes') {
+    res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+    res.end(JSON.stringify(HL_THEMES));
+    return;
+  }
+
   if (method === 'GET' && url === '/health') {
     res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
     res.end(JSON.stringify({ status: 'ok' }));
@@ -133,7 +153,7 @@ async function handleRenderRequest(req: IncomingMessage, res: ServerResponse): P
     return;
   }
 
-  let params: { content?: string; theme?: string };
+  let params: { content?: string; theme?: string; hlTheme?: string };
   try {
     params = JSON.parse(body);
   } catch {
@@ -152,6 +172,7 @@ async function handleRenderRequest(req: IncomingMessage, res: ServerResponse): P
     const result = await renderArticle({
       content: params.content,
       theme: params.theme ?? 'default',
+      hlTheme: params.hlTheme || undefined,
     });
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
     res.end(result.content);

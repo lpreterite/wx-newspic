@@ -76,6 +76,7 @@ html, body { height: 100%; font-family: system-ui, -apple-system, sans-serif; ba
 <div class="header">
   <h1>Wenyan Preview</h1>
   <select id="themeSelect"></select>
+  <select id="hlThemeSelect"></select>
   <button id="renderBtn" onclick="render()">Render</button>
   <span id="statusIndicator"></span>
 </div>
@@ -137,6 +138,22 @@ fetch('/themes')
     render();
   });
 
+var hlThemeSelect = document.getElementById('hlThemeSelect');
+fetch('/hl-themes')
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    hlThemeSelect.innerHTML = '';
+    data.forEach(function(t) {
+      var opt = document.createElement('option');
+      opt.value = t.id;
+      opt.textContent = t.name;
+      hlThemeSelect.appendChild(opt);
+    });
+  })
+  .catch(function() {
+    hlThemeSelect.innerHTML = '';
+  });
+
 function setLoading(on) {
   if (on) {
     statusIndicator.innerHTML = '<span class="spinner"></span>';
@@ -158,6 +175,7 @@ async function render() {
       body: JSON.stringify({
         content: editor.value(),
         theme: themeSelect.value,
+        hlTheme: document.getElementById('hlThemeSelect').value,
       }),
     });
     if (!res.ok) {

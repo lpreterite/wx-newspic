@@ -8,6 +8,7 @@ export function registerPreviewCommand(program: Command): void {
     .description('启动本地预览服务（分屏编辑器 + 即时主题切换）')
     .option('-p, --port <number>', '监听端口', '3030')
     .option('-f, --theme-file <path>', '自定义主题 CSS 文件路径')
+    .option('--hl-theme <string>', '默认代码高亮主题')
     .action(handlePreview);
 }
 
@@ -36,6 +37,7 @@ async function handlePreview(options: Record<string, string>): Promise<void> {
   await createPreviewServer({
     port,
     themeFile: options.themeFile,
+    hlTheme: options.hlTheme,
     onReady: (p: number) => {
       console.log(`Preview: http://localhost:${p}`);
     },
