@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.1](https://github.com/lpreterite/wx-newspic/compare/v0.3.0...v0.3.1) (2026-06-19)
+
+
+### Bug Fixes
+
+* **#53:** CDN URL 替换 <img src> 改用 branded type 拆分 map ([f63886e](https://github.com/lpreterite/wx-newspic/commit/f63886e7c46de4416e0cf046992439aa9846cd05)), closes [#53](https://github.com/lpreterite/wx-newspic/issues/53) [#53](https://github.com/lpreterite/wx-newspic/issues/53)
+
 # [0.3.0](https://github.com/lpreterite/wx-newspic/compare/v0.2.1...v0.3.0) (2026-06-18)
 
 
