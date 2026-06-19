@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.2](https://github.com/lpreterite/wx-newspic/compare/v0.3.1...v0.3.2) (2026-06-19)
+
+
+### Bug Fixes
+
+* dry-run placeholder branded type 编译错误（CdnUrl 不可赋值给 MediaId） ([9803bd4](https://github.com/lpreterite/wx-newspic/commit/9803bd4e4a6926c151f40e553f7abc1e898fa911))
+
 ## [0.3.1](https://github.com/lpreterite/wx-newspic/compare/v0.3.0...v0.3.1) (2026-06-19)
 
 
