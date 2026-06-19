@@ -8,6 +8,10 @@ import { WechatClientError } from '../wechat/client.js';
 import { renderArticle } from '../renderer/index.js';
 import { extractImageSrcs, replaceImageSrcs, extractFirstImage } from '../renderer/images.js';
 
+type Brand<T, B> = T & { __brand: B };
+type CdnUrl = Brand<string, 'cdn-url'>;
+type MediaId = Brand<string, 'media-id'>;
+
 const SUPPORTED_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.gif'];
 const MAX_IMAGE_SIZE = 10 * 1024 * 1024;
 const MAX_IMAGE_COUNT = 20;
@@ -373,7 +377,11 @@ export async function executeNewsPublish(params: {
 
   // 提取 HTML 中的图片并上传
   const imageSrcs = extractImageSrcs(content);
-  const srcToMediaId: Record<string, string> = {};
+  // 两个 map 分别服务不同用途，类型层面不可互换：
+  // - srcToCdnUrl → 用于 <img src> 替换（需 CDN URL）
+  // - srcToMediaId → 用于 thumb_media_id 查找（需微信 media_id）
+  const srcToCdnUrl: Record<string, CdnUrl> = {};
+  const srcToMediaId: Record<string, MediaId> = {};
 
   for (const src of imageSrcs) {
     if (src.startsWith('data:')) continue;
@@ -382,7 +390,9 @@ export async function executeNewsPublish(params: {
     if (src.startsWith('http://') || src.startsWith('https://')) {
       if (dryRun) {
         console.log(`[dry-run] 跳过远程图片下载: ${src}`);
-        srcToMediaId[src] = `dry-run-img-${Object.keys(srcToMediaId).length + 1}`;
+        const placeholder = `dry-run-img-${Object.keys(srcToCdnUrl).length + 1}` as CdnUrl;
+        srcToCdnUrl[src] = placeholder;
+        srcToMediaId[src] = placeholder;
         continue;
       }
       imagePath = await downloadImage(src);
@@ -406,7 +416,9 @@ export async function executeNewsPublish(params: {
 
     if (dryRun) {
       console.log(`[dry-run] 图片已读取: ${imagePath} (${buffer.length} bytes)`);
-      srcToMediaId[src] = `dry-run-img-${Object.keys(srcToMediaId).length + 1}`;
+      const placeholder = `dry-run-img-${Object.keys(srcToCdnUrl).length + 1}` as CdnUrl;
+      srcToCdnUrl[src] = placeholder;
+      srcToMediaId[src] = placeholder;
       continue;
     }
 
@@ -428,11 +440,12 @@ export async function executeNewsPublish(params: {
       );
     }
 
-    srcToMediaId[src] = uploadResult.data.image_media_id;
+    srcToCdnUrl[src] = uploadResult.data.url as CdnUrl;
+    srcToMediaId[src] = uploadResult.data.image_media_id as MediaId;
   }
 
-  // 替换 <img src> 为 media_id
-  const htmlContent = replaceImageSrcs(content, srcToMediaId);
+  // 替换 <img src> 为 CDN URL
+  const htmlContent = replaceImageSrcs(content, srcToCdnUrl);
 
   // 确定封面
   let thumbMediaId: string | undefined;

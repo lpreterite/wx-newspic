@@ -264,6 +264,7 @@ describe('publish command - parameter validation', () => {
 
     it('图片上传和封面处理完整流程', async () => {
       // local.png 上传 + remote.jpg 下载并上传 + 创建草稿 = 4 次 fetch
+      const fetchCalls: { url: string; body?: string }[] = [];
       const mockFetch = vi.fn()
         // 上传 local.png
         .mockResolvedValueOnce({
@@ -284,11 +285,14 @@ describe('publish command - parameter validation', () => {
           }),
         })
         // 创建草稿
-        .mockResolvedValueOnce({
-          json: () => Promise.resolve({
-            success: true,
-            data: { media_id: 'draft_789', created_at: '2026-05-18T12:00:00Z' },
-          }),
+        .mockImplementationOnce((url: string, opts?: { body?: string }) => {
+          fetchCalls.push({ url, body: opts?.body });
+          return Promise.resolve({
+            json: () => Promise.resolve({
+              success: true,
+              data: { media_id: 'draft_789', created_at: '2026-05-18T12:00:00Z' },
+            }),
+          });
         });
 
       vi.stubGlobal('fetch', mockFetch);
@@ -309,6 +313,14 @@ describe('publish command - parameter validation', () => {
 
       expect(result.success).toBe(true);
       expect(result.media_id).toBe('draft_789');
+
+      // 验证 create-draft 请求体中 <img src> 为 CDN URL 而非 media_id
+      const draftCall = fetchCalls.find((c) => c.url.includes('/api/wechat/create-draft'));
+      expect(draftCall).toBeDefined();
+      const draftBody = JSON.parse(draftCall!.body!);
+      expect(draftBody.content).toBe('<p>正文</p><img src="http://mmbiz.qpic.cn/001"><img src="http://mmbiz.qpic.cn/002">');
+      expect(draftBody.content).not.toContain('media_');
+      expect(draftBody.thumb_media_id).toBe('media_001');
     });
   });
 
