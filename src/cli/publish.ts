@@ -390,9 +390,9 @@ export async function executeNewsPublish(params: {
     if (src.startsWith('http://') || src.startsWith('https://')) {
       if (dryRun) {
         console.log(`[dry-run] 跳过远程图片下载: ${src}`);
-        const placeholder = `dry-run-img-${Object.keys(srcToCdnUrl).length + 1}` as CdnUrl;
-        srcToCdnUrl[src] = placeholder;
-        srcToMediaId[src] = placeholder;
+        const idx = Object.keys(srcToCdnUrl).length + 1;
+        srcToCdnUrl[src] = `dry-run-img-${idx}` as CdnUrl;
+        srcToMediaId[src] = `dry-run-img-${idx}` as MediaId;
         continue;
       }
       imagePath = await downloadImage(src);
@@ -416,9 +416,9 @@ export async function executeNewsPublish(params: {
 
     if (dryRun) {
       console.log(`[dry-run] 图片已读取: ${imagePath} (${buffer.length} bytes)`);
-      const placeholder = `dry-run-img-${Object.keys(srcToCdnUrl).length + 1}` as CdnUrl;
-      srcToCdnUrl[src] = placeholder;
-      srcToMediaId[src] = placeholder;
+      const idx = Object.keys(srcToCdnUrl).length + 1;
+      srcToCdnUrl[src] = `dry-run-img-${idx}` as CdnUrl;
+      srcToMediaId[src] = `dry-run-img-${idx}` as MediaId;
       continue;
     }
 
