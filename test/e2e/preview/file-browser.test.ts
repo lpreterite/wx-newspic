@@ -147,5 +147,12 @@ describe('preview 文件浏览器 E2E', () => {
     expect(await draftsItem.locator('.fa-caret-down').isVisible()).toBe(true);
 
     const draftFile = page.locator('.file-tree-item', { hasText: 'draft-1.md' }).last();
+    expect(await draftFile.isVisible()).toBe(true);
+  });
+
+  it('截图留底: 侧栏完整视图（供视觉验收对照）', async () => {
+    await gotoPreview();
+    await page.screenshot({ path: 'test/artifacts/sidebar.png', fullPage: true });
+    expect(await page.locator('.file-sidebar').isVisible()).toBe(true);
   });
 });

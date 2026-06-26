@@ -100,6 +100,18 @@ html, body { height: 100%; font-family: system-ui, -apple-system, sans-serif; ba
 .file-tree-icon .fa-folder { color: #f5a623; }
 .file-tree-item .fa-file-text-o { color: #888; }
 
+/* 层级引导线 */
+.file-tree ul ul {
+  margin-left: 4px;
+  border-left: 1px dashed #d0d0d0;
+}
+
+/* 基于深度的缩进 */
+.file-tree-item[data-depth="0"] { padding-left: 12px; }
+.file-tree-item[data-depth="1"] { padding-left: 32px; }
+.file-tree-item[data-depth="2"] { padding-left: 52px; }
+.file-tree-item[data-depth="3"] { padding-left: 72px; }
+
 .file-tree-section + .file-tree-section { border-top: 1px solid #eee; }
 .file-tree-section-header {
   padding: 8px 12px 4px; font-size: 11px; font-weight: 600;
@@ -344,7 +356,7 @@ function renderTree(nodes, depth) {
     var node = nodes[i];
     var li = document.createElement('li');
     li.className = 'file-tree-item';
-    li.style.paddingLeft = (12 + depth * 20) + 'px';
+    li.setAttribute('data-depth', String(depth));
     if (node.type === 'dir') {
       var icon = document.createElement('span');
       icon.className = 'file-tree-icon';
