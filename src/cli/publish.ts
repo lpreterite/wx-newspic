@@ -40,7 +40,7 @@ export function registerPublishCommand(program: Command): void {
   const cmd = program
     .command('publish')
     .description('发布到公众号草稿箱（支持图片消息和图文消息）')
-    .option('--type, -T <choice>', '文章类型: news | newspic（默认 newspic）')
+    .option('--type, -T <choice>', '文章类型: news（长文）| newspic（图片消息，默认）。传 --md 时自动从 frontmatter type 识别')
     .option('--title, -t <string>', '标题（必填，最长 32 字）')
     .option('--content, -c <string>', '正文内容（newspic 为纯文本，news 为 Markdown）')
     .option('--md, -m <path>', 'Markdown 文件路径（news 模式，与 --content 二选一）')
