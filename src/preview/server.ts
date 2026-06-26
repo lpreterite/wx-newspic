@@ -3,9 +3,11 @@ import type http from 'node:http';
 import { readdirSync, existsSync } from 'node:fs';
 import { resolve, basename } from 'node:path';
 import { homedir } from 'node:os';
+import { URL } from 'node:url';
 import { renderPreviewPage } from './template.js';
 import { DEFAULT_MARKDOWN } from './default-content.js';
 import { renderArticle, registerThemeFromFile } from '../renderer/index.js';
+import { scanDirectory, isPathSafe, readFileContent } from './directory.js';
 
 const THEMES_DIR = resolve(homedir(), '.wx-newspic', 'themes');
 const HL_THEMES = [
@@ -132,6 +134,61 @@ async function handleRequest(req: IncomingMessage, res: ServerResponse, watchDir
   if (method === 'GET' && url === '/health') {
     res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
     res.end(JSON.stringify({ status: 'ok' }));
+    return;
+  }
+
+  if (method === 'GET' && url.startsWith('/files')) {
+    const parsed = new URL(url, 'http://localhost');
+    const dir = parsed.searchParams.get('dir');
+    if (!dir) {
+      res.writeHead(400, { 'Content-Type': 'application/json; charset=utf-8' });
+      res.end(JSON.stringify({ error: '缺少 dir 参数' }));
+      return;
+    }
+    const resolvedDir = resolve(dir);
+    if (!isPathSafe(resolvedDir, watchDirs ?? [])) {
+      res.writeHead(403, { 'Content-Type': 'application/json; charset=utf-8' });
+      res.end(JSON.stringify({ error: '路径不在允许范围内' }));
+      return;
+    }
+    if (!existsSync(resolvedDir)) {
+      res.writeHead(404, { 'Content-Type': 'application/json; charset=utf-8' });
+      res.end(JSON.stringify({ error: '目录不存在' }));
+      return;
+    }
+    const tree = scanDirectory(resolvedDir, 2);
+    res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+    res.end(JSON.stringify(tree));
+    return;
+  }
+
+  if (method === 'GET' && url.startsWith('/file')) {
+    const parsed = new URL(url, 'http://localhost');
+    const filePath = parsed.searchParams.get('path');
+    if (!filePath) {
+      res.writeHead(400, { 'Content-Type': 'application/json; charset=utf-8' });
+      res.end(JSON.stringify({ error: '缺少 path 参数' }));
+      return;
+    }
+    const resolvedPath = resolve(filePath);
+    if (!isPathSafe(resolvedPath, watchDirs ?? [])) {
+      res.writeHead(403, { 'Content-Type': 'application/json; charset=utf-8' });
+      res.end(JSON.stringify({ error: '路径不在允许范围内' }));
+      return;
+    }
+    if (!existsSync(resolvedPath)) {
+      res.writeHead(404, { 'Content-Type': 'application/json; charset=utf-8' });
+      res.end(JSON.stringify({ error: '文件不存在' }));
+      return;
+    }
+    try {
+      const result = readFileContent(resolvedPath);
+      res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+      res.end(JSON.stringify(result));
+    } catch {
+      res.writeHead(500, { 'Content-Type': 'application/json; charset=utf-8' });
+      res.end(JSON.stringify({ error: '文件读取失败' }));
+    }
     return;
   }
 

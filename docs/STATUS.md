@@ -1,6 +1,6 @@
 # wx-newspic 项目状态
 
-> 最后更新：2026-06-26（PRD-v040 + tech-design-v040: preview 文件浏览器面板 — 用户故事 + 方案规划完成）
+> 最后更新：2026-06-26（#59+#61: 后端目录扫描 API + 单元测试，161 测试通过）
 > 项目总览：[README.md](../README.md)
 
 ---
@@ -134,12 +134,11 @@
 
 | 任务 | 状态 | 说明 |
 |------|------|------|
-| PRD-v040 场景化用户故事 + 方案规划 | ✅ 完成 | 4 个用户故事，补充 ASCII 布局图 |
-| tech-design-v040 技术方案 | ✅ 完成 | CLI/后端/前端/测试/安全 全规格 |
+| PRD-v040 + tech-design-v040 | ✅ 完成 | 用户故事 + 方案 + 设计决策 |
 | #58 CLI --watch-dir 参数 | ✅ 完成 | Commander 参数 + 逗号展开 + 目录校验 + 透传 server + 前端 data-dirs 骨架 |
-| #59 后端目录扫描 API | ⏳ 待实施 | GET /files + GET /file 路由 |
+| #59 后端目录扫描 API | ✅ 完成 | scanDirectory / isPathSafe / readFileContent, GET /files + GET /file 路由 |
 | #60 前端文件浏览器侧栏 | ⏳ 待实施 | 侧栏 HTML/CSS/JS，文件加载交互 |
-| #61 新增路由测试 | ⏳ 待实施 | 单元测试覆盖 |
+| #61 新增路由测试 | ✅ 完成 | 6 纯函数测试 + 6 HTTP 集成测试，共 12 新增，总 161 通过 |
 | #62 E2E 自动化验收 | ⏳ 待实施 | Playwright E2E 测试 |
 
 ---
@@ -160,11 +159,12 @@
 | renderer/index.test.ts | 10 | ✅ |
 | renderer/themes.test.ts | 4 | ✅ |
 | renderer/images.test.ts | 13 | ✅ |
-| test/unit/preview/server.test.ts | 7 | ✅ |
+| test/unit/preview/server.test.ts | 13 | ✅ |
+| test/unit/preview/directory.test.ts | 6 | ✅ |
 | schema/index.test.ts | 11 | ✅ |
 | cli/credential.test.ts | 3 | ✅ |
 | cli/serve.test.ts | 2 | ✅ |
-| **总计** | **149** | **✅ 全部通过** |
+| **总计** | **161** | **✅ 全部通过** |
 ## 已知问题（GitHub Issues）
 
 | Issue | 标题 | 优先级 | 状态 |
@@ -209,9 +209,9 @@
 | [#57](https://github.com/lpreterite/wx-newspic/issues/57) | ENH: 统一 Markdown Frontmatter Schema 规范 | P1 | ✅ closed — Zod Schema + strict/loose + 全字段透传 + #55 修复 |
 | [#56](https://github.com/lpreterite/wx-newspic/issues/56) | FEAT: preview 文件浏览器面板 | P2 | 📋 PRD-v040 已产出，待验收 |
 | [#58](https://github.com/lpreterite/wx-newspic/issues/58) | FEAT: preview --watch-dir CLI 参数 | P2 | ⏳ 待实施 |
-| [#59](https://github.com/lpreterite/wx-newspic/issues/59) | FEAT: preview 后端目录扫描 API | P2 | ⏳ 待实施 |
+| [#59](https://github.com/lpreterite/wx-newspic/issues/59) | FEAT: preview 后端目录扫描 API | P2 | ✅ 完成 |
 | [#60](https://github.com/lpreterite/wx-newspic/issues/60) | FEAT: preview 前端文件浏览器侧栏 | P2 | ⏳ 待实施 |
-| [#61](https://github.com/lpreterite/wx-newspic/issues/61) | TEST: preview 新增路由测试 | P2 | ⏳ 待实施 |
+| [#61](https://github.com/lpreterite/wx-newspic/issues/61) | TEST: preview 新增路由测试 | P2 | ✅ 完成 |
 | [#62](https://github.com/lpreterite/wx-newspic/issues/62) | E2E 验收: preview 文件浏览器 | P2 | ⏳ 待实施 |
 
 ## 风险项

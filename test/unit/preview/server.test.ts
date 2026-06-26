@@ -1,6 +1,9 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { request as httpRequest } from 'node:http';
 import type { Server, IncomingHttpHeaders } from 'node:http';
+import { mkdtempSync, writeFileSync, mkdirSync, rmSync } from 'node:fs';
+import { join } from 'node:path';
+import { tmpdir } from 'node:os';
 import { createPreviewServer } from '../../../src/preview/server.js';
 
 let server: Server | undefined;
@@ -147,5 +150,132 @@ describe('POST /render — 前端集成', () => {
     expect(data.content.length).toBeGreaterThan(0);
     expect(data.content).toContain('Hello');
     expect(data.content).toContain('World');
+  });
+});
+
+describe('GET /files — 目录树', () => {
+  let fsServer: Server;
+  let fsPort: number;
+  let testDir: string;
+
+  beforeAll(async () => {
+    testDir = mkdtempSync(join(tmpdir(), 'preview-fs-test-'));
+    writeFileSync(join(testDir, 'intro.md'), '# Hello\n\ncontent', 'utf-8');
+    writeFileSync(join(testDir, 'guide.md'), '# Guide\n\ncontent', 'utf-8');
+    mkdirSync(join(testDir, 'drafts'));
+    writeFileSync(join(testDir, 'drafts', 'draft-1.md'), '# Draft 1', 'utf-8');
+    writeFileSync(join(testDir, 'logo.png'), 'fake-png');
+
+    fsServer = await createPreviewServer({ port: 0, host: HOST, watchDirs: [testDir] });
+    const addr = fsServer.address();
+    if (addr && typeof addr === 'object') {
+      fsPort = addr.port;
+    } else {
+      throw new Error('Failed to get server port');
+    }
+  });
+
+  afterAll(async () => {
+    if (fsServer) await new Promise<void>((resolve) => fsServer.close(() => resolve()));
+    rmSync(testDir, { recursive: true, force: true });
+  });
+
+  function req(path: string): Promise<{ status: number; body: string }> {
+    return new Promise((resolve, reject) => {
+      const r = httpRequest({ hostname: HOST, port: fsPort, path, method: 'GET' }, (res) => {
+        const chunks: Buffer[] = [];
+        res.on('data', (c: Buffer) => chunks.push(c));
+        res.on('end', () => resolve({ status: res.statusCode ?? 0, body: Buffer.concat(chunks).toString('utf-8') }));
+      });
+      r.on('error', reject);
+      r.end();
+    });
+  }
+
+  it('TC-07: GET /files 返回正确目录树结构', async () => {
+    const res = await req('/files?dir=' + encodeURIComponent(testDir));
+    expect(res.status).toBe(200);
+    const data = JSON.parse(res.body);
+    expect(Array.isArray(data)).toBe(true);
+
+    const draftDir = data.find((n: any) => n.name === 'drafts');
+    expect(draftDir).toBeDefined();
+    expect(draftDir.type).toBe('dir');
+    expect(draftDir.children).toHaveLength(1);
+    expect(draftDir.children[0].name).toBe('draft-1.md');
+
+    const intro = data.find((n: any) => n.name === 'intro.md');
+    expect(intro).toBeDefined();
+    expect(intro.type).toBe('file');
+  });
+
+  it('TC-08: GET /files 过滤非 .md 文件', async () => {
+    const res = await req('/files?dir=' + encodeURIComponent(testDir));
+    const data = JSON.parse(res.body);
+    const names = data.map((n: any) => n.name);
+    expect(names).not.toContain('logo.png');
+  });
+
+  it('TC-09: GET /files 路径越权返回 403', async () => {
+    const res = await req('/files?dir=' + encodeURIComponent('/etc'));
+    expect(res.status).toBe(403);
+  });
+});
+
+describe('GET /file — 文件内容', () => {
+  let fsServer: Server;
+  let fsPort: number;
+  let testDir: string;
+
+  beforeAll(async () => {
+    testDir = mkdtempSync(join(tmpdir(), 'preview-file-test-'));
+    writeFileSync(join(testDir, 'intro.md'), '# Hello\n\ncontent', 'utf-8');
+    writeFileSync(join(testDir, 'guide.md'), '# Guide', 'utf-8');
+
+    fsServer = await createPreviewServer({ port: 0, host: HOST, watchDirs: [testDir] });
+    const addr = fsServer.address();
+    if (addr && typeof addr === 'object') {
+      fsPort = addr.port;
+    } else {
+      throw new Error('Failed to get server port');
+    }
+  });
+
+  afterAll(async () => {
+    if (fsServer) await new Promise<void>((resolve) => fsServer.close(() => resolve()));
+    rmSync(testDir, { recursive: true, force: true });
+  });
+
+  function req(path: string): Promise<{ status: number; body: string }> {
+    return new Promise((resolve, reject) => {
+      const r = httpRequest({ hostname: HOST, port: fsPort, path, method: 'GET' }, (res) => {
+        const chunks: Buffer[] = [];
+        res.on('data', (c: Buffer) => chunks.push(c));
+        res.on('end', () => resolve({ status: res.statusCode ?? 0, body: Buffer.concat(chunks).toString('utf-8') }));
+      });
+      r.on('error', reject);
+      r.end();
+    });
+  }
+
+  it('TC-10: GET /file 返回文件内容', async () => {
+    const res = await req('/file?path=' + encodeURIComponent(join(testDir, 'intro.md')));
+    expect(res.status).toBe(200);
+    const data = JSON.parse(res.body);
+    expect(data.content).toContain('# Hello');
+    expect(data.content).toContain('content');
+    expect(data.name).toBe('intro.md');
+  });
+
+  it('TC-11: GET /file 文件不存在返回 404', async () => {
+    const res = await req('/file?path=' + encodeURIComponent(join(testDir, 'nonexistent.md')));
+    expect(res.status).toBe(404);
+    const data = JSON.parse(res.body);
+    expect(data.error).toBeDefined();
+  });
+
+  it('TC-12: GET /file 路径越权返回 403', async () => {
+    const res = await req('/file?path=' + encodeURIComponent('/etc/passwd'));
+    expect(res.status).toBe(403);
   });
 });
