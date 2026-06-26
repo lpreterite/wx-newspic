@@ -1,4 +1,4 @@
-export function renderPreviewPage(markdown: string): string {
+export function renderPreviewPage(markdown: string, watchDirs: string[] = []): string {
   return `<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -54,6 +54,52 @@ html, body { height: 100%; font-family: system-ui, -apple-system, sans-serif; ba
   transition: opacity .2s;
 }
 
+.file-sidebar {
+  width: 0; overflow: hidden;
+  background: #fafafa;
+  border-right: 1px solid #ddd;
+  display: flex; flex-direction: column;
+  transition: width .2s ease;
+  flex-shrink: 0;
+}
+.file-sidebar.expanded { width: 260px; }
+
+.sidebar-header {
+  display: flex; align-items: center;
+  height: 40px; padding: 0 12px;
+  border-bottom: 1px solid #ddd;
+  flex-shrink: 0;
+}
+.sidebar-title { font-size: 13px; font-weight: 600; margin-right: auto; }
+.sidebar-toggle, .sidebar-show-btn {
+  background: none; border: none; cursor: pointer;
+  padding: 4px 6px; font-size: 14px; color: #666;
+  border-radius: 3px; line-height: 1;
+}
+.sidebar-toggle:hover, .sidebar-show-btn:hover { background: #e8e8e8; }
+.sidebar-show-btn { margin-right: 4px; }
+
+.file-tree {
+  flex: 1; overflow-y: auto;
+  padding: 4px 0; font-size: 13px;
+}
+.file-tree-loading {
+  display: flex; align-items: center; gap: 8px;
+  padding: 12px 16px; color: #888; font-size: 13px;
+}
+
+.file-tree-item {
+  display: flex; align-items: center; gap: 4px;
+  height: 36px; padding: 0 12px; cursor: pointer;
+  white-space: nowrap; overflow: hidden;
+  text-overflow: ellipsis; user-select: none;
+}
+.file-tree-item:hover { background: #f0f0f0; }
+.file-tree-item.active { background: #e3f2fd; }
+.file-tree-icon { width: 20px; text-align: center; flex-shrink: 0; }
+.file-tree-icon .fa-folder { color: #f5a623; }
+.file-tree-item .fa-file-text-o { color: #888; }
+
 .spinner {
   display: inline-block;
   width: 14px; height: 14px;
@@ -67,6 +113,8 @@ html, body { height: 100%; font-family: system-ui, -apple-system, sans-serif; ba
 
 @media (max-width: 768px) {
   .split { flex-direction: column; }
+  .file-sidebar { display: none; }
+  .file-sidebar.expanded { width: 100%; max-height: 200px; display: flex; }
   .EasyMDE { height: 40vh; border-right: none; border-bottom: 1px solid #ddd; }
 }
 </style>
@@ -74,6 +122,9 @@ html, body { height: 100%; font-family: system-ui, -apple-system, sans-serif; ba
 <body>
 
 <div class="header">
+  <button id="sidebarShowBtn" class="sidebar-show-btn" title="展开文件浏览器">
+    <i class="fa fa-bars"></i>
+  </button>
   <h1>Wenyan Preview</h1>
   <select id="themeSelect"></select>
   <select id="hlThemeSelect"></select>
@@ -82,6 +133,20 @@ html, body { height: 100%; font-family: system-ui, -apple-system, sans-serif; ba
 </div>
 
 <div class="split">
+  <aside class="file-sidebar expanded" id="fileSidebar" data-dirs='${JSON.stringify(watchDirs)}'>
+    <div class="sidebar-header">
+      <span class="sidebar-title">文件</span>
+      <button id="sidebarToggle" class="sidebar-toggle" title="收起侧栏">
+        <i class="fa fa-chevron-left"></i>
+      </button>
+    </div>
+    <div class="file-tree" id="fileTree">
+      <div class="file-tree-loading">
+        <span class="spinner"></span>
+        <span>加载中...</span>
+      </div>
+    </div>
+  </aside>
   <textarea id="editor" spellcheck="false">${escapeHtml(markdown)}</textarea>
   <iframe id="preview" srcdoc=""></iframe>
 </div>
@@ -193,6 +258,156 @@ async function render() {
     setLoading(false);
     if (lastHtml) preview.srcdoc = lastHtml;
   }
+}
+
+var sidebar = document.getElementById('fileSidebar');
+var fileTree = document.getElementById('fileTree');
+
+document.getElementById('sidebarToggle').onclick = function() {
+  sidebar.classList.toggle('expanded');
+  var icon = this.querySelector('i');
+  icon.className = sidebar.classList.contains('expanded') ? 'fa fa-chevron-left' : 'fa fa-chevron-right';
+  localStorage.setItem('sidebarExpanded', sidebar.classList.contains('expanded'));
+};
+
+document.getElementById('sidebarShowBtn').onclick = function() {
+  sidebar.classList.add('expanded');
+  document.getElementById('sidebarToggle').querySelector('i').className = 'fa fa-chevron-left';
+  localStorage.setItem('sidebarExpanded', 'true');
+};
+
+var savedSidebar = localStorage.getItem('sidebarExpanded');
+if (savedSidebar === 'false') {
+  sidebar.classList.remove('expanded');
+}
+
+var watchDirs = [];
+try { watchDirs = JSON.parse(sidebar.dataset.dirs || '[]'); } catch(e) { console.warn('解析 watch-dirs 失败:', e); }
+if (watchDirs.length > 0) {
+  loadFileTree();
+}
+
+async function loadFileTree() {
+  fileTree.innerHTML = '<div class="file-tree-loading"><span class="spinner"></span><span>加载中...</span></div>';
+  var allItems = [];
+  for (var i = 0; i < watchDirs.length; i++) {
+    try {
+      var dir = watchDirs[i];
+      var res = await fetch('/files?dir=' + encodeURIComponent(dir));
+      if (!res.ok) continue;
+      var nodes = await res.json();
+      if (watchDirs.length > 1) {
+        allItems.push({ section: dir, nodes: nodes });
+      } else {
+        allItems = nodes;
+      }
+    } catch(e) { console.warn('加载目录树失败:', e); }
+  }
+  fileTree.innerHTML = '';
+  if (allItems.length === 0) {
+    fileTree.innerHTML = '<div class="file-tree-loading">此目录下无 Markdown 文件</div>';
+    return;
+  }
+  if (watchDirs.length > 1) {
+    for (var i = 0; i < allItems.length; i++) {
+      var section = document.createElement('div');
+      section.className = 'file-tree-section';
+      var header = document.createElement('div');
+      header.className = 'file-tree-section-header';
+      header.textContent = allItems[i].section;
+      section.appendChild(header);
+      section.appendChild(renderTree(allItems[i].nodes, 0));
+      fileTree.appendChild(section);
+    }
+  } else {
+    fileTree.appendChild(renderTree(allItems, 0));
+  }
+  autoSelectFirstFile();
+}
+
+function renderTree(nodes, depth) {
+  var ul = document.createElement('ul');
+  ul.style.listStyle = 'none';
+  ul.style.padding = '0';
+  ul.style.margin = '0';
+  for (var i = 0; i < nodes.length; i++) {
+    var node = nodes[i];
+    var li = document.createElement('li');
+    li.className = 'file-tree-item';
+    li.style.paddingLeft = (12 + depth * 20) + 'px';
+    if (node.type === 'dir') {
+      var icon = document.createElement('span');
+      icon.className = 'file-tree-icon';
+      icon.innerHTML = '<i class="fa fa-caret-right"></i>';
+      var folderIcon = document.createElement('span');
+      folderIcon.className = 'file-tree-icon';
+      folderIcon.innerHTML = '<i class="fa fa-folder"></i>';
+      var name = document.createElement('span');
+      name.textContent = node.name;
+      li.appendChild(icon);
+      li.appendChild(folderIcon);
+      li.appendChild(name);
+      if (node.children && node.children.length > 0) {
+        var childUl = renderTree(node.children, depth + 1);
+        childUl.style.display = 'none';
+        li.appendChild(childUl);
+        li.onclick = (function(li) {
+          return function(e) {
+            e.stopPropagation();
+            var childContainer = li.querySelector('ul');
+            var caret = li.querySelector('.fa-caret-right, .fa-caret-down');
+            if (childContainer) {
+              if (childContainer.style.display === 'none') {
+                childContainer.style.display = '';
+                if (caret) caret.className = 'fa fa-caret-down';
+              } else {
+                childContainer.style.display = 'none';
+                if (caret) caret.className = 'fa fa-caret-right';
+              }
+            }
+          };
+        })(li);
+      }
+    } else {
+      (function(li, node) {
+        var spacer = document.createElement('span');
+        spacer.className = 'file-tree-icon';
+        var fileIcon = document.createElement('span');
+        fileIcon.className = 'file-tree-icon';
+        fileIcon.innerHTML = '<i class="fa fa-file-text-o"></i>';
+        var name = document.createElement('span');
+        name.textContent = node.name;
+        li.appendChild(spacer);
+        li.appendChild(fileIcon);
+        li.appendChild(name);
+        li.onclick = function(e) {
+          e.stopPropagation();
+          loadFileContent(li, node.path);
+        };
+      })(li, node);
+    }
+    ul.appendChild(li);
+  }
+  return ul;
+}
+
+function autoSelectFirstFile() {
+  var firstFile = fileTree.querySelector('.file-tree-item .fa-file-text-o');
+  if (firstFile) firstFile.closest('.file-tree-item').click();
+}
+
+async function loadFileContent(li, filePath) {
+  document.querySelectorAll('.file-tree-item.active').forEach(function(el) { el.classList.remove('active'); });
+  li.classList.add('active');
+  try {
+    var res = await fetch('/file?path=' + encodeURIComponent(filePath));
+    if (!res.ok) { alert('文件加载失败'); return; }
+    var data = await res.json();
+    editor.value(data.content);
+    editor.codemirror.scrollTo(0, 0);
+    clearTimeout(renderTimeout);
+    render();
+  } catch(e) { alert('文件加载失败'); }
 }
 </script>
 </body>

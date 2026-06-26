@@ -61,10 +61,11 @@ export interface PreviewServerOptions {
   onReady?: (port: number) => void;
   themeFile?: string;
   hlTheme?: string;
+  watchDirs?: string[];
 }
 
 export async function createPreviewServer(options: PreviewServerOptions): Promise<http.Server> {
-  const { port, host, themeFile, hlTheme } = options;
+  const { port, host, themeFile, hlTheme, watchDirs } = options;
 
   if (themeFile) {
     const themeId = basename(themeFile, '.css');
@@ -75,7 +76,7 @@ export async function createPreviewServer(options: PreviewServerOptions): Promis
 
   const server = createHttpServer(async (req: IncomingMessage, res: ServerResponse) => {
     try {
-      await handleRequest(req, res);
+      await handleRequest(req, res, watchDirs);
     } catch {
       res.writeHead(500, { 'Content-Type': 'text/plain; charset=utf-8' });
       res.end('Internal Server Error');
@@ -99,7 +100,7 @@ export async function createPreviewServer(options: PreviewServerOptions): Promis
   });
 }
 
-async function handleRequest(req: IncomingMessage, res: ServerResponse): Promise<void> {
+async function handleRequest(req: IncomingMessage, res: ServerResponse, watchDirs?: string[]): Promise<void> {
   const url = req.url ?? '/';
   const method = req.method ?? 'GET';
 
@@ -109,7 +110,7 @@ async function handleRequest(req: IncomingMessage, res: ServerResponse): Promise
   }
 
   if (method === 'GET' && url === '/') {
-    const html = renderPreviewPage(DEFAULT_MARKDOWN);
+    const html = renderPreviewPage(DEFAULT_MARKDOWN, watchDirs ?? [process.cwd()]);
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
     res.end(html);
     return;

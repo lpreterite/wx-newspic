@@ -136,7 +136,7 @@
 |------|------|------|
 | PRD-v040 场景化用户故事 + 方案规划 | ✅ 完成 | 4 个用户故事，补充 ASCII 布局图 |
 | tech-design-v040 技术方案 | ✅ 完成 | CLI/后端/前端/测试/安全 全规格 |
-| #58 CLI --watch-dir 参数 | ⏳ 待实施 | Commander 参数 + 目录校验 |
+| #58 CLI --watch-dir 参数 | ✅ 完成 | Commander 参数 + 逗号展开 + 目录校验 + 透传 server + 前端 data-dirs 骨架 |
 | #59 后端目录扫描 API | ⏳ 待实施 | GET /files + GET /file 路由 |
 | #60 前端文件浏览器侧栏 | ⏳ 待实施 | 侧栏 HTML/CSS/JS，文件加载交互 |
 | #61 新增路由测试 | ⏳ 待实施 | 单元测试覆盖 |
