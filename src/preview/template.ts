@@ -36,7 +36,7 @@ html, body { height: 100%; font-family: system-ui, -apple-system, sans-serif; ba
   display: flex; height: calc(100vh - 48px);
 }
 
-.EasyMDE {
+.EasyMDE, .EasyMDEContainer {
   flex: 1 1 0;
   min-width: 0;
   display: flex;
@@ -44,11 +44,11 @@ html, body { height: 100%; font-family: system-ui, -apple-system, sans-serif; ba
   min-height: 0;
   border-right: 1px solid #ddd;
 }
-.EasyMDE .CodeMirror {
+.EasyMDE .CodeMirror, .EasyMDEContainer .CodeMirror {
   flex: 1;
   min-height: 0;
 }
-.EasyMDE .editor-statusbar { flex-shrink: 0; }
+.EasyMDE .editor-statusbar, .EasyMDEContainer .editor-statusbar { flex-shrink: 0; }
 
 .split iframe {
   flex: 1 1 0;
@@ -141,7 +141,7 @@ html, body { height: 100%; font-family: system-ui, -apple-system, sans-serif; ba
   .split { flex-direction: column; }
   .file-sidebar { display: none; }
   .file-sidebar.expanded { width: 100%; max-height: 200px; display: flex; }
-  .EasyMDE { height: 40vh; border-right: none; border-bottom: 1px solid #ddd; }
+  .EasyMDE, .EasyMDEContainer { height: 40vh; border-right: none; border-bottom: 1px solid #ddd; }
 }
 </style>
 </head>
