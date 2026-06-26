@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { mkdtempSync, writeFileSync, mkdirSync, rmSync } from 'node:fs';
+import { mkdtempSync, writeFileSync, mkdirSync, rmSync, symlinkSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { scanDirectory, isPathSafe } from '../../../src/preview/directory.js';
@@ -120,6 +120,23 @@ describe('scanDirectory', () => {
       cleanupTempDir(dir);
     }
   });
+
+  it('TC-07: scanDirectory 跳过 symlink 防止目录遍历', () => {
+    const dir = createTempDir();
+    try {
+      createFile(dir, 'real.md', '# real');
+      symlinkSync('/etc/passwd', join(dir, 'fake.md'));
+      createDir(dir, 'outside');
+      symlinkSync('/etc', join(dir, 'outside', 'etc-link'));
+
+      const result = scanDirectory(dir);
+      const names = result.map((n) => n.name);
+      expect(names).toEqual(['outside', 'real.md']);
+      expect(names).not.toContain('fake.md');
+    } finally {
+      cleanupTempDir(dir);
+    }
+  });
 });
 
 describe('isPathSafe', () => {
@@ -132,5 +149,21 @@ describe('isPathSafe', () => {
     expect(isPathSafe('/tmp/other/file.md', allowed)).toBe(false);
     expect(isPathSafe('/etc/passwd', allowed)).toBe(false);
     expect(isPathSafe('/tmp/work-other', allowed)).toBe(false);
+  });
+
+  it('TC-15: isPathSafe 通过真实路径防止 symlink 绕过', () => {
+    const dir = createTempDir();
+    try {
+      const linkDir = join(dir, 'link');
+      symlinkSync('/etc', linkDir);
+      const allowed = [dir];
+
+      expect(isPathSafe(join(dir, 'real.md'), allowed)).toBe(true);
+      expect(isPathSafe(linkDir, allowed)).toBe(false);
+      expect(isPathSafe(join(linkDir, 'passwd'), allowed)).toBe(false);
+      expect(isPathSafe(join(dir, 'link/../..'), allowed)).toBe(false);
+    } finally {
+      cleanupTempDir(dir);
+    }
   });
 });

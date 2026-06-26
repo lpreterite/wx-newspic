@@ -133,7 +133,8 @@ html, body { height: 100%; font-family: system-ui, -apple-system, sans-serif; ba
 </div>
 
 <div class="split">
-  <aside class="file-sidebar expanded" id="fileSidebar" data-dirs='${JSON.stringify(watchDirs)}'>
+  <script id="watchDirsData" type="application/json">${JSON.stringify(watchDirs)}</script>
+  <aside class="file-sidebar expanded" id="fileSidebar">
     <div class="sidebar-header">
       <span class="sidebar-title">文件</span>
       <button id="sidebarToggle" class="sidebar-toggle" title="收起侧栏">
@@ -282,7 +283,10 @@ if (savedSidebar === 'false') {
 }
 
 var watchDirs = [];
-try { watchDirs = JSON.parse(sidebar.dataset.dirs || '[]'); } catch(e) { console.warn('解析 watch-dirs 失败:', e); }
+try {
+  var script = document.getElementById('watchDirsData');
+  if (script) watchDirs = JSON.parse(script.textContent || '[]');
+} catch(e) { console.warn('解析 watch-dirs 失败:', e); }
 if (watchDirs.length > 0) {
   loadFileTree();
 }

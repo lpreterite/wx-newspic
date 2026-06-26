@@ -1,6 +1,6 @@
 # wx-newspic 项目状态
 
-> 最后更新：2026-06-26（#59+#61: 后端目录扫描 API + 单元测试，161 测试通过）
+> 最后更新：2026-06-26（安全审计修复: realpathSync 防 symlink + extname 白名单 + lstatSync 跳过 symlink，165 测试通过）
 > 项目总览：[README.md](../README.md)
 
 ---
@@ -160,11 +160,11 @@
 | renderer/themes.test.ts | 4 | ✅ |
 | renderer/images.test.ts | 13 | ✅ |
 | test/unit/preview/server.test.ts | 13 | ✅ |
-| test/unit/preview/directory.test.ts | 6 | ✅ |
+| test/unit/preview/directory.test.ts | 8 | ✅ |
 | schema/index.test.ts | 11 | ✅ |
 | cli/credential.test.ts | 3 | ✅ |
 | cli/serve.test.ts | 2 | ✅ |
-| **总计** | **161** | **✅ 全部通过** |
+| **总计** | **165** | **✅ 全部通过** |
 ## 已知问题（GitHub Issues）
 
 | Issue | 标题 | 优先级 | 状态 |

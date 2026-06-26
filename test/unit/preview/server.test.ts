@@ -220,6 +220,13 @@ describe('GET /files — 目录树', () => {
     const res = await req('/files?dir=' + encodeURIComponent('/etc'));
     expect(res.status).toBe(403);
   });
+
+  it('TC-14: GET /files 传入文件路径返回 400', async () => {
+    const res = await req('/files?dir=' + encodeURIComponent(join(testDir, 'intro.md')));
+    expect(res.status).toBe(400);
+    const data = JSON.parse(res.body);
+    expect(data.error).toBeDefined();
+  });
 });
 
 describe('GET /file — 文件内容', () => {
@@ -231,6 +238,7 @@ describe('GET /file — 文件内容', () => {
     testDir = mkdtempSync(join(tmpdir(), 'preview-file-test-'));
     writeFileSync(join(testDir, 'intro.md'), '# Hello\n\ncontent', 'utf-8');
     writeFileSync(join(testDir, 'guide.md'), '# Guide', 'utf-8');
+    writeFileSync(join(testDir, '.env'), 'SECRET=key', 'utf-8');
 
     fsServer = await createPreviewServer({ port: 0, host: HOST, watchDirs: [testDir] });
     const addr = fsServer.address();
@@ -277,5 +285,12 @@ describe('GET /file — 文件内容', () => {
   it('TC-12: GET /file 路径越权返回 403', async () => {
     const res = await req('/file?path=' + encodeURIComponent('/etc/passwd'));
     expect(res.status).toBe(403);
+  });
+
+  it('TC-13: GET /file 拒绝非 .md 文件', async () => {
+    const res = await req('/file?path=' + encodeURIComponent(join(testDir, '.env')));
+    expect(res.status).toBe(403);
+    const data = JSON.parse(res.body);
+    expect(data.error).toContain('.md');
   });
 });

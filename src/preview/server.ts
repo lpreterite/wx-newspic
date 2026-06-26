@@ -1,7 +1,7 @@
 import { createServer as createHttpServer, type IncomingMessage, type ServerResponse } from 'node:http';
 import type http from 'node:http';
-import { readdirSync, existsSync } from 'node:fs';
-import { resolve, basename } from 'node:path';
+import { readdirSync, existsSync, statSync } from 'node:fs';
+import { resolve, basename, extname } from 'node:path';
 import { homedir } from 'node:os';
 import { URL } from 'node:url';
 import { renderPreviewPage } from './template.js';
@@ -156,6 +156,11 @@ async function handleRequest(req: IncomingMessage, res: ServerResponse, watchDir
       res.end(JSON.stringify({ error: '目录不存在' }));
       return;
     }
+    if (!statSync(resolvedDir).isDirectory()) {
+      res.writeHead(400, { 'Content-Type': 'application/json; charset=utf-8' });
+      res.end(JSON.stringify({ error: '路径不是目录' }));
+      return;
+    }
     const tree = scanDirectory(resolvedDir, 2);
     res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
     res.end(JSON.stringify(tree));
@@ -174,6 +179,11 @@ async function handleRequest(req: IncomingMessage, res: ServerResponse, watchDir
     if (!isPathSafe(resolvedPath, watchDirs ?? [])) {
       res.writeHead(403, { 'Content-Type': 'application/json; charset=utf-8' });
       res.end(JSON.stringify({ error: '路径不在允许范围内' }));
+      return;
+    }
+    if (extname(resolvedPath).toLowerCase() !== '.md') {
+      res.writeHead(403, { 'Content-Type': 'application/json; charset=utf-8' });
+      res.end(JSON.stringify({ error: '只允许读取 .md 文件' }));
       return;
     }
     if (!existsSync(resolvedPath)) {

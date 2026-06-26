@@ -139,7 +139,7 @@ export interface PreviewServerOptions {
 // 目录树节点
 export interface FileTreeNode {
   name: string;
-  path: string;      // 相对路径（相对于 watchDir），用于前端 fetch
+  path: string;      // 绝对路径，前端直接用于 GET /file?path=... 请求
   type: 'dir' | 'file';
   children?: FileTreeNode[];
   hasMore?: boolean;  // dir 专用：是否有更深层子目录
@@ -460,15 +460,27 @@ test/e2e/preview/fixtures/
 
 所有通过 URL 参数传入的路径（`dir`、`path`）必须通过以下校验：
 
+1. **路径解析**：使用 `resolve()` 将路径归一化为绝对路径
+2. **Symlink 防护**：使用 `realpathSync()` 解析真实路径，防止 symlink 指向允许范围外的目录
+3. **存在性校验**：使用 `realpathSync()` 沿父目录链向上查找，确保完整路径在允许范围内
+4. **文件类型限制（仅 /file）**：使用 `extname()` 校验后缀必须为 `.md`
+
 ```typescript
 function isPathSafe(requestedPath: string, allowedDirs: string[]): boolean {
-  const resolved = resolve(stripLeadingSlash(requestedPath));
+  const resolved = resolve(requestedPath);
+  const realRequested = resolveRealPath(resolved);  // 沿父链向上解析到真实路径
+  
   return allowedDirs.some((allowed) => {
-    const base = resolve(allowed);
-    return resolved === base || resolved.startsWith(base + '/');
+    const realAllowed = resolveRealPath(resolve(allowed));
+    return realRequested === realAllowed || realRequested.startsWith(realAllowed + '/');
   });
 }
 ```
+
+### 7.2 目录扫描安全
+
+- 使用 `lstatSync()` 替代 `statSync()` 来检测 symlink
+- 检测到 symlink 时直接跳过，不跟随扫描
 
 ### 7.2 编码处理
 
@@ -529,3 +541,4 @@ function isPathSafe(requestedPath: string, allowedDirs: string[]): boolean {
 | 版本 | 日期 | 修订内容 |
 |------|------|----------|
 | v0.1 | 2026-06-26 | 初始版本 |
+| v0.2 | 2026-06-26 | §4.1 路径约定修正为绝对路径；§7.1 安全方案更新为 realpathSync + extname 校验 |

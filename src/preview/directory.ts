@@ -1,5 +1,5 @@
-import { readdirSync, readFileSync, statSync } from 'node:fs';
-import { join, resolve } from 'node:path';
+import { readdirSync, readFileSync, lstatSync, realpathSync, statSync } from 'node:fs';
+import { join, resolve, basename, dirname } from 'node:path';
 
 export interface FileTreeNode {
   name: string;
@@ -17,17 +17,19 @@ export function scanDirectory(dirPath: string, maxDepth: number = 2): FileTreeNo
     if (name.startsWith('.')) continue;
 
     const fullPath = join(dirPath, name);
-    let stat: ReturnType<typeof statSync>;
+    let stat: ReturnType<typeof lstatSync>;
     try {
-      stat = statSync(fullPath);
+      stat = lstatSync(fullPath);
     } catch {
       continue;
     }
 
+    if (stat.isSymbolicLink()) continue;
+
     if (stat.isDirectory()) {
       const children = maxDepth > 1 ? scanDirectory(fullPath, maxDepth - 1) : [];
       const hasMore = readdirSync(fullPath).some(
-        (child) => !child.startsWith('.') && statSync(join(fullPath, child)).isDirectory()
+        (child) => !child.startsWith('.') && lstatSync(join(fullPath, child)).isDirectory()
       );
 
       nodes.push({
@@ -56,13 +58,38 @@ export function scanDirectory(dirPath: string, maxDepth: number = 2): FileTreeNo
 
 export function isPathSafe(requestedPath: string, allowedDirs: string[]): boolean {
   const resolved = resolve(requestedPath);
+  const realRequested = resolveRealPath(resolved);
+
   return allowedDirs.some((allowed) => {
-    const base = resolve(allowed);
-    return resolved === base || resolved.startsWith(base + '/');
+    const resolvedAllowed = resolve(allowed);
+    const realAllowed = resolveRealPath(resolvedAllowed);
+    return realRequested === realAllowed || realRequested.startsWith(realAllowed + '/');
   });
+}
+
+function resolveRealPath(target: string): string {
+  try {
+    return realpathSync(target);
+  } catch {
+    const parts: string[] = [];
+    let current = target;
+    while (true) {
+      const parent = dirname(current);
+      if (parent === current) break;
+      parts.unshift(basename(current));
+      current = parent;
+      try {
+        const realParent = realpathSync(current);
+        return join(realParent, ...parts);
+      } catch {
+        continue;
+      }
+    }
+    return target;
+  }
 }
 
 export function readFileContent(filePath: string): { content: string; name: string } {
   const content = readFileSync(filePath, 'utf-8');
-  return { content, name: filePath.split('/').pop() ?? filePath };
+  return { content, name: basename(filePath) };
 }
