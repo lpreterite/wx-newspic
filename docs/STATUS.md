@@ -1,6 +1,6 @@
 # wx-newspic 项目状态
 
-> 最后更新：2026-06-26（安全审计修复: realpathSync 防 symlink + extname 白名单 + lstatSync 跳过 symlink，165 测试通过）
+> 最后更新：2026-06-26（#60 前端侧栏完成，#63 相对路径图片 Issue 创建，165 测试通过）
 > 项目总览：[README.md](../README.md)
 
 ---
@@ -137,8 +137,8 @@
 | PRD-v040 + tech-design-v040 | ✅ 完成 | 用户故事 + 方案 + 设计决策 |
 | #58 CLI --watch-dir 参数 | ✅ 完成 | Commander 参数 + 逗号展开 + 目录校验 + 透传 server + 前端 data-dirs 骨架 |
 | #59 后端目录扫描 API | ✅ 完成 | scanDirectory / isPathSafe / readFileContent, GET /files + GET /file 路由 |
-| #60 前端文件浏览器侧栏 | ⏳ 待实施 | 侧栏 HTML/CSS/JS，文件加载交互 |
-| #61 新增路由测试 | ✅ 完成 | 6 纯函数测试 + 6 HTTP 集成测试，共 12 新增，总 161 通过 |
+| #60 前端文件浏览器侧栏 | ✅ 完成 | 侧栏 HTML/CSS/JS，多目录区块标题头，展开收起，文件加载 |
+| #61 新增路由测试 | ✅ 完成 | 6 纯函数 + 6 HTTP 集成 + 4 安全测试，共 16 新增，总 165 通过 |
 | #62 E2E 自动化验收 | ⏳ 待实施 | Playwright E2E 测试 |
 
 ---
@@ -210,9 +210,10 @@
 | [#56](https://github.com/lpreterite/wx-newspic/issues/56) | FEAT: preview 文件浏览器面板 | P2 | 📋 PRD-v040 已产出，待验收 |
 | [#58](https://github.com/lpreterite/wx-newspic/issues/58) | FEAT: preview --watch-dir CLI 参数 | P2 | ⏳ 待实施 |
 | [#59](https://github.com/lpreterite/wx-newspic/issues/59) | FEAT: preview 后端目录扫描 API | P2 | ✅ 完成 |
-| [#60](https://github.com/lpreterite/wx-newspic/issues/60) | FEAT: preview 前端文件浏览器侧栏 | P2 | ⏳ 待实施 |
+| [#60](https://github.com/lpreterite/wx-newspic/issues/60) | FEAT: preview 前端文件浏览器侧栏 | P2 | ✅ 完成 |
 | [#61](https://github.com/lpreterite/wx-newspic/issues/61) | TEST: preview 新增路由测试 | P2 | ✅ 完成 |
 | [#62](https://github.com/lpreterite/wx-newspic/issues/62) | E2E 验收: preview 文件浏览器 | P2 | ⏳ 待实施 |
+| [#63](https://github.com/lpreterite/wx-newspic/issues/63) | BUG: preview 相对路径图片 404 | P2 | ⏳ 待处理 |
 
 ## 风险项
 
