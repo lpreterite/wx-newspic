@@ -118,6 +118,10 @@ async function handleNewsPublish(options: Record<string, string | string[] | boo
     content: rendered.content,
     cover: rendered.cover,
     author: rendered.author || (options.author as string | undefined),
+    sourceUrl: rendered.source_url,
+    digest: rendered.digest,
+    needOpenComment: rendered.need_open_comment,
+    onlyFansCanComment: rendered.only_fans_can_comment,
     serverUrl,
     apiKey,
     appId: cred.appId,
@@ -355,13 +359,17 @@ export async function executeNewsPublish(params: {
   content: string;
   cover?: string;
   author?: string;
+  sourceUrl?: string;
+  digest?: string;
+  needOpenComment?: boolean;
+  onlyFansCanComment?: boolean;
   serverUrl: string;
   apiKey: string;
   appId: string;
   appSecret: string;
   dryRun?: boolean;
 }): Promise<DraftResult> {
-  const { title, content, cover, author, serverUrl, apiKey, dryRun } = params;
+  const { title, content, cover, author, sourceUrl, digest, needOpenComment, onlyFansCanComment, serverUrl, apiKey, dryRun } = params;
 
   if (!serverUrl && !dryRun) {
     throw new WechatClientError(
@@ -377,6 +385,10 @@ export async function executeNewsPublish(params: {
 
   // 提取 HTML 中的图片并上传
   const imageSrcs = extractImageSrcs(content);
+  // #55: 如果 cover 是本地路径且不在 imageSrcs 中，加入上传队列
+  if (cover && !imageSrcs.includes(cover)) {
+    imageSrcs.push(cover);
+  }
   // 两个 map 分别服务不同用途，类型层面不可互换：
   // - srcToCdnUrl → 用于 <img src> 替换（需 CDN URL）
   // - srcToMediaId → 用于 thumb_media_id 查找（需微信 media_id）
@@ -472,9 +484,15 @@ export async function executeNewsPublish(params: {
     title,
     content: htmlContent,
     author,
-    need_open_comment: 1,
-    only_fans_can_comment: 0,
+    need_open_comment: needOpenComment != null ? (needOpenComment ? 1 : 0) : 1,
+    only_fans_can_comment: onlyFansCanComment != null ? (onlyFansCanComment ? 1 : 0) : 0,
   };
+  if (sourceUrl) {
+    draftBody.content_source_url = sourceUrl;
+  }
+  if (digest) {
+    draftBody.digest = digest;
+  }
   if (thumbMediaId) {
     draftBody.thumb_media_id = thumbMediaId;
   }

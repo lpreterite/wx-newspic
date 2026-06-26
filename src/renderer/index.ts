@@ -4,6 +4,7 @@ import { JSDOM } from 'jsdom';
 import { createWenyanCore, registerAllBuiltInThemes, registerTheme } from '@wenyan-md/core';
 import type { Theme } from '@wenyan-md/core';
 import type { RenderOptions, RenderedArticle } from './types.js';
+import { parseFrontmatter } from '../schema/frontmatter.js';
 
 let coreInstance: Awaited<ReturnType<typeof createWenyanCore>> | null = null;
 let themesRegistered = false;
@@ -42,18 +43,11 @@ export function registerThemeFromFile(themeFile: string, themeId: string): void 
   registerTheme(theme);
 }
 
-/**
- * 渲染 Markdown 内容为公众号图文消息 HTML。
- *
- * - news: 解析 frontmatter → 渲染 Markdown → 应用主题 → 返回 HTML
- *
- * 仅做内容转换，不涉及网络 IO（图片上传等由上层处理）。
- */
 export async function renderArticle(options: RenderOptions): Promise<RenderedArticle> {
   const { content, theme = 'default', hlTheme = 'github-dark', themeFile } = options;
 
   if (!content) {
-    return { content: '', title: '' };
+    return { content: '', title: '', type: 'article', created: '' };
   }
 
   if (themeFile) {
@@ -61,10 +55,14 @@ export async function renderArticle(options: RenderOptions): Promise<RenderedArt
   }
 
   const core = await getCore();
-  const fm = await core.handleFrontMatter(content);
-  const mdBody = fm.content;
+  const { frontmatter, content: mdBody } = parseFrontmatter(content, { strict: false });
 
-  const html = await core.renderMarkdown(mdBody);
+  let body = mdBody;
+  if (frontmatter.description) {
+    body = `> ${frontmatter.description}\n\n${body}`;
+  }
+
+  const html = await core.renderMarkdown(body);
 
   const el = dom.window.document.createElement('div');
   el.id = 'wenyan';
@@ -76,13 +74,7 @@ export async function renderArticle(options: RenderOptions): Promise<RenderedArt
   });
 
   return {
+    ...frontmatter,
     content: styledContent,
-    title: fm.title || '',
-    cover: fm.cover,
-    author: fm.author,
-    source_url: fm.source_url,
-    need_open_comment: fm.need_open_comment,
-    only_fans_can_comment: fm.only_fans_can_comment,
-    image_list: fm.image_list,
   };
 }

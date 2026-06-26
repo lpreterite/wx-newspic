@@ -1,4 +1,5 @@
 import { createServer as createHttpServer, type IncomingMessage, type ServerResponse } from 'node:http';
+import type http from 'node:http';
 import { readdirSync, existsSync } from 'node:fs';
 import { resolve, basename } from 'node:path';
 import { homedir } from 'node:os';
@@ -56,13 +57,14 @@ function registerCustomThemes(): void {
 
 export interface PreviewServerOptions {
   port: number;
+  host?: string;
   onReady?: (port: number) => void;
   themeFile?: string;
   hlTheme?: string;
 }
 
-export async function createPreviewServer(options: PreviewServerOptions): Promise<void> {
-  const { port, themeFile, hlTheme } = options;
+export async function createPreviewServer(options: PreviewServerOptions): Promise<http.Server> {
+  const { port, host, themeFile, hlTheme } = options;
 
   if (themeFile) {
     const themeId = basename(themeFile, '.css');
@@ -81,9 +83,11 @@ export async function createPreviewServer(options: PreviewServerOptions): Promis
   });
 
   return new Promise((resolve, reject) => {
-    server.listen(port, () => {
-      options.onReady?.(port);
-      resolve();
+    server.listen(port, host, () => {
+      const addr = server.address();
+      const actualPort = addr && typeof addr === 'object' ? addr.port : port;
+      options.onReady?.(actualPort);
+      resolve(server);
     });
     server.on('error', (err: NodeJS.ErrnoException) => {
       if (err.code === 'EADDRINUSE') {
@@ -174,8 +178,8 @@ async function handleRenderRequest(req: IncomingMessage, res: ServerResponse): P
       theme: params.theme ?? 'default',
       hlTheme: params.hlTheme || undefined,
     });
-    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-    res.end(result.content);
+    res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+    res.end(JSON.stringify(result));
   } catch (err) {
     res.writeHead(500, { 'Content-Type': 'text/plain; charset=utf-8' });
     res.end(`渲染失败: ${String(err)}`);

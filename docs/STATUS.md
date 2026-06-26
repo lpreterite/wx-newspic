@@ -1,13 +1,13 @@
 # wx-newspic 项目状态
 
-> 最后更新：2026-06-18（#49 fixed — decodeURIComponent + safeBasename + --dry-run 模式）
+> 最后更新：2026-06-26（#57 统一 Frontmatter Schema — Zod 校验 + #55 cover 修复 + publish 字段透传）
 > 项目总览：[README.md](../README.md)
 
 ---
 
 ## 当前阶段
 
-**执行阶段** — M7 渲染管线完成，M8 长文发布完成，M9 预览服务完成。M6 实战发布待启动。
+**执行阶段** — M7 渲染管线完成，M8 长文发布完成，M9 预览服务完成，M10 Frontmatter Schema 完成。
 
 ## 已知问题
 
@@ -111,6 +111,16 @@
 | T9.5 (#38) 门禁验收 Step 3+4 | ✅ 完成 | 主题集成 + 体验打磨 — 12/12 通过 |
 | T9.6 (#39) 交付准备 | ✅ 完成 | STATUS.md + CHANGELOG + Release (#47 closed) |
 
+### M10: 统一 Frontmatter Schema ✅ 完成
+
+| 任务 | 状态 | 测试 | 说明 |
+|------|------|------|------|
+| T10.1 (#57) Zod Schema 定义 + parseFrontmatter() | ✅ 完成 | 11/11 | strict/loose 双模式，条件校验 cover，Date→string 自动转换 |
+| T10.2 替换 renderer 中的 core.handleFrontMatter() | ✅ 完成 | 10/10 | description 注入 `<blockquote>` 向后兼容 |
+| T10.3 (#55) publish news 模式 cover 上传修复 | ✅ 完成 | — | cover 路径加入图片上传队列 |
+| T10.4 publish 字段透传 | ✅ 完成 | — | need_open_comment/only_fans_can_comment/source_url/digest 从 frontmatter 读取 |
+| T10.5 preview 服务返回完整 frontmatter JSON | ✅ 完成 | 7/7 | `/render` 响应格式从 text/html 改为 application/json，含齐全集成测试 |
+
 #### M9 关键决策
 
 | 决策 | 结论 |
@@ -135,12 +145,14 @@
 | server/integration/server.test.ts | 12 | ✅ |
 | cli/publish.test.ts | 26 | ✅ |
 | cli/render.test.ts | 7 | ✅ |
-| renderer/index.test.ts | 8 | ✅ |
+| renderer/index.test.ts | 10 | ✅ |
 | renderer/themes.test.ts | 4 | ✅ |
 | renderer/images.test.ts | 13 | ✅ |
+| test/unit/preview/server.test.ts | 7 | ✅ |
+| schema/index.test.ts | 11 | ✅ |
 | cli/credential.test.ts | 3 | ✅ |
 | cli/serve.test.ts | 2 | ✅ |
-| **总计** | **128** | **✅ 全部通过** |
+| **总计** | **149** | **✅ 全部通过** |
 ## 已知问题（GitHub Issues）
 
 | Issue | 标题 | 优先级 | 状态 |
@@ -181,6 +193,8 @@
 | [#50](https://github.com/lpreterite/wx-newspic/issues/50) | 验收 #49：中文路径 ByteString 修复 | P1 | ✅ closed — 128/128 测试通过，Docker dry-run 3/3 通过 |
 | [#51](https://github.com/lpreterite/wx-newspic/issues/51) | DOCS: #49 修复相关架构刷新（ByteString + safeBasename + dry-run） | P2 | ✅ closed — tech-design-001 §2.3 + tech-design-002 §5.2 + checklists G3-03 |
 | [#52](https://github.com/lpreterite/wx-newspic/issues/52) | Docker 测试架构：构建一次、多次复用 | P2 | ✅ closed — Dockerfile.test + entrypoint-test.sh + docker-compose.yml |
+| [#55](https://github.com/lpreterite/wx-newspic/issues/55) | BUG: news 模式 publish 时 frontmatter cover 路径不被识别为待上传图片 | P1 | ✅ fixed — 随 #57 在 imageSrcs 中添加 cover |
+| [#57](https://github.com/lpreterite/wx-newspic/issues/57) | ENH: 统一 Markdown Frontmatter Schema 规范 | P1 | ✅ closed — Zod Schema + strict/loose + 全字段透传 + #55 修复 |
 
 ## 风险项
 

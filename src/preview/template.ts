@@ -184,7 +184,8 @@ async function render() {
       if (lastHtml) preview.srcdoc = lastHtml;
       return;
     }
-    var html = await res.text();
+    var data = await res.json();
+    var html = data.content || '';
     lastHtml = html;
     preview.srcdoc = html;
     setLoading(false);

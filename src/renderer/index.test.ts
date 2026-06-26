@@ -14,7 +14,7 @@ describe('renderArticle', () => {
 
   it('extracts title from frontmatter', async () => {
     const result = await renderArticle({
-      content: '---\ntitle: My Title\n---\n\n# Not this title\n\nBody',
+      content: '---\ntitle: My Title\ntype: article\ncreated: 2026-06-25\ncover: cover.png\n---\n\n# Not this title\n\nBody',
     });
 
     expect(result.title).toBe('My Title');
@@ -37,7 +37,7 @@ describe('renderArticle', () => {
 
   it('extracts cover from frontmatter', async () => {
     const result = await renderArticle({
-      content: '---\ntitle: With Cover\ncover: https://example.com/cover.jpg\n---\n\nBody',
+      content: '---\ntitle: With Cover\ntype: article\ncreated: 2026-06-25\ncover: https://example.com/cover.jpg\n---\n\nBody',
     });
 
     expect(result.cover).toBe('https://example.com/cover.jpg');
@@ -68,5 +68,40 @@ describe('renderArticle', () => {
 
     expect(result.content).toContain('<img');
     expect(result.content).toContain('src="https://example.com/img.png"');
+  });
+
+  it('injects description as blockquote', async () => {
+    const result = await renderArticle({
+      content: '---\ntitle: Desc\ntype: article\ncreated: 2026-06-25\ncover: cover.png\ndescription: 这是一段引言\n---\n\n正文内容',
+    });
+
+    expect(result.content).toContain('这是一段引言');
+    expect(result.content).toContain('<blockquote');
+  });
+
+  it('returns all frontmatter fields in result', async () => {
+    const result = await renderArticle({
+      content: `---
+title: 完整字段
+type: article
+created: 2026-06-25
+cover: cover.png
+tags: [tag1, tag2]
+author: 作者
+digest: 摘要
+source_url: https://example.com
+need_open_comment: true
+only_fans_can_comment: false
+---
+
+正文`,
+    });
+
+    expect(result.tags).toEqual(['tag1', 'tag2']);
+    expect(result.author).toBe('作者');
+    expect(result.digest).toBe('摘要');
+    expect(result.source_url).toBe('https://example.com');
+    expect(result.need_open_comment).toBe(true);
+    expect(result.only_fans_can_comment).toBe(false);
   });
 });

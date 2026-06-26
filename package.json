@@ -51,9 +51,11 @@
     "dotenv": "^16.4.7",
     "fastify": "^5.2.1",
     "globby": "^14.1.0",
+    "gray-matter": "^4.0.3",
     "jsdom": "^27.4.0",
     "node-fetch": "^3.3.2",
-    "pino": "^9.6.0"
+    "pino": "^9.6.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@release-it/conventional-changelog": "^11.0.1",
