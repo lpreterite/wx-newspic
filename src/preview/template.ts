@@ -101,6 +101,7 @@ html, body { height: 100%; font-family: system-ui, -apple-system, sans-serif; ba
 .file-tree-item .fa-file-text-o { color: #888; }
 
 /* 层级引导线 */
+.file-tree > ul { margin: 0; }
 .file-tree ul ul {
   margin-left: 4px;
   border-left: 1px dashed #d0d0d0;
@@ -351,7 +352,6 @@ function renderTree(nodes, depth) {
   var ul = document.createElement('ul');
   ul.style.listStyle = 'none';
   ul.style.padding = '0';
-  ul.style.margin = '0';
   for (var i = 0; i < nodes.length; i++) {
     var node = nodes[i];
     var li = document.createElement('li');

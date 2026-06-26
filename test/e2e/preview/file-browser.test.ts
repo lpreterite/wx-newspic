@@ -152,6 +152,11 @@ describe('preview 文件浏览器 E2E', () => {
 
   it('截图留底: 侧栏完整视图（供视觉验收对照）', async () => {
     await gotoPreview();
+    const firstDir = page.locator('.file-tree-item:has(.fa-folder)').first();
+    if (await firstDir.isVisible()) {
+      await firstDir.click();
+      await page.waitForTimeout(300);
+    }
     await page.screenshot({ path: 'test/artifacts/sidebar.png', fullPage: true });
     expect(await page.locator('.file-sidebar').isVisible()).toBe(true);
   });
