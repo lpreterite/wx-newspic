@@ -1,6 +1,6 @@
 # wx-newspic 项目状态
 
-> 最后更新：2026-06-26（#62 E2E 测试通过，5 场景全部验证，165 单元 + 5 E2E = 170）
+> 最后更新：2026-06-26（#63+#66: 图片代理路由 + frontmatter 类型区分渲染，171 全部通过）
 > 项目总览：[README.md](../README.md)
 
 ---
@@ -213,7 +213,10 @@
 | [#60](https://github.com/lpreterite/wx-newspic/issues/60) | FEAT: preview 前端文件浏览器侧栏 | P2 | ✅ 完成 |
 | [#61](https://github.com/lpreterite/wx-newspic/issues/61) | TEST: preview 新增路由测试 | P2 | ✅ 完成 |
 | [#62](https://github.com/lpreterite/wx-newspic/issues/62) | E2E 验收: preview 文件浏览器 | P2 | ✅ 完成 |
-| [#63](https://github.com/lpreterite/wx-newspic/issues/63) | BUG: preview 相对路径图片 404 | P2 | ⏳ 待处理 |
+| [#63](https://github.com/lpreterite/wx-newspic/issues/63) | BUG: preview 相对路径图片 404 | P2 | ✅ 完成 |
+| [#64](https://github.com/lpreterite/wx-newspic/issues/64) | BUG: build 类型错误 | P2 | ✅ 完成 |
+| [#65](https://github.com/lpreterite/wx-newspic/issues/65) | UI: 侧栏视觉改进 | P2 | ✅ 完成 |
+| [#66](https://github.com/lpreterite/wx-newspic/issues/66) | FEAT: frontmatter 类型区分渲染 | P2 | ✅ 完成 |
 
 ## 风险项
 
