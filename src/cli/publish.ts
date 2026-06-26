@@ -7,6 +7,7 @@ import { getCredential, getServerConfig } from '../config/credential.js';
 import { WechatClientError } from '../wechat/client.js';
 import { renderArticle } from '../renderer/index.js';
 import { extractImageSrcs, replaceImageSrcs, extractFirstImage } from '../renderer/images.js';
+import { parseFrontmatter } from '../schema/frontmatter.js';
 
 type Brand<T, B> = T & { __brand: B };
 type CdnUrl = Brand<string, 'cdn-url'>;
@@ -58,8 +59,24 @@ export function registerPublishCommand(program: Command): void {
 }
 
 export async function handlePublish(options: Record<string, string | string[] | boolean>): Promise<void> {
-  const type = (options.type as string) || 'newspic';
+  let type = (options.type as string) || '';
   const dryRun = !!options.dryRun;
+
+  // Auto-detect type from frontmatter if --md provided and no explicit --type
+  if (!type && options.md) {
+    const mdPath = String(options.md);
+    if (existsSync(mdPath)) {
+      try {
+        const raw = readFileSync(mdPath, 'utf-8');
+        const { frontmatter } = parseFrontmatter(raw, { strict: false });
+        if (frontmatter.type === 'article') type = 'news';
+      } catch {
+        // fall through to default
+      }
+    }
+  }
+
+  if (!type) type = 'newspic';
 
   if (type === 'news') {
     await handleNewsPublish(options, dryRun);
