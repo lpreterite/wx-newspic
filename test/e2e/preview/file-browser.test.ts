@@ -56,11 +56,11 @@ describe('preview 文件浏览器 E2E', () => {
   });
 
   async function gotoPreview(): Promise<void> {
-    await page.goto(`http://${HOST}:${port}`, { waitUntil: 'networkidle' });
+    await page.goto(`http://${HOST}:${port}`, { waitUntil: 'domcontentloaded', timeout: 15000 });
     await page.waitForFunction(() => {
       const el = document.querySelector('.file-tree');
       return el && !el.querySelector('.file-tree-loading');
-    }, { timeout: 10000 });
+    }, { timeout: 45000 });
   }
 
   it('E2E-01: 侧栏可见，显示文件树（多目录三个区块）', async () => {

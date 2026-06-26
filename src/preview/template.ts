@@ -7,8 +7,6 @@ export function renderPreviewPage(markdown: string, watchDirs: string[] = []): s
 <title>Wenyan Preview</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
-<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 html, body { height: 100%; font-family: system-ui, -apple-system, sans-serif; background: #f5f5f5; }
@@ -122,7 +120,6 @@ html, body { height: 100%; font-family: system-ui, -apple-system, sans-serif; ba
 .file-tree-item[data-depth="2"] .file-tree-content { padding-left: 52px; }
 .file-tree-item[data-depth="3"] .file-tree-content { padding-left: 72px; }
 
-.file-tree-section + .file-tree-section { border-top: 1px solid #eee; }
 .file-tree-section-header {
   padding: 8px 12px 4px; font-size: 11px; font-weight: 600;
   color: #999; text-transform: uppercase; letter-spacing: .5px;
@@ -139,23 +136,7 @@ html, body { height: 100%; font-family: system-ui, -apple-system, sans-serif; ba
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* Swiper / Cover */
-.preview-cover {
-  width: 100%; max-height: 300px; overflow: hidden;
-  border-bottom: 1px solid #eee;
-}
-.preview-cover img {
-  width: 100%; height: auto; display: block;
-  object-fit: cover; max-height: 300px;
-}
-.preview-swiper { width: 100%; }
-.preview-swiper .swiper-slide { text-align: center; background: #fafafa; }
-.preview-swiper .swiper-slide img {
-  max-width: 100%; max-height: 360px; width: auto; height: auto;
-  display: inline-block; object-fit: contain;
-}
-.preview-swiper .swiper-pagination-bullet-active { background: #07c; }
-.wenyan-content { padding: 16px; }
+.file-tree-section + .file-tree-section { border-top: 1px solid #eee; }
 
 @media (max-width: 768px) {
   .split { flex-direction: column; }
@@ -336,7 +317,6 @@ async function render() {
     }
     lastHtml = previewHtml;
     preview.srcdoc = previewHtml;
-    initSwiper();
     setLoading(false);
   } catch (e) {
     setLoading(false);
@@ -348,26 +328,20 @@ function buildNewsPicPreview(images, contentHtml) {
   var slides = images.map(function(url) {
     return '<div class="swiper-slide"><img src="' + url + '" alt=""></div>';
   }).join('');
-  return '<div class="preview-swiper swiper mySwiper"><div class="swiper-wrapper">' + slides + '</div><div class="swiper-pagination"></div></div><div class="wenyan-content">' + contentHtml + '</div>';
+  var bodyContent = '<div class="preview-swiper swiper mySwiper"><div class="swiper-wrapper">' + slides + '</div><div class="swiper-pagination"></div></div><div class="wenyan-content">' + contentHtml + '</div>';
+  return '<!DOCTYPE html><html lang="zh-CN"><head>' +
+    '<meta charset="UTF-8">' +
+    '<meta name="viewport" content="width=device-width, initial-scale=1.0">' +
+    '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">' +
+    '<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"><\\/script>' +
+    '<style>.preview-swiper{width:100%}.preview-swiper .swiper-slide{text-align:center;background:#fafafa}.preview-swiper .swiper-slide img{max-width:100%;max-height:360px;width:auto;height:auto;display:inline-block;object-fit:contain}.preview-swiper .swiper-pagination-bullet-active{background:#07c}.wenyan-content{padding:16px}<\/style>' +
+    '</head><body>' + bodyContent +
+    '<script>new Swiper(".mySwiper",{pagination:{el:".swiper-pagination",clickable:true},loop:false,autoHeight:true})<\\/script>' +
+    '</body></html>';
 }
 
 function buildArticlePreview(coverUrl, contentHtml) {
   return '<div class="preview-cover"><img src="' + coverUrl + '" alt="cover"></div><div class="wenyan-content">' + contentHtml + '</div>';
-}
-
-function initSwiper() {
-  if (typeof Swiper !== 'undefined') {
-    setTimeout(function() {
-      var el = document.querySelector('.mySwiper');
-      if (el && !el.swiper) {
-        new Swiper('.mySwiper', {
-          pagination: { el: '.swiper-pagination', clickable: true },
-          loop: false,
-          autoHeight: true,
-        });
-      }
-    }, 50);
-  }
 }
 
 var sidebar = document.getElementById('fileSidebar');

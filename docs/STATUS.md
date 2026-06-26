@@ -1,13 +1,13 @@
 # wx-newspic 项目状态
 
-> 最后更新：2026-06-26（#63+#66: 图片代理路由 + frontmatter 类型区分渲染，171 全部通过）
+> 最后更新：2026-06-26（#63+#66: 图片代理 + frontmatter 渲染，Swiper CDN 移入 iframe srcdoc 修复轮播效果，171 全部通过）
 > 项目总览：[README.md](../README.md)
 
 ---
 
 ## 当前阶段
 
-**执行阶段** — M7 渲染管线完成，M8 长文发布完成，M9 预览服务完成，M10 Frontmatter Schema 完成。M11 预览文件浏览器 — 技术方案就绪。
+**执行阶段** — M7 渲染管线完成，M8 长文发布完成，M9 预览服务完成，M10 Frontmatter Schema 完成，M11 预览文件浏览器完成。
 
 ## 已知问题
 
@@ -130,7 +130,7 @@
 | 渲染引擎 | 复用 `renderArticle()` 管线，`node:http` 服务端零外部依赖 |
 | 工单精简 | #35 与 #30 重叠 → 关闭 #35，合并至 #36，不再有独立 Step 3 |
 
-### M11: 预览文件浏览器面板 ✅ 方案就绪
+### M11: 预览文件浏览器面板 ✅ 完成
 
 | 任务 | 状态 | 说明 |
 |------|------|------|
@@ -140,6 +140,16 @@
 | #60 前端文件浏览器侧栏 | ✅ 完成 | 侧栏 HTML/CSS/JS，多目录区块标题头，展开收起，文件加载 |
 | #61 新增路由测试 | ✅ 完成 | 6 纯函数 + 6 HTTP 集成 + 4 安全测试，共 16 新增，总 165 通过 |
 | #62 E2E 自动化验收 | ✅ 完成 | Playwright + 系统 Chrome，5 场景全部通过 |
+| Swiper 轮播修复 | ✅ 完成 | CDN JS/CSS 移入 iframe srcdoc，父页面 initSwiper() 删除，修复 `<\/script>` 双反斜杠转义陷阱 |
+
+#### M11 关键修复：Swiper 轮播效果
+
+| 项目 | 说明 |
+|------|------|
+| 问题 | `initSwiper()` 在父页面 `document.querySelector('.mySwiper')` 查找，但 Swiper DOM 在 iframe srcdoc 内，导致 Swiper 从未初始化 |
+| 根因 | `<\\/script>` 在 TypeScript 模板字符串中需写 `<\\\\/script>`（双反斜杠），否则 `\\/` 被解析为 `/`，浏览器误认为 `</script>` 提前结束主脚本 |
+| 方案 | Swiper CDN 和初始化脚本移入 `buildNewsPicPreview()` 返回的完整 HTML 文档中，在 iframe 内部自闭环 |
+| 截图 | `swiper-fixed.png`（已清理）— 轮播图片、分页器小圆点（3 个）、正文均正确显示 |
 
 ---
 
@@ -159,12 +169,14 @@
 | renderer/index.test.ts | 10 | ✅ |
 | renderer/themes.test.ts | 4 | ✅ |
 | renderer/images.test.ts | 13 | ✅ |
-| test/unit/preview/server.test.ts | 13 | ✅ |
+| test/unit/preview/server.test.ts | 15 | ✅ |
 | test/unit/preview/directory.test.ts | 8 | ✅ |
 | schema/index.test.ts | 11 | ✅ |
 | cli/credential.test.ts | 3 | ✅ |
 | cli/serve.test.ts | 2 | ✅ |
-| **总计** | **165** | **✅ 全部通过** |
+| **单元测试总计** | **165** | **✅ 全部通过** |
+| test/e2e/preview/file-browser.test.ts | 6 | ✅ |
+| **E2E 测试总计** | **6** | **✅ 全部通过** |
 ## 已知问题（GitHub Issues）
 
 | Issue | 标题 | 优先级 | 状态 |
@@ -207,7 +219,7 @@
 | [#52](https://github.com/lpreterite/wx-newspic/issues/52) | Docker 测试架构：构建一次、多次复用 | P2 | ✅ closed — Dockerfile.test + entrypoint-test.sh + docker-compose.yml |
 | [#55](https://github.com/lpreterite/wx-newspic/issues/55) | BUG: news 模式 publish 时 frontmatter cover 路径不被识别为待上传图片 | P1 | ✅ fixed — 随 #57 在 imageSrcs 中添加 cover |
 | [#57](https://github.com/lpreterite/wx-newspic/issues/57) | ENH: 统一 Markdown Frontmatter Schema 规范 | P1 | ✅ closed — Zod Schema + strict/loose + 全字段透传 + #55 修复 |
-| [#56](https://github.com/lpreterite/wx-newspic/issues/56) | FEAT: preview 文件浏览器面板 | P2 | 📋 PRD-v040 已产出，待验收 |
+| [#56](https://github.com/lpreterite/wx-newspic/issues/56) | FEAT: preview 文件浏览器面板 | P2 | ✅ 完成 — Swiper 轮播、frontmatter 类型渲染、图片代理、E2E 验收 |
 | [#58](https://github.com/lpreterite/wx-newspic/issues/58) | FEAT: preview --watch-dir CLI 参数 | P2 | ⏳ 待实施 |
 | [#59](https://github.com/lpreterite/wx-newspic/issues/59) | FEAT: preview 后端目录扫描 API | P2 | ✅ 完成 |
 | [#60](https://github.com/lpreterite/wx-newspic/issues/60) | FEAT: preview 前端文件浏览器侧栏 | P2 | ✅ 完成 |
@@ -217,6 +229,7 @@
 | [#64](https://github.com/lpreterite/wx-newspic/issues/64) | BUG: build 类型错误 | P2 | ✅ 完成 |
 | [#65](https://github.com/lpreterite/wx-newspic/issues/65) | UI: 侧栏视觉改进 | P2 | ✅ 完成 |
 | [#66](https://github.com/lpreterite/wx-newspic/issues/66) | FEAT: frontmatter 类型区分渲染 | P2 | ✅ 完成 |
+| [#67](https://github.com/lpreterite/wx-newspic/issues/67) | ENH: publish 命令 frontmatter 自动检测类型 | P2 | ✅ 完成 — 无显式 `--type` 时从 frontmatter 推断 news/newspic |
 
 ## 风险项
 
