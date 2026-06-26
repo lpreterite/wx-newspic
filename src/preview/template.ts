@@ -166,7 +166,7 @@ const themeSelect = document.getElementById('themeSelect');
 const renderBtn = document.getElementById('renderBtn');
 const statusIndicator = document.getElementById('statusIndicator');
 
-const editor = new EasyMDE({
+var editor = new EasyMDE({
   element: textarea,
   autoDownloadFontAwesome: false,
   spellChecker: false,

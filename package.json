@@ -38,7 +38,8 @@
     "lint": "tsc --noEmit",
     "prepublishOnly": "npm run build && npm test",
     "release": "release-it",
-    "release:dry": "release-it --dry-run"
+    "release:dry": "release-it --dry-run",
+    "test:e2e": "vitest run --config vitest.e2e.config.ts"
   },
   "bin": {
     "wx-newspic": "bin/wx-newspic"
@@ -61,6 +62,7 @@
     "@release-it/conventional-changelog": "^11.0.1",
     "@types/jsdom": "^28.0.3",
     "@types/node": "^25.8.0",
+    "playwright": "^1.61.1",
     "release-it": "^20.2.0",
     "tsx": "^4.19.3",
     "typescript": "^5.7.3",

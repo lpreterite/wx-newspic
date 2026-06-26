@@ -1,6 +1,6 @@
 # wx-newspic 项目状态
 
-> 最后更新：2026-06-26（#60 前端侧栏完成，#63 相对路径图片 Issue 创建，165 测试通过）
+> 最后更新：2026-06-26（#62 E2E 测试通过，5 场景全部验证，165 单元 + 5 E2E = 170）
 > 项目总览：[README.md](../README.md)
 
 ---
@@ -139,7 +139,7 @@
 | #59 后端目录扫描 API | ✅ 完成 | scanDirectory / isPathSafe / readFileContent, GET /files + GET /file 路由 |
 | #60 前端文件浏览器侧栏 | ✅ 完成 | 侧栏 HTML/CSS/JS，多目录区块标题头，展开收起，文件加载 |
 | #61 新增路由测试 | ✅ 完成 | 6 纯函数 + 6 HTTP 集成 + 4 安全测试，共 16 新增，总 165 通过 |
-| #62 E2E 自动化验收 | ⏳ 待实施 | Playwright E2E 测试 |
+| #62 E2E 自动化验收 | ✅ 完成 | Playwright + 系统 Chrome，5 场景全部通过 |
 
 ---
 
@@ -212,7 +212,7 @@
 | [#59](https://github.com/lpreterite/wx-newspic/issues/59) | FEAT: preview 后端目录扫描 API | P2 | ✅ 完成 |
 | [#60](https://github.com/lpreterite/wx-newspic/issues/60) | FEAT: preview 前端文件浏览器侧栏 | P2 | ✅ 完成 |
 | [#61](https://github.com/lpreterite/wx-newspic/issues/61) | TEST: preview 新增路由测试 | P2 | ✅ 完成 |
-| [#62](https://github.com/lpreterite/wx-newspic/issues/62) | E2E 验收: preview 文件浏览器 | P2 | ⏳ 待实施 |
+| [#62](https://github.com/lpreterite/wx-newspic/issues/62) | E2E 验收: preview 文件浏览器 | P2 | ✅ 完成 |
 | [#63](https://github.com/lpreterite/wx-newspic/issues/63) | BUG: preview 相对路径图片 404 | P2 | ⏳ 待处理 |
 
 ## 风险项
