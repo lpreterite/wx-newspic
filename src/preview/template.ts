@@ -379,23 +379,25 @@ function renderTree(nodes, depth) {
         var childUl = renderTree(node.children, depth + 1);
         childUl.style.display = 'none';
         li.appendChild(childUl);
-        li.onclick = (function(li) {
-          return function(e) {
-            e.stopPropagation();
-            var childContainer = li.querySelector('ul');
-            var caret = li.querySelector('.fa-caret-right, .fa-caret-down');
-            if (childContainer) {
-              if (childContainer.style.display === 'none') {
-                childContainer.style.display = '';
-                if (caret) caret.className = 'fa fa-caret-down';
-              } else {
-                childContainer.style.display = 'none';
-                if (caret) caret.className = 'fa fa-caret-right';
-              }
-            }
-          };
-        })(li);
       }
+      content.onclick = (function(li, content, node) {
+        return function(e) {
+          e.stopPropagation();
+          var childContainer = li.querySelector(':scope > ul');
+          var caret = content.querySelector('.fa-caret-right, .fa-caret-down');
+          if (childContainer) {
+            if (childContainer.style.display === 'none') {
+              childContainer.style.display = '';
+              if (caret) caret.className = 'fa fa-caret-down';
+            } else {
+              childContainer.style.display = 'none';
+              if (caret) caret.className = 'fa fa-caret-right';
+            }
+          } else if (node.hasMore) {
+            loadMoreDir(li, content, node.path);
+          }
+        };
+      })(li, content, node);
     } else {
       (function(li, node, content) {
         var spacer = document.createElement('span');
@@ -409,7 +411,7 @@ function renderTree(nodes, depth) {
         content.appendChild(fileIcon);
         content.appendChild(name);
         li.appendChild(content);
-        li.onclick = function(e) {
+        content.onclick = function(e) {
           e.stopPropagation();
           loadFileContent(li, node.path);
         };
@@ -423,6 +425,23 @@ function renderTree(nodes, depth) {
 function autoSelectFirstFile() {
   var firstFile = fileTree.querySelector('.file-tree-item .fa-file-text-o');
   if (firstFile) firstFile.closest('.file-tree-item').click();
+}
+
+async function loadMoreDir(li, content, dirPath) {
+  var caret = content.querySelector('.fa-caret-right, .fa-caret-down');
+  if (caret) caret.className = 'fa fa-caret-down';
+  try {
+    var res = await fetch('/files?dir=' + encodeURIComponent(dirPath));
+    if (!res.ok) { if (caret) caret.className = 'fa fa-caret-right'; return; }
+    var nodes = await res.json();
+    if (nodes.length === 0) { if (caret) caret.className = 'fa fa-caret-right'; return; }
+    var childUl = renderTree(nodes, parseInt(li.getAttribute('data-depth')) + 1);
+    li.appendChild(childUl);
+    var childContainer = li.querySelector(':scope > ul');
+    if (childContainer) childContainer.style.display = '';
+  } catch(e) {
+    if (caret) caret.className = 'fa fa-caret-right';
+  }
 }
 
 async function loadFileContent(li, filePath) {
