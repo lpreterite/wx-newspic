@@ -100,6 +100,12 @@ html, body { height: 100%; font-family: system-ui, -apple-system, sans-serif; ba
 .file-tree-icon .fa-folder { color: #f5a623; }
 .file-tree-item .fa-file-text-o { color: #888; }
 
+.file-tree-section + .file-tree-section { border-top: 1px solid #eee; }
+.file-tree-section-header {
+  padding: 8px 12px 4px; font-size: 11px; font-weight: 600;
+  color: #999; text-transform: uppercase; letter-spacing: .5px;
+}
+
 .spinner {
   display: inline-block;
   width: 14px; height: 14px;
