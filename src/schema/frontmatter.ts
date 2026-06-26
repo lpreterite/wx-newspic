@@ -5,7 +5,7 @@ const YYYYMMDD = /^\d{4}-\d{2}-\d{2}$/;
 
 const BaseFrontmatterSchema = z.object({
   title: z.string().min(1, '标题不能为空'),
-  type: z.enum(['article', 'newspic'], { required_error: '缺少文档类型 (article | newspic)' }),
+  type: z.enum(['article', 'newspic'], '缺少文档类型 (article | newspic)'),
   created: z.string().regex(YYYYMMDD, '创建日期格式须为 YYYY-MM-DD'),
   tags: z.array(z.string()).optional(),
   status: z.enum(['draft', 'published', 'archived']).optional(),

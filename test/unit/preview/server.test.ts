@@ -6,7 +6,7 @@ import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { createPreviewServer } from '../../../src/preview/server.js';
 
-let server: Server | undefined;
+let server!: Server;
 let port: number;
 
 const HOST = '127.0.0.1';
