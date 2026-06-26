@@ -1,13 +1,13 @@
 # wx-newspic 项目状态
 
-> 最后更新：2026-06-26（#57 统一 Frontmatter Schema — Zod 校验 + #55 cover 修复 + publish 字段透传）
+> 最后更新：2026-06-26（PRD-v040 + tech-design-v040: preview 文件浏览器面板 — 用户故事 + 方案规划完成）
 > 项目总览：[README.md](../README.md)
 
 ---
 
 ## 当前阶段
 
-**执行阶段** — M7 渲染管线完成，M8 长文发布完成，M9 预览服务完成，M10 Frontmatter Schema 完成。
+**执行阶段** — M7 渲染管线完成，M8 长文发布完成，M9 预览服务完成，M10 Frontmatter Schema 完成。M11 预览文件浏览器 — 技术方案就绪。
 
 ## 已知问题
 
@@ -130,6 +130,18 @@
 | 渲染引擎 | 复用 `renderArticle()` 管线，`node:http` 服务端零外部依赖 |
 | 工单精简 | #35 与 #30 重叠 → 关闭 #35，合并至 #36，不再有独立 Step 3 |
 
+### M11: 预览文件浏览器面板 ✅ 方案就绪
+
+| 任务 | 状态 | 说明 |
+|------|------|------|
+| PRD-v040 场景化用户故事 + 方案规划 | ✅ 完成 | 4 个用户故事，补充 ASCII 布局图 |
+| tech-design-v040 技术方案 | ✅ 完成 | CLI/后端/前端/测试/安全 全规格 |
+| #58 CLI --watch-dir 参数 | ⏳ 待实施 | Commander 参数 + 目录校验 |
+| #59 后端目录扫描 API | ⏳ 待实施 | GET /files + GET /file 路由 |
+| #60 前端文件浏览器侧栏 | ⏳ 待实施 | 侧栏 HTML/CSS/JS，文件加载交互 |
+| #61 新增路由测试 | ⏳ 待实施 | 单元测试覆盖 |
+| #62 E2E 自动化验收 | ⏳ 待实施 | Playwright E2E 测试 |
+
 ---
 
 ## 测试总览
@@ -195,6 +207,12 @@
 | [#52](https://github.com/lpreterite/wx-newspic/issues/52) | Docker 测试架构：构建一次、多次复用 | P2 | ✅ closed — Dockerfile.test + entrypoint-test.sh + docker-compose.yml |
 | [#55](https://github.com/lpreterite/wx-newspic/issues/55) | BUG: news 模式 publish 时 frontmatter cover 路径不被识别为待上传图片 | P1 | ✅ fixed — 随 #57 在 imageSrcs 中添加 cover |
 | [#57](https://github.com/lpreterite/wx-newspic/issues/57) | ENH: 统一 Markdown Frontmatter Schema 规范 | P1 | ✅ closed — Zod Schema + strict/loose + 全字段透传 + #55 修复 |
+| [#56](https://github.com/lpreterite/wx-newspic/issues/56) | FEAT: preview 文件浏览器面板 | P2 | 📋 PRD-v040 已产出，待验收 |
+| [#58](https://github.com/lpreterite/wx-newspic/issues/58) | FEAT: preview --watch-dir CLI 参数 | P2 | ⏳ 待实施 |
+| [#59](https://github.com/lpreterite/wx-newspic/issues/59) | FEAT: preview 后端目录扫描 API | P2 | ⏳ 待实施 |
+| [#60](https://github.com/lpreterite/wx-newspic/issues/60) | FEAT: preview 前端文件浏览器侧栏 | P2 | ⏳ 待实施 |
+| [#61](https://github.com/lpreterite/wx-newspic/issues/61) | TEST: preview 新增路由测试 | P2 | ⏳ 待实施 |
+| [#62](https://github.com/lpreterite/wx-newspic/issues/62) | E2E 验收: preview 文件浏览器 | P2 | ⏳ 待实施 |
 
 ## 风险项
 
