@@ -37,7 +37,8 @@ html, body { height: 100%; font-family: system-ui, -apple-system, sans-serif; ba
 }
 
 .EasyMDE {
-  flex: 1;
+  flex: 1 1 0;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   min-height: 0;
@@ -50,7 +51,10 @@ html, body { height: 100%; font-family: system-ui, -apple-system, sans-serif; ba
 .EasyMDE .editor-statusbar { flex-shrink: 0; }
 
 .split iframe {
-  flex: 1; border: none; background: #fff;
+  flex: 1 1 0;
+  min-width: 0;
+  border: none; background: #fff;
+  border-left: 1px solid #ddd;
   transition: opacity .2s;
 }
 
@@ -99,7 +103,7 @@ html, body { height: 100%; font-family: system-ui, -apple-system, sans-serif; ba
 }
 .file-tree-content:hover { background: #f0f0f0; }
 .file-tree-item.active .file-tree-content { background: #e3f2fd; }
-.file-tree-icon { width: 20px; text-align: center; flex-shrink: 0; }
+.file-tree-icon { width: 1em; text-align: center; flex-shrink: 0; }
 .file-tree-icon .fa-folder { color: #f5a623; }
 .file-tree-item .fa-file-text-o { color: #888; }
 
@@ -112,7 +116,7 @@ html, body { height: 100%; font-family: system-ui, -apple-system, sans-serif; ba
 
 /* 基于深度的缩进 */
 .file-tree-item[data-depth="0"] .file-tree-content { padding-left: 12px; }
-.file-tree-item[data-depth="1"] .file-tree-content { padding-left: 32px; }
+.file-tree-item[data-depth="1"] .file-tree-content { padding-left: 1em; }
 .file-tree-item[data-depth="2"] .file-tree-content { padding-left: 52px; }
 .file-tree-item[data-depth="3"] .file-tree-content { padding-left: 72px; }
 
