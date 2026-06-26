@@ -7,6 +7,8 @@ export function renderPreviewPage(markdown: string, watchDirs: string[] = []): s
 <title>Wenyan Preview</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 html, body { height: 100%; font-family: system-ui, -apple-system, sans-serif; background: #f5f5f5; }
@@ -137,6 +139,24 @@ html, body { height: 100%; font-family: system-ui, -apple-system, sans-serif; ba
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
+/* Swiper / Cover */
+.preview-cover {
+  width: 100%; max-height: 300px; overflow: hidden;
+  border-bottom: 1px solid #eee;
+}
+.preview-cover img {
+  width: 100%; height: auto; display: block;
+  object-fit: cover; max-height: 300px;
+}
+.preview-swiper { width: 100%; }
+.preview-swiper .swiper-slide { text-align: center; background: #fafafa; }
+.preview-swiper .swiper-slide img {
+  max-width: 100%; max-height: 360px; width: auto; height: auto;
+  display: inline-block; object-fit: contain;
+}
+.preview-swiper .swiper-pagination-bullet-active { background: #07c; }
+.wenyan-content { padding: 16px; }
+
 @media (max-width: 768px) {
   .split { flex-direction: column; }
   .file-sidebar { display: none; }
@@ -196,6 +216,7 @@ var editor = new EasyMDE({
 
 let lastHtml = '';
 let renderTimeout;
+let currentFileDir = '';
 
 editor.codemirror.on('changes', () => {
   clearTimeout(renderTimeout);
@@ -258,6 +279,13 @@ function setLoading(on) {
   }
 }
 
+function isRemoteUrl(url) {
+  return /^https?:\/\//i.test(url);
+}
+function toProxyUrl(absPath) {
+  return '/image-proxy?path=' + encodeURIComponent(absPath);
+}
+
 async function render() {
   setLoading(true);
   try {
@@ -278,12 +306,67 @@ async function render() {
     }
     var data = await res.json();
     var html = data.content || '';
-    lastHtml = html;
-    preview.srcdoc = html;
+
+    // Convert <img src> relative paths in rendered HTML
+    if (currentFileDir) {
+      html = html.replace(/<img[^>]+src="([^"]+)"[^>]*>/gi, function(match, src) {
+        if (isRemoteUrl(src) || src.startsWith('/image-proxy') || src.startsWith('data:')) return match;
+        var resolved = currentFileDir + '/' + src.replace(/^\\.\\//, '');
+        return match.replace('src="' + src + '"', 'src="' + toProxyUrl(resolved) + '"');
+      });
+    }
+
+    // Convert frontmatter cover / images paths
+    var coverUrl = data.cover || '';
+    if (coverUrl && !isRemoteUrl(coverUrl) && currentFileDir) {
+      coverUrl = toProxyUrl(currentFileDir + '/' + coverUrl.replace(/^\\.\\//, ''));
+    }
+    var imageUrls = (data.images || []).map(function(url) {
+      if (isRemoteUrl(url)) return url;
+      if (!currentFileDir) return url;
+      return toProxyUrl(currentFileDir + '/' + url.replace(/^\\.\\//, ''));
+    });
+
+    // Build preview HTML based on type
+    var previewHtml = html;
+    if (data.type === 'newspic' && imageUrls.length > 0) {
+      previewHtml = buildNewsPicPreview(imageUrls, html);
+    } else if (data.type === 'article' && coverUrl) {
+      previewHtml = buildArticlePreview(coverUrl, html);
+    }
+    lastHtml = previewHtml;
+    preview.srcdoc = previewHtml;
+    initSwiper();
     setLoading(false);
   } catch (e) {
     setLoading(false);
     if (lastHtml) preview.srcdoc = lastHtml;
+  }
+}
+
+function buildNewsPicPreview(images, contentHtml) {
+  var slides = images.map(function(url) {
+    return '<div class="swiper-slide"><img src="' + url + '" alt=""></div>';
+  }).join('');
+  return '<div class="preview-swiper swiper mySwiper"><div class="swiper-wrapper">' + slides + '</div><div class="swiper-pagination"></div></div><div class="wenyan-content">' + contentHtml + '</div>';
+}
+
+function buildArticlePreview(coverUrl, contentHtml) {
+  return '<div class="preview-cover"><img src="' + coverUrl + '" alt="cover"></div><div class="wenyan-content">' + contentHtml + '</div>';
+}
+
+function initSwiper() {
+  if (typeof Swiper !== 'undefined') {
+    setTimeout(function() {
+      var el = document.querySelector('.mySwiper');
+      if (el && !el.swiper) {
+        new Swiper('.mySwiper', {
+          pagination: { el: '.swiper-pagination', clickable: true },
+          loop: false,
+          autoHeight: true,
+        });
+      }
+    }, 50);
   }
 }
 
@@ -451,6 +534,8 @@ async function loadMoreDir(li, content, dirPath) {
 async function loadFileContent(li, filePath) {
   document.querySelectorAll('.file-tree-item.active').forEach(function(el) { el.classList.remove('active'); });
   li.classList.add('active');
+  var lastSlash = filePath.lastIndexOf('/');
+  currentFileDir = lastSlash > -1 ? filePath.slice(0, lastSlash) : '';
   try {
     var res = await fetch('/file?path=' + encodeURIComponent(filePath));
     if (!res.ok) { alert('文件加载失败'); return; }

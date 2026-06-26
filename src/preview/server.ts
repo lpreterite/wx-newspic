@@ -1,6 +1,6 @@
 import { createServer as createHttpServer, type IncomingMessage, type ServerResponse } from 'node:http';
 import type http from 'node:http';
-import { readdirSync, existsSync, statSync } from 'node:fs';
+import { readdirSync, existsSync, statSync, readFileSync } from 'node:fs';
 import { resolve, basename, extname } from 'node:path';
 import { homedir } from 'node:os';
 import { URL } from 'node:url';
@@ -199,6 +199,41 @@ async function handleRequest(req: IncomingMessage, res: ServerResponse, watchDir
       res.writeHead(500, { 'Content-Type': 'application/json; charset=utf-8' });
       res.end(JSON.stringify({ error: '文件读取失败' }));
     }
+    return;
+  }
+
+  if (method === 'GET' && url.startsWith('/image-proxy')) {
+    const parsed = new URL(url, 'http://localhost');
+    const imgPath = parsed.searchParams.get('path');
+    if (!imgPath) {
+      res.writeHead(400, { 'Content-Type': 'application/json; charset=utf-8' });
+      res.end(JSON.stringify({ error: '缺少 path 参数' }));
+      return;
+    }
+    const resolvedPath = resolve(imgPath);
+    if (!isPathSafe(resolvedPath, watchDirs ?? [])) {
+      res.writeHead(403, { 'Content-Type': 'application/json; charset=utf-8' });
+      res.end(JSON.stringify({ error: '路径不在允许范围内' }));
+      return;
+    }
+    if (!existsSync(resolvedPath)) {
+      res.writeHead(404, { 'Content-Type': 'application/json; charset=utf-8' });
+      res.end(JSON.stringify({ error: '图片不存在' }));
+      return;
+    }
+    const ext = extname(resolvedPath).toLowerCase();
+    const mimeMap: Record<string, string> = {
+      '.png': 'image/png',
+      '.jpg': 'image/jpeg',
+      '.jpeg': 'image/jpeg',
+      '.gif': 'image/gif',
+      '.webp': 'image/webp',
+      '.svg': 'image/svg+xml',
+    };
+    const contentType = mimeMap[ext] || 'application/octet-stream';
+    const buffer = readFileSync(resolvedPath);
+    res.writeHead(200, { 'Content-Type': contentType, 'Content-Length': buffer.length });
+    res.end(buffer);
     return;
   }
 
