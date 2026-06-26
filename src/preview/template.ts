@@ -89,13 +89,16 @@ html, body { height: 100%; font-family: system-ui, -apple-system, sans-serif; ba
 }
 
 .file-tree-item {
-  display: flex; align-items: center; gap: 4px;
-  height: 36px; padding: 0 12px; cursor: pointer;
+  display: block; cursor: pointer;
   white-space: nowrap; overflow: hidden;
   text-overflow: ellipsis; user-select: none;
 }
-.file-tree-item:hover { background: #f0f0f0; }
-.file-tree-item.active { background: #e3f2fd; }
+.file-tree-content {
+  display: flex; align-items: center; gap: 4px;
+  height: 36px; padding: 0 12px;
+}
+.file-tree-content:hover { background: #f0f0f0; }
+.file-tree-item.active .file-tree-content { background: #e3f2fd; }
 .file-tree-icon { width: 20px; text-align: center; flex-shrink: 0; }
 .file-tree-icon .fa-folder { color: #f5a623; }
 .file-tree-item .fa-file-text-o { color: #888; }
@@ -108,10 +111,10 @@ html, body { height: 100%; font-family: system-ui, -apple-system, sans-serif; ba
 }
 
 /* 基于深度的缩进 */
-.file-tree-item[data-depth="0"] { padding-left: 12px; }
-.file-tree-item[data-depth="1"] { padding-left: 32px; }
-.file-tree-item[data-depth="2"] { padding-left: 52px; }
-.file-tree-item[data-depth="3"] { padding-left: 72px; }
+.file-tree-item[data-depth="0"] .file-tree-content { padding-left: 12px; }
+.file-tree-item[data-depth="1"] .file-tree-content { padding-left: 32px; }
+.file-tree-item[data-depth="2"] .file-tree-content { padding-left: 52px; }
+.file-tree-item[data-depth="3"] .file-tree-content { padding-left: 72px; }
 
 .file-tree-section + .file-tree-section { border-top: 1px solid #eee; }
 .file-tree-section-header {
@@ -357,6 +360,8 @@ function renderTree(nodes, depth) {
     var li = document.createElement('li');
     li.className = 'file-tree-item';
     li.setAttribute('data-depth', String(depth));
+    var content = document.createElement('div');
+    content.className = 'file-tree-content';
     if (node.type === 'dir') {
       var icon = document.createElement('span');
       icon.className = 'file-tree-icon';
@@ -366,9 +371,10 @@ function renderTree(nodes, depth) {
       folderIcon.innerHTML = '<i class="fa fa-folder"></i>';
       var name = document.createElement('span');
       name.textContent = node.name;
-      li.appendChild(icon);
-      li.appendChild(folderIcon);
-      li.appendChild(name);
+      content.appendChild(icon);
+      content.appendChild(folderIcon);
+      content.appendChild(name);
+      li.appendChild(content);
       if (node.children && node.children.length > 0) {
         var childUl = renderTree(node.children, depth + 1);
         childUl.style.display = 'none';
@@ -391,7 +397,7 @@ function renderTree(nodes, depth) {
         })(li);
       }
     } else {
-      (function(li, node) {
+      (function(li, node, content) {
         var spacer = document.createElement('span');
         spacer.className = 'file-tree-icon';
         var fileIcon = document.createElement('span');
@@ -399,14 +405,15 @@ function renderTree(nodes, depth) {
         fileIcon.innerHTML = '<i class="fa fa-file-text-o"></i>';
         var name = document.createElement('span');
         name.textContent = node.name;
-        li.appendChild(spacer);
-        li.appendChild(fileIcon);
-        li.appendChild(name);
+        content.appendChild(spacer);
+        content.appendChild(fileIcon);
+        content.appendChild(name);
+        li.appendChild(content);
         li.onclick = function(e) {
           e.stopPropagation();
           loadFileContent(li, node.path);
         };
-      })(li, node);
+      })(li, node, content);
     }
     ul.appendChild(li);
   }
