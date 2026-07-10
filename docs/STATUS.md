@@ -1,6 +1,6 @@
 # wx-newspic 项目状态
 
-> 最后更新：2026-06-26（#63+#66: 图片代理 + frontmatter 渲染，Swiper CDN 移入 iframe srcdoc 修复轮播效果，171 全部通过）
+> 最后更新：2026-07-10（M10+M11 全部完成，#58~#67 关闭，发布 v0.4.0）
 > 项目总览：[README.md](../README.md)
 
 ---
@@ -220,7 +220,7 @@
 | [#55](https://github.com/lpreterite/wx-newspic/issues/55) | BUG: news 模式 publish 时 frontmatter cover 路径不被识别为待上传图片 | P1 | ✅ fixed — 随 #57 在 imageSrcs 中添加 cover |
 | [#57](https://github.com/lpreterite/wx-newspic/issues/57) | ENH: 统一 Markdown Frontmatter Schema 规范 | P1 | ✅ closed — Zod Schema + strict/loose + 全字段透传 + #55 修复 |
 | [#56](https://github.com/lpreterite/wx-newspic/issues/56) | FEAT: preview 文件浏览器面板 | P2 | ✅ 完成 — Swiper 轮播、frontmatter 类型渲染、图片代理、E2E 验收 |
-| [#58](https://github.com/lpreterite/wx-newspic/issues/58) | FEAT: preview --watch-dir CLI 参数 | P2 | ⏳ 待实施 |
+| [#58](https://github.com/lpreterite/wx-newspic/issues/58) | FEAT: preview --watch-dir CLI 参数 | P2 | ✅ 完成 |
 | [#59](https://github.com/lpreterite/wx-newspic/issues/59) | FEAT: preview 后端目录扫描 API | P2 | ✅ 完成 |
 | [#60](https://github.com/lpreterite/wx-newspic/issues/60) | FEAT: preview 前端文件浏览器侧栏 | P2 | ✅ 完成 |
 | [#61](https://github.com/lpreterite/wx-newspic/issues/61) | TEST: preview 新增路由测试 | P2 | ✅ 完成 |
