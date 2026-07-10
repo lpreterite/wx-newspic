@@ -1,5 +1,30 @@
 # Changelog
 
+# [0.4.0](https://github.com/lpreterite/wx-newspic/compare/v0.3.2...v0.4.0) (2026-07-10)
+
+
+### Bug Fixes
+
+* **#64:** Zod v4 enum 参数修正 + server 断言赋值 + vitest 排除 dist/.opencode ([517afba](https://github.com/lpreterite/wx-newspic/commit/517afba100ba1fb9ff13f81b4e63d67020aeb889)), closes [#64](https://github.com/lpreterite/wx-newspic/issues/64)
+* EasyMDEContainer 类名适配，编辑器与预览等宽 ([5b6666c](https://github.com/lpreterite/wx-newspic/commit/5b6666ce48a1fc5149c78dfbe261b6204cbc5d92))
+* publish 自动识别 frontmatter type，article 走 news 发布 ([94ddf59](https://github.com/lpreterite/wx-newspic/commit/94ddf591f9cc2432ec6e772832051ffee68c1d06))
+* Swiper 轮播移入 iframe srcdoc 自闭环，解决轮播不显示 bug ([ad6c0ed](https://github.com/lpreterite/wx-newspic/commit/ad6c0ed0569214e55eabd46748a94954094a5df1))
+* 代码审计安全修复 + 补安全测试 ([01eda97](https://github.com/lpreterite/wx-newspic/commit/01eda9708c22f61b9ad8a79247f438dcd5d42ce3)), closes [script#watchDirsData](https://github.com/script/issues/watchDirsData)
+* 图标1em等宽 + depth-1缩进1em + 编辑器和预览等宽 ([d83aca2](https://github.com/lpreterite/wx-newspic/commit/d83aca21d9b87ae4ba0153972a41411304e339a0))
+* 引导线 CSS 覆盖 inline margin，截图用例展开目录再截图 ([fe8711f](https://github.com/lpreterite/wx-newspic/commit/fe8711feb272a438d6806b044d4bcc5ef897b825))
+* 点击处理器移至 .file-content，修复 event 冒泡导致二级目录无法展开 ([01de1a3](https://github.com/lpreterite/wx-newspic/commit/01de1a355035daacf956e6211ddb8eb46f745b2d))
+* 目录项改为 block 布局 + content 内层容器，子项正确在下方显示 ([413b583](https://github.com/lpreterite/wx-newspic/commit/413b583eafd0babc8a0d30fa2bb6d1020de4b845))
+
+
+### Features
+
+* **#57:** 统一 Frontmatter Schema + 修复 [#55](https://github.com/lpreterite/wx-newspic/issues/55) cover 上传 ([88042ff](https://github.com/lpreterite/wx-newspic/commit/88042ff66228ece9dd016a6942fc84163310c64d)), closes [#57](https://github.com/lpreterite/wx-newspic/issues/57)
+* **#58:** preview 新增 --watch-dir CLI 参数 + 前端侧栏骨架 ([61bee4e](https://github.com/lpreterite/wx-newspic/commit/61bee4e1abb7768d575c372bf45898c06acf0a54)), closes [#58](https://github.com/lpreterite/wx-newspic/issues/58)
+* **#59)+test(#61:** 后端目录扫描 API + 单元测试 ([888d41a](https://github.com/lpreterite/wx-newspic/commit/888d41adb04eb7d77957cbe3c3ff0c12e1d60691)), closes [#59](https://github.com/lpreterite/wx-newspic/issues/59) [#61](https://github.com/lpreterite/wx-newspic/issues/61)
+* **#60:** 补全多目录区块标题头 CSS 样式 ([57bb6ab](https://github.com/lpreterite/wx-newspic/commit/57bb6ab28062f3ec6d97c23b4a05fc4adc219bbf)), closes [#60](https://github.com/lpreterite/wx-newspic/issues/60)
+* **#66)+fix(#63:** frontmatter 类型区分渲染 + 图片代理路由 ([ae43b09](https://github.com/lpreterite/wx-newspic/commit/ae43b090ff78615bc748ab3a7298b12887e20823)), closes [#66](https://github.com/lpreterite/wx-newspic/issues/66) [#63](https://github.com/lpreterite/wx-newspic/issues/63) [#63](https://github.com/lpreterite/wx-newspic/issues/63)
+* 添加项目专属代码审计员子角色 (CodeReviewer) ([93383eb](https://github.com/lpreterite/wx-newspic/commit/93383eb7ade4623f506fcb7b70c36abe3be3f4a1))
+
 ## [0.3.2](https://github.com/lpreterite/wx-newspic/compare/v0.3.1...v0.3.2) (2026-06-19)
 
 
